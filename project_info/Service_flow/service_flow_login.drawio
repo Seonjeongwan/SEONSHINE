@@ -134,26 +134,6 @@
                 <mxCell id="44" value="Confirm&lt;br&gt;Waiting Alert" style="whiteSpace=wrap;html=1;shadow=0;strokeWidth=1;spacing=6;spacingTop=-4;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
                     <mxGeometry x="538" y="902" width="120" height="60" as="geometry"/>
                 </mxCell>
-                <mxCell id="86yQ_0pp3kVXkVTbXB08-46" value="Menu registration" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#99CCFF;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
-                    <mxGeometry x="40" y="80" width="80" height="40" as="geometry"/>
-                </mxCell>
-                <mxCell id="86yQ_0pp3kVXkVTbXB08-47" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=block;endFill=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="86yQ_0pp3kVXkVTbXB08-48" target="86yQ_0pp3kVXkVTbXB08-50">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="86yQ_0pp3kVXkVTbXB08-48" value="Menu registration page" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
-                    <mxGeometry x="160" y="160" width="120" height="40" as="geometry"/>
-                </mxCell>
-                <mxCell id="86yQ_0pp3kVXkVTbXB08-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=block;endFill=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="86yQ_0pp3kVXkVTbXB08-50">
-                    <mxGeometry relative="1" as="geometry">
-                        <mxPoint x="560" y="180" as="targetPoint"/>
-                    </mxGeometry>
-                </mxCell>
-                <mxCell id="86yQ_0pp3kVXkVTbXB08-50" value="Input Infomation" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
-                    <mxGeometry x="360" y="160" width="120" height="40" as="geometry"/>
-                </mxCell>
-                <mxCell id="86yQ_0pp3kVXkVTbXB08-51" value="MenuItems(DB)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=13.150943396226467;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
-                    <mxGeometry x="560" y="145" width="110" height="70" as="geometry"/>
-                </mxCell>
             </root>
         </mxGraphModel>
     </diagram>
