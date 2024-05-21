@@ -1,0 +1,24 @@
+common
+
+- login
+- sign_up
+
+admin
+
+- change order
+- confirm sign_up
+- register menu
+- order history
+- order list (for the day)
+
+user
+
+- order menu
+- order list (for the day)
+- order history
+
+restaurant
+
+- register menu
+- order list (for the day) / only can see on the day registered
+-

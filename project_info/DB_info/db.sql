@@ -25,7 +25,7 @@ CREATE TABLE Users (
   branch_id VARCHAR(20) COMMENT '부서정보',
   email VARCHAR(100) UNIQUE NOT NULL COMMENT '신한메일 / 식당메일',
   password_hash VARCHAR(255) NOT NULL COMMENT 'hash 변환된 비밀 번호',
-  confirm_yn VARCHAR(10) NOT NULL COMMENT '승인 여부 0:승인대기 1:승인 2:정지 9:강제해지',
+  confirm_yn VARCHAR(10) NOT NULL COMMENT '승인 여부 0:승인대기 1:승인 2:정지 9:강제정지',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '생성일자',
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '변경일자',
   FOREIGN KEY (branch_id) REFERENCES Branch_info(branch_id) ON DELETE NO ACTION
@@ -72,7 +72,7 @@ CREATE TABLE MenuItems (
 
 
 CREATE TABLE Orders (
-  order_id INT AUTO_INCREMENT PRIMARY KEY,
+  order_id VARCHAR(100) COMMENT '주문 ID : 주문일자 + 부서번호 + 식당번호',
   order_branch VARCHAR(20) COMMENT '나중에 부서별 확장성을 위해 놔둠',
   restaurant_id VARCHAR(20) NOT NULL COMMENT '식당 ID',
   order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '주문일자',
@@ -87,7 +87,7 @@ CREATE TABLE Orders (
 
 
 CREATE TABLE OrderItems (
-  order_item_id VARCHAR(100) PRIMARY KEY COMMENT '주문번호 : 주문일자 + 부서번호 + 아이디번호 + 식당번호 + 메뉴번호',
+  order_item_id VARCHAR(100) PRIMARY KEY COMMENT '주문 메뉴 ID : 주문일자 + 부서번호 + 아이디번호 + 식당번호 + 메뉴번호',
   order_id INT NOT NULL COMMENT '주문 번호',
   user_id VARCHAR(20) COMMENT '이용자 ID',
   order_branch VARCHAR(20) COMMENT '부서번호',

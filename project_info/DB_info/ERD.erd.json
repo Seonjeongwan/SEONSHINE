@@ -4,8 +4,8 @@
   "settings": {
     "width": 2000,
     "height": 2000,
-    "scrollTop": -691,
-    "scrollLeft": 0,
+    "scrollTop": -7,
+    "scrollLeft": -84,
     "zoomLevel": 1,
     "show": 431,
     "database": 4,
@@ -304,7 +304,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1716187865958,
+          "updateAt": 1716260622927,
           "createAt": 1716187780359
         }
       },
@@ -682,7 +682,7 @@
         "id": "71HcE31vuGkVpbAXnVK_3",
         "tableId": "-B5FPN19bv6BWHf4hPoFR",
         "name": "confirm_yn",
-        "comment": "승인 여부 0:승인대기 1:승인 2:정지 9:강제해지",
+        "comment": "승인 여부 0:승인대기 1:승인 2:정지 9:강제정지",
         "dataType": "VARCHAR(10)",
         "default": "",
         "options": 8,
@@ -694,7 +694,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1716187780359,
+          "updateAt": 1716278758320,
           "createAt": 1716187780359
         }
       },
@@ -2167,6 +2167,14 @@
       -1,
       1716187870002,
       {}
+    ],
+    "71HcE31vuGkVpbAXnVK_3": [
+      "tableColumnEntities",
+      -1,
+      -1,
+      {
+        "comment": 1716278758320
+      }
     ]
   }
 }
