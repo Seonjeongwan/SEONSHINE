@@ -16,7 +16,7 @@ app.post("/register", async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const query = "INSERT INTO users (username, password) VALUES (?, ?)";
+    const query = "INSERT INTO users (user_id, password_hash) VALUES (?, ?)";
     db.query(query, [username, hashedPassword], (err, result) => {
       if (err) {
         res.status(500).send({ message: "Database error", error: err });
@@ -32,14 +32,23 @@ app.post("/register", async (req, res) => {
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
-  const query = "SELECT * FROM Users WHERE user_id = ? AND password_hash = ?";
-  db.query(query, [username, password], (err, results) => {
+  const query = "SELECT * FROM users WHERE user_id = ?";
+  db.query(query, [username], async (err, results) => {
     if (err) {
       res.status(500).send({ message: "Database error", error: err });
-    } else if (results.length > 0) {
-      res.status(200).send({ message: "Login successful", user: results[0] });
-    } else {
+    } else if (results.length === 0) {
       res.status(401).send({ message: "Invalid credentials" });
+    } else {
+      const user = results[0];
+      const isPasswordValid = await bcrypt.compare(
+        password,
+        user.password_hash
+      );
+      if (isPasswordValid) {
+        res.status(200).send({ message: "Login successful", user });
+      } else {
+        res.status(401).send({ message: "Invalid credentials" });
+      }
     }
   });
 });

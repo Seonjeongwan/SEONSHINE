@@ -1,11 +1,6 @@
-react-router-dom
-axios
-antd
-dayjs
+#react 프로젝트 설치
+npx create-react-app SEONSHINE-app
 
+#애플리케이션 시작
+npm start
 
-backend
-mkdir seonshine_backend
-cd seonshine_backend
-npm init -y
-npm install express mysql2 body-parser cors
