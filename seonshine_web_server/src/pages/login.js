@@ -1,6 +1,7 @@
 import "../assets/styles/login.css";
 import React, { useState } from "react";
 import { Button, Checkbox, Form, Input, message } from "antd";
+import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
 
 const LoginPage = () => {
@@ -89,6 +90,10 @@ const LoginPage = () => {
         <Button type="primary" htmlType="submit">
           Sign-in
         </Button>
+
+        <Link to="/sign_up">
+          <Button type="default">Register</Button>
+        </Link>
       </Form.Item>
     </Form>
   );

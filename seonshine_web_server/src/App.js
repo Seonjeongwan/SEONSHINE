@@ -28,7 +28,7 @@ function App() {
     { path: "/menu_register", element: <Menu_Register_Page /> },
     { path: "/order_his", element: <Order_His_Page /> },
     { path: "/order_list", element: <Order_List_Page /> },
-    { path: "/sign_ip", element: <Sign_Up_Page /> },
+    { path: "/sign_up", element: <Sign_Up_Page /> },
     { path: "/user_mgt", element: <User_Mgt_Page /> },
   ]);
 
