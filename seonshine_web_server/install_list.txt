@@ -1,0 +1,11 @@
+react-router-dom
+axios
+antd
+dayjs
+
+
+backend
+mkdir seonshine_backend
+cd seonshine_backend
+npm init -y
+npm install express mysql2 body-parser cors

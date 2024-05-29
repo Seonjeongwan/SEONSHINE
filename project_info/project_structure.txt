@@ -1,0 +1,24 @@
+my-project/
+├── react-app/
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── package-lock.json
+│   └── src/
+│       ├── index.js
+│       └── ...
+├── api-server/
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── package-lock.json
+│   └── src/
+│       ├── index.js
+│       └── ...
+├── file-server/
+│   ├── Dockerfile
+│   └── files/
+│       └── ...
+├── docker-compose.yml
+├── .github/
+│   └── workflows/
+│       └── deploy.yml
+└── README.md
