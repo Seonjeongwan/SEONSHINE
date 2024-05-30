@@ -6,6 +6,7 @@ import { PageLoading } from './components/molecules/pageLoading';
 import AppRoutes from './routes/appRoutes';
 import { useLoadingStore } from './store/loading.store';
 import theme from './theme';
+import './theme/reset.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {
