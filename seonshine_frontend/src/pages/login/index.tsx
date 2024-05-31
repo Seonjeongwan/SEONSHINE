@@ -1,7 +1,7 @@
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box, Button, Checkbox, FormControlLabel, Link, Stack } from '@mui/material';
+import { Box, Button, Checkbox, FormControlLabel, Link, Stack, TextField } from '@mui/material';
 
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
@@ -26,6 +26,8 @@ const LoginPage = () => {
       password: '',
     },
   });
+
+  console.log('errors', errors);
 
   const submitForm = (data: LoginSchemaType) => {
     debugger;
@@ -70,20 +72,38 @@ const LoginPage = () => {
                       title="Employee ID"
                       required
                     />
-                    <FormInput
+                    <Controller
+                      name="employeeId"
+                      control={control}
+                      render={({ field: { value = '', onChange }, fieldState: { error } }) => (
+                        <TextField
+                          value={value}
+                          onChange={onChange}
+                          placeholder="Employee ID"
+                          autoFocus
+                          variant="filled"
+                          error={!!error?.message}
+                          helperText={error?.message}
+                          size="small"
+                          className="block"
+                          fullWidth
+                        />
+                      )}
+                    />
+                    {/* <FormInput
                       name="employeeId"
                       autoFocus
                       register={register}
                       placeholder="Employee ID"
                       error={errors.employeeId}
-                    />
+                    /> */}
                   </Stack>
                   <Stack
                     direction="column"
                     className="gap-0.5"
                   >
                     <FormLabel
-                      title="Employee ID"
+                      title="Password"
                       required
                     />
                     <FormInput

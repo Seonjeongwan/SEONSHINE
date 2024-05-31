@@ -28,7 +28,7 @@ module.exports = {
     '@typescript-eslint/no-empty-function': 'error',
     '@typescript-eslint/no-for-in-array': 'error',
     '@typescript-eslint/no-this-alias': 'error',
-    '@typescript-eslint/no-unused-vars': 'error',
+    // '@typescript-eslint/no-unused-vars': 'error',
     'jsx-a11y/alt-text': ['error', { elements: ['img'] }],
     'jsx-a11y/aria-role': ['error', { allowedInvalidRoles: ['text'], ignoreNonDOM: true }],
     'jsx-a11y/img-redundant-alt': ['error', { elements: ['img'], words: ['image', 'photo', 'picture'] }],

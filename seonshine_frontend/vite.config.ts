@@ -1,43 +1,43 @@
-import react from "@vitejs/plugin-react-swc";
-import path from "path";
-import { defineConfig } from "vite";
-import svgr from "vite-plugin-svgr";
+import react from '@vitejs/plugin-react-swc';
+import path from 'path';
+import { defineConfig } from 'vite';
+import svgr from 'vite-plugin-svgr';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
     port: 3000,
+    host: true,
   },
   preview: {
     port: 4000,
-    host: true,
   },
   build: {
-    outDir: "./build",
+    outDir: './build',
     rollupOptions: {
       output: {
-        entryFileNames: "entries/[name].js",
-        chunkFileNames: "chunks/[name].js",
-        assetFileNames: "assets/[name].[ext]",
+        entryFileNames: 'entries/[name].js',
+        chunkFileNames: 'chunks/[name].js',
+        assetFileNames: 'assets/[name].[ext]',
       },
     },
     chunkSizeWarningLimit: 700,
   },
-  base: "./",
+  base: './',
   plugins: [
     react({
       tsDecorators: true,
     }),
     svgr(),
     {
-      name: "eslint",
-      enforce: "pre",
-      apply: "serve",
+      name: 'eslint',
+      enforce: 'pre',
+      apply: 'serve',
     },
   ],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src/"),
+      '@': path.resolve(__dirname, './src/'),
     },
   },
 });
