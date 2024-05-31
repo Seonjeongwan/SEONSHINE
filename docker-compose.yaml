@@ -6,3 +6,10 @@ services:
       - "3000:3000"
     volumes:
       - ./seonshine_frontend/src:/app/src
+      - /app/node_modules
+    # For -it:
+    # stdin_open: true
+    # tty: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true # Ensures polling for file changes. Trick for Windows
+
