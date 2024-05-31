@@ -18,6 +18,14 @@ const componentsConfig: Components = {
       },
     },
   },
+  MuiFormHelperText: {
+    styleOverrides: {
+      root: {
+        marginLeft: '0',
+        fontSize: '11px',
+      },
+    },
+  },
 };
 
 export default componentsConfig;

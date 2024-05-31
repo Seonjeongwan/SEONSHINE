@@ -1,12 +1,13 @@
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box, Button, Checkbox, FormControlLabel, Link, Stack, TextField } from '@mui/material';
+import { Box, Button, Checkbox, FormControlLabel, Link, Stack } from '@mui/material';
 
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
 
 import loginBanner from '../../assets/images/login-banner.png';
+import logo from '../../assets/images/Logo-Shinhan-Bank.webp';
 import { LoginSchema, LoginSchemaType } from './schemas';
 
 const LoginPage = () => {
@@ -40,7 +41,7 @@ const LoginPage = () => {
       className="w-screen h-screen bg-gray-100"
     >
       <Stack className="w-full h-full bg-white shadow-md lg:rounded-md shadow-gray-300 lg:w-194 lg:h-120">
-        <Box className="grid h-full lg:grid-cols-2">
+        <Box className="grid w-full h-full grid-cols-1 lg:grid-cols-2">
           <Box className="hidden h-full lg:flex lg:items-center lg:justify-center">
             <img
               src={loginBanner}
@@ -61,9 +62,19 @@ const LoginPage = () => {
                 flexDirection="column"
                 className="h-full"
               >
-                <h3 className="text-2xl font-bold">Login</h3>
+                <Stack
+                  direction="row"
+                  justifyContent="center"
+                >
+                  <img
+                    src={logo}
+                    className="h-8 mt-3"
+                  />
+                </Stack>
 
-                <Box className="grid gap-4 mt-8">
+                <h3 className="text-2xl font-bold mt-14 lg:mt-7">Login</h3>
+
+                <Box className="grid gap-2 mt-4">
                   <Stack
                     direction="column"
                     className="gap-0.5"
@@ -72,31 +83,13 @@ const LoginPage = () => {
                       title="Employee ID"
                       required
                     />
-                    <Controller
-                      name="employeeId"
-                      control={control}
-                      render={({ field: { value = '', onChange }, fieldState: { error } }) => (
-                        <TextField
-                          value={value}
-                          onChange={onChange}
-                          placeholder="Employee ID"
-                          autoFocus
-                          variant="filled"
-                          error={!!error?.message}
-                          helperText={error?.message}
-                          size="small"
-                          className="block"
-                          fullWidth
-                        />
-                      )}
-                    />
-                    {/* <FormInput
+                    <FormInput
                       name="employeeId"
                       autoFocus
                       register={register}
                       placeholder="Employee ID"
                       error={errors.employeeId}
-                    /> */}
+                    />
                   </Stack>
                   <Stack
                     direction="column"
@@ -110,12 +103,13 @@ const LoginPage = () => {
                       name="password"
                       register={register}
                       placeholder="Password"
-                      error={errors.employeeId}
+                      error={errors.password}
+                      type="password"
                     />
                   </Stack>
                 </Box>
                 <Stack
-                  marginTop={5}
+                  marginTop={2}
                   justifyContent="space-between"
                   alignItems="center"
                 >
@@ -139,6 +133,7 @@ const LoginPage = () => {
                   variant="contained"
                   fullWidth
                   className="mt-4 text-lg"
+                  type="submit"
                 >
                   Login
                 </Button>

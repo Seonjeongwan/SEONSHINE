@@ -5,7 +5,7 @@ import componentsConfig from './components';
 const theme = createTheme({
   spacing: 4,
   typography: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: 'Roboto',
     button: {
       textTransform: 'none',
