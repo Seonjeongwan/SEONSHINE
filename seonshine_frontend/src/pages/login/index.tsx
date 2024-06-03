@@ -1,7 +1,9 @@
+import { useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box, Button, Checkbox, FormControlLabel, Link, Stack } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Box, Button, Checkbox, FormControlLabel, IconButton, Link, Stack, Typography } from '@mui/material';
 
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
@@ -28,11 +30,19 @@ const LoginPage = () => {
     },
   });
 
-  console.log('errors', errors);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
+
+  console.log({ errors });
+  const handleClickShowPassword = useCallback(() => setShowPassword((prev) => !prev), []);
 
   const submitForm = (data: LoginSchemaType) => {
     debugger;
   };
+
+  const rememberMeHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setRememberMe(e.target.checked);
+  }, []);
 
   return (
     <Stack
@@ -104,7 +114,12 @@ const LoginPage = () => {
                       register={register}
                       placeholder="Password"
                       error={errors.password}
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
+                      endAdornment={
+                        <IconButton onClick={handleClickShowPassword}>
+                          {showPassword ? <Visibility /> : <VisibilityOff />}
+                        </IconButton>
+                      }
                     />
                   </Stack>
                 </Box>
@@ -114,7 +129,12 @@ const LoginPage = () => {
                   alignItems="center"
                 >
                   <FormControlLabel
-                    control={<Checkbox size="small" />}
+                    control={
+                      <Checkbox
+                        size="small"
+                        onChange={rememberMeHandler}
+                      />
+                    }
                     label="Remember me"
                     sx={{
                       '.MuiFormControlLabel-label': {
@@ -123,7 +143,7 @@ const LoginPage = () => {
                     }}
                   />
                   <Link
-                    href="#"
+                    href="/forgot-password"
                     className="text-sm"
                   >
                     Forgot Password?
@@ -138,12 +158,20 @@ const LoginPage = () => {
                   Login
                 </Button>
                 <hr className="w-full my-4" />
-                <Link
-                  href="#"
-                  className="text-sm"
-                >
-                  No account yet? Sign Up
-                </Link>
+                <Stack>
+                  <Typography
+                    component="span"
+                    className="text-sm"
+                  >
+                    No account yet?&nbsp;
+                  </Typography>
+                  <Link
+                    href="/sign-up"
+                    className="text-sm"
+                  >
+                    Sign Up
+                  </Link>
+                </Stack>
               </Stack>
             </form>
           </Stack>
