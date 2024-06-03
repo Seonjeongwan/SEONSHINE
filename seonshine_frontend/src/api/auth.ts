@@ -5,7 +5,7 @@ interface LoginResponse {
 }
 
 export const login = async (employeeId: string, password: string): Promise<LoginResponse> => {
-  const response = await axiosInstance.post<LoginResponse>('/auth/login', { employeeId, password });
+  const response = await axiosInstance.post<LoginResponse>('/auth/login', { username: employeeId, password });
   localStorage.setItem('token', response.data.token);
   return response.data;
 };

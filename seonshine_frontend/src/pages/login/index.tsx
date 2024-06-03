@@ -160,7 +160,6 @@ return (
                 </Link>
               </Stack>
             </form>
-            {mutation.isError && <div className="text-red-500">Login failed. Please try again.</div>}
           </Stack>
         </Box>
       </Stack>
