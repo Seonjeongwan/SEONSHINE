@@ -3,4 +3,5 @@ export const paths = {
   login: '/login',
   forgotPassword: 'forgot-password',
   signUp: 'sign-up',
+  test: 'test',
 };

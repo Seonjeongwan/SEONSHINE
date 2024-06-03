@@ -1,12 +1,16 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { Box, Button, Checkbox, FormControlLabel, IconButton, Link, Stack, Typography } from '@mui/material';
+import { useMutation } from '@tanstack/react-query';
 
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
+
+import { login } from '@/api/auth';
 
 import loginBanner from '../../assets/images/login-banner.png';
 import logo from '../../assets/images/Logo-Shinhan-Bank.webp';
@@ -30,14 +34,33 @@ const LoginPage = () => {
     },
   });
 
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [rememberMe, setRememberMe] = useState<boolean>(false);
 
-  console.log({ errors });
   const handleClickShowPassword = useCallback(() => setShowPassword((prev) => !prev), []);
 
+  const mutation = useMutation({
+    mutationFn: async (data: LoginSchemaType) => {
+      return login(data.employeeId, data.password);
+    },
+    onSuccess: (data) => {
+      console.log('Login successful', data);
+      if (rememberMe) {
+        localStorage.setItem('token', data.token);
+      } else {
+        sessionStorage.setItem('token', data.token);
+      }
+      navigate('/');
+    },
+    onError: (error) => {
+      console.error('Login failed', error);
+    },
+  });
+
   const submitForm = (data: LoginSchemaType) => {
-    debugger;
+    mutation.mutate(data);
   };
 
   const rememberMeHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,6 +177,7 @@ const LoginPage = () => {
                   fullWidth
                   className="mt-4 text-lg"
                   type="submit"
+                  disabled={mutation.isPending}
                 >
                   Login
                 </Button>
@@ -174,6 +198,7 @@ const LoginPage = () => {
                 </Stack>
               </Stack>
             </form>
+            {mutation.isError && <div className="text-red-500">Login failed. Please try again.</div>}
           </Stack>
         </Box>
       </Stack>
