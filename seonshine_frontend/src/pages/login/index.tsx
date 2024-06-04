@@ -10,6 +10,8 @@ import { Box, Button, Checkbox, FormControlLabel, IconButton, Link, Stack, Typog
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
 
+import { useAuth } from '@/hooks/useAuth';
+
 import { useLoginApi } from '@/api/hooks/auhtApi.hook';
 import { useLoadingStore } from '@/store/loading.store';
 
@@ -36,10 +38,9 @@ const LoginPage = () => {
   });
 
   const { mutate: exeLogin, isPending } = useLoginApi();
+  const { login: handleLoginSuccess } = useAuth();
 
   const setLoading = useLoadingStore((state) => state.setLoading);
-
-  const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [rememberMe, setRememberMe] = useState<boolean>(false);
@@ -51,30 +52,12 @@ const LoginPage = () => {
       { employeeId, password },
       {
         onSuccess: (data) => {
-          console.log('Login successful', data);
           setLoading(false);
-          toast.success('Login successfully !');
-          navigate('/');
-        },
-        onError: (error) => {
-          console.error('Login failed', error);
-          toast.error('Login failed !');
+          rememberMe && handleLoginSuccess(data, data.token);
         },
       },
     );
   };
-
-  const mutation = useMutation({
-    mutationFn: async (data: LoginSchemaType) => {
-      return login(data.employeeId, data.password);
-    },
-    onSuccess: (data) => {
-      console.log('Login successful', data);
-    },
-    onError: (error) => {
-      console.error('Login failed', error);
-    },
-  });
 
   const submitForm = (data: LoginSchemaType) => {
     handleLogin(data);
