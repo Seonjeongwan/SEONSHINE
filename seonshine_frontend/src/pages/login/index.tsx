@@ -64,6 +64,18 @@ const LoginPage = () => {
     );
   };
 
+  const mutation = useMutation({
+    mutationFn: async (data: LoginSchemaType) => {
+      return login(data.employeeId, data.password);
+    },
+    onSuccess: (data) => {
+      console.log('Login successful', data);
+    },
+    onError: (error) => {
+      console.error('Login failed', error);
+    },
+  });
+
   const submitForm = (data: LoginSchemaType) => {
     handleLogin(data);
   };
