@@ -1,39 +1,36 @@
-import { useStore } from '@/hooks/useStore';
-import { TCurrentUser } from '@/types/user';
+import useAuthStore from '@/store/auth.store';
+import { CurrentUserType } from '@/types/user';
 import { clearUserFromCache, saveUserToCache } from '@/utils/persistCache/auth';
 import { clearAccessToken, setAccessToken } from '@/utils/persistCache/token';
 
-type TUseAuth = {
+type UseAuthType = {
   authenticated: boolean;
-  currentUser: TCurrentUser | null;
+  currentUser: CurrentUserType | null;
   logout: () => void;
-  login: (user: TCurrentUser, accessToken: string) => void;
-  updateUserInfo: (user: TCurrentUser) => void;
+  login: (user: CurrentUserType, accessToken: string) => void;
+  updateUserInfo: (user: CurrentUserType) => void;
   updateToken: (accessToken: string) => void;
-}
+};
 
-export const useAuth = (): TUseAuth => {
-  const { authStore } = useStore();
+export const useAuth = (): UseAuthType => {
+  const { currentUser, setCurrentUser, isAuthenticated } = useAuthStore();
 
-  const authenticated = authStore.isAuthenticated();
-
-  const currentUser = authStore.getCurrentUser();
-
+  const authenticated = isAuthenticated();
+  
   const logout = () => {
-    authStore.setCurrentUser(null);
+    setCurrentUser(null);
     clearUserFromCache();
     clearAccessToken();
   };
 
-  const login = (user: TCurrentUser, accessToken: string) => {
-    authStore.setCurrentUser(user);
-
+  const login = (user: CurrentUserType, accessToken: string) => {
+    setCurrentUser(user);
     saveUserToCache(user);
     setAccessToken(accessToken);
   };
 
-  const updateUserInfo = (user: TCurrentUser) => {
-    authStore.setCurrentUser(user);
+  const updateUserInfo = (user: CurrentUserType) => {
+    setCurrentUser(user);
     saveUserToCache(user);
   };
 

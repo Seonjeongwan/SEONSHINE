@@ -3,7 +3,7 @@ export const RoleName = {
     USER: 'User',
   };
 
-export type TCurrentUser = {
+export type CurrentUserType = {
     user_id: string,
     role_id: string,
     username: string,
