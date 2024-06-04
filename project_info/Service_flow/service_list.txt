@@ -21,4 +21,15 @@ restaurant
 
 - register menu
 - order list (for the day) / only can see on the day registered
--
+
+Menu structure
+- Food Order
+    - Order
+    - Order List (today)
+    - Order History
+    - Menu List
+
+- Management
+    - User Management
+    - Restaurant Management
+    - Menu Management
