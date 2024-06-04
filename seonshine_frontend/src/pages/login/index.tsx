@@ -1,16 +1,17 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { Box, Button, Checkbox, FormControlLabel, IconButton, Link, Stack, Typography } from '@mui/material';
-import { useMutation } from '@tanstack/react-query';
 
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
 
-import { login } from '@/api/auth';
+import { useLoginApi } from '@/api/hooks/auhtApi.hook';
+import { useLoadingStore } from '@/store/loading.store';
 
 import loginBanner from '../../assets/images/login-banner.png';
 import logo from '../../assets/images/Logo-Shinhan-Bank.webp';
@@ -34,6 +35,10 @@ const LoginPage = () => {
     },
   });
 
+  const { mutate: exeLogin, isPending } = useLoginApi();
+
+  const setLoading = useLoadingStore((state) => state.setLoading);
+
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -41,31 +46,35 @@ const LoginPage = () => {
 
   const handleClickShowPassword = useCallback(() => setShowPassword((prev) => !prev), []);
 
-  const mutation = useMutation({
-    mutationFn: async (data: LoginSchemaType) => {
-      return login(data.employeeId, data.password);
-    },
-    onSuccess: (data) => {
-      console.log('Login successful', data);
-      if (rememberMe) {
-        localStorage.setItem('token', data.token);
-      } else {
-        sessionStorage.setItem('token', data.token);
-      }
-      navigate('/');
-    },
-    onError: (error) => {
-      console.error('Login failed', error);
-    },
-  });
+  const handleLogin = ({ employeeId, password }: LoginSchemaType) => {
+    exeLogin(
+      { employeeId, password },
+      {
+        onSuccess: (data) => {
+          console.log('Login successful', data);
+          setLoading(false);
+          toast.success('Login successfully !');
+          navigate('/');
+        },
+        onError: (error) => {
+          console.error('Login failed', error);
+          toast.error('Login failed !');
+        },
+      },
+    );
+  };
 
   const submitForm = (data: LoginSchemaType) => {
-    mutation.mutate(data);
+    handleLogin(data);
   };
 
   const rememberMeHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setRememberMe(e.target.checked);
   }, []);
+
+  useEffect(() => {
+    setLoading(isPending);
+  }, [isPending]);
 
   return (
     <Stack
@@ -73,7 +82,7 @@ const LoginPage = () => {
       alignItems="center"
       className="w-screen h-screen bg-gray-100"
     >
-      <Stack className="w-full h-full bg-white shadow-md lg:rounded-md shadow-gray-300 lg:w-194 lg:h-120">
+      <Stack className="w-full h-full bg-white shadow-md lg:rounded-md shadow-gray-300 lg:w-194 lg:h-auto py-8">
         <Box className="grid w-full h-full grid-cols-1 lg:grid-cols-2">
           <Box className="hidden h-full lg:flex lg:items-center lg:justify-center">
             <img
@@ -105,7 +114,7 @@ const LoginPage = () => {
                   />
                 </Stack>
 
-                <h3 className="text-2xl font-bold mt-14 lg:mt-7">Login</h3>
+                <h3 className="text-3xl font-bold mt-14 lg:mt-7">Login</h3>
 
                 <Box className="grid gap-2 mt-4">
                   <Stack
@@ -177,7 +186,7 @@ const LoginPage = () => {
                   fullWidth
                   className="mt-4 text-lg"
                   type="submit"
-                  disabled={mutation.isPending}
+                  disabled={isPending}
                 >
                   Login
                 </Button>
@@ -198,7 +207,6 @@ const LoginPage = () => {
                 </Stack>
               </Stack>
             </form>
-            {mutation.isError && <div className="text-red-500">Login failed. Please try again.</div>}
           </Stack>
         </Box>
       </Stack>

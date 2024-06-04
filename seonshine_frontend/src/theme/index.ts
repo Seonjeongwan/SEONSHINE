@@ -5,7 +5,7 @@ import componentsConfig from './components';
 const theme = createTheme({
   spacing: 4,
   typography: {
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: 'Calibri',
     button: {
       textTransform: 'none',
