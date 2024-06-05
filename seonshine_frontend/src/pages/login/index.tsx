@@ -2,13 +2,15 @@ import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Button, Checkbox, FormControlLabel, Link, Stack } from '@mui/material';
+import { useMutation } from '@tanstack/react-query';
 
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
-
+import { login } from '@/apis/auth';
 import loginBanner from '../../assets/images/login-banner.png';
 import logo from '../../assets/images/Logo-Shinhan-Bank.webp';
 import { LoginSchema, LoginSchemaType } from './schemas';
+import { useLoginApi } from '@/apis/hooks/authApi.hook';
 
 const LoginPage = () => {
   const {
@@ -30,11 +32,13 @@ const LoginPage = () => {
 
   console.log('errors', errors);
 
+  const { mutate: login, isPending } = useLoginApi();
+
   const submitForm = (data: LoginSchemaType) => {
-    debugger;
+    login(data);
   };
 
-  return (
+return (
     <Stack
       justifyContent="center"
       alignItems="center"
@@ -134,6 +138,7 @@ const LoginPage = () => {
                   fullWidth
                   className="mt-4 text-lg"
                   type="submit"
+                  disabled={isPending}
                 >
                   Login
                 </Button>
