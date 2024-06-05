@@ -1,0 +1,18 @@
+project_root/
+│
+├── .env
+├── package.json
+├── server.js
+├── config/
+│   ├── db.js
+│   └── mailer.js
+├── db/
+│   └── connection.js
+├── routes/
+│   ├── authRoutes.js
+│   └── userRoutes.js
+├── controllers/
+│   ├── authController.js
+│   └── userController.js
+└── utils/
+    └── emailUtil.js
