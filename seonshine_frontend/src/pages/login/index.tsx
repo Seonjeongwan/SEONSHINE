@@ -1,5 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
@@ -9,6 +11,7 @@ import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
 
 import { useAuth } from '@/hooks/useAuth';
+import { paths } from '@/routes/paths';
 
 import { useLoginApi } from '@/apis/hooks/authApi.hook';
 import { useLoadingStore } from '@/store/loading.store';
@@ -29,6 +32,7 @@ const LoginPage = () => {
       password: '',
     },
   });
+  const navigate = useNavigate();
 
   const { mutate: exeLogin, isPending } = useLoginApi();
   const { login: handleLoginSuccess } = useAuth();
@@ -36,15 +40,20 @@ const LoginPage = () => {
   const setLoading = useLoadingStore((state) => state.setLoading);
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [rememberMe, setRememberMe] = useState<boolean>(false);
 
-  const handleClickShowPassword = useCallback(() => setShowPassword((prev) => !prev), []);
+  const rememberCheckboxRef = useRef<HTMLInputElement>(null);
+
+  const handleClickShowPassword = () => setShowPassword((prev) => !prev);
 
   const handleLogin = (data: LoginSchemaType) => {
     exeLogin(data, {
       onSuccess: (data) => {
         setLoading(false);
-        handleLoginSuccess(data, data.token, rememberMe);
+        handleLoginSuccess(data, data.token, !!rememberCheckboxRef.current?.checked);
+        navigate('/test');
+      },
+      onError: () => {
+        toast.error('Login failed!');
       },
     });
   };
@@ -52,10 +61,6 @@ const LoginPage = () => {
   const submitForm = (data: LoginSchemaType) => {
     handleLogin(data);
   };
-
-  const rememberMeHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setRememberMe(e.target.checked);
-  }, []);
 
   useEffect(() => {
     setLoading(isPending);
@@ -149,7 +154,7 @@ const LoginPage = () => {
                     control={
                       <Checkbox
                         size="small"
-                        onChange={rememberMeHandler}
+                        inputRef={rememberCheckboxRef}
                       />
                     }
                     label="Remember me"
@@ -160,7 +165,7 @@ const LoginPage = () => {
                     }}
                   />
                   <Link
-                    href="/forgot-password"
+                    href={paths.forgotPassword}
                     className="text-sm"
                   >
                     Forgot Password?
@@ -184,7 +189,7 @@ const LoginPage = () => {
                     No account yet?&nbsp;
                   </Typography>
                   <Link
-                    href="/sign-up"
+                    href={paths.signUp}
                     className="text-sm"
                   >
                     Sign Up
