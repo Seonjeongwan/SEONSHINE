@@ -1,3 +1,6 @@
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import { Box, CssBaseline, StyledEngineProvider, ThemeProvider } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -29,6 +32,7 @@ function App() {
             <PageLoading isLoading={isLoading} />
             <AppRoutes />
           </Box>
+          <ToastContainer autoClose={3000} />
         </ThemeProvider>
       </StyledEngineProvider>
     </QueryClientProvider>
