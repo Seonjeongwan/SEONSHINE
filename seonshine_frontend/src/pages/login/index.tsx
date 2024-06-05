@@ -19,12 +19,7 @@ import { LoginSchema, LoginSchemaType } from './schemas';
 
 const LoginPage = () => {
   const {
-    control,
-    trigger,
     handleSubmit,
-    getValues,
-    setValue,
-    clearErrors,
     register,
     formState: { errors },
   } = useForm<LoginSchemaType>({
@@ -109,7 +104,7 @@ const LoginPage = () => {
                 <Box className="grid gap-2 mt-4">
                   <Stack
                     direction="column"
-                    className="gap-0.5"
+                    className="gap-2"
                   >
                     <FormLabel
                       title="Employee ID"
@@ -125,7 +120,7 @@ const LoginPage = () => {
                   </Stack>
                   <Stack
                     direction="column"
-                    className="gap-0.5"
+                    className="gap-2"
                   >
                     <FormLabel
                       title="Password"
@@ -164,12 +159,7 @@ const LoginPage = () => {
                       },
                     }}
                   />
-                  <Link
-                    href="/forgot-password"
-                    className="text-sm"
-                  >
-                    Forgot Password?
-                  </Link>
+                  <Link href="/forgot-password">Forgot Password?</Link>
                 </Stack>
                 <Button
                   variant="contained"
@@ -182,18 +172,8 @@ const LoginPage = () => {
                 </Button>
                 <hr className="w-full my-4" />
                 <Stack>
-                  <Typography
-                    component="span"
-                    className="text-sm"
-                  >
-                    No account yet?&nbsp;
-                  </Typography>
-                  <Link
-                    href="/sign-up"
-                    className="text-sm"
-                  >
-                    Sign Up
-                  </Link>
+                  <Typography component="span">No account yet?&nbsp;</Typography>
+                  <Link href="/sign-up">Sign Up</Link>
                 </Stack>
               </Stack>
             </form>
