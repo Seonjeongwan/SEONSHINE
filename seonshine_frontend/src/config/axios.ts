@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { useAuth } from '@/hooks/useAuth';
+import { getAccessToken } from '@/utils/persistCache/token';
 
 const axiosInstance = axios.create({
   baseURL: 'https://dummyjson.com',
@@ -10,7 +11,7 @@ const axiosInstance = axios.create({
 });
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = getAccessToken()?.accessToken;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

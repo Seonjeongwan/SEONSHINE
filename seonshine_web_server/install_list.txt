@@ -1,5 +1,6 @@
 #react 프로젝트 설치
 npx create-react-app SEONSHINE-app
+npm install -g typescript
 
 #애플리케이션 시작
 npm start

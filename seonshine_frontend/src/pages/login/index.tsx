@@ -1,7 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
@@ -12,7 +10,7 @@ import { FormLabel } from '@/components/molecules/formEntity/label';
 
 import { useAuth } from '@/hooks/useAuth';
 
-import { useLoginApi } from '@/api/hooks/auhtApi.hook';
+import { useLoginApi } from '@/apis/hooks/authApi.hook';
 import { useLoadingStore } from '@/store/loading.store';
 
 import loginBanner from '../../assets/images/login-banner.png';
@@ -47,16 +45,13 @@ const LoginPage = () => {
 
   const handleClickShowPassword = useCallback(() => setShowPassword((prev) => !prev), []);
 
-  const handleLogin = ({ employeeId, password }: LoginSchemaType) => {
-    exeLogin(
-      { employeeId, password },
-      {
-        onSuccess: (data) => {
-          setLoading(false);
-          rememberMe && handleLoginSuccess(data, data.token);
-        },
+  const handleLogin = (data: LoginSchemaType) => {
+    exeLogin(data, {
+      onSuccess: (data) => {
+        setLoading(false);
+        handleLoginSuccess(data, data.token, rememberMe);
       },
-    );
+    });
   };
 
   const submitForm = (data: LoginSchemaType) => {

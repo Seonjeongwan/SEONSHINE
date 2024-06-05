@@ -1,7 +1,9 @@
-export const RoleName = {
-    ADMIN: 'Admin',
-    USER: 'User',
-  };
+
+export enum RoleEnum {
+  ADMIN = "admin",
+  USER = "user",
+  RESTAURANT = "restaurant"
+}
 
 export type CurrentUserType = {
     user_id: string,
