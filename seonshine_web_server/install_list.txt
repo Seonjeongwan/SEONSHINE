@@ -2,6 +2,11 @@
 npx create-react-app SEONSHINE-app
 npm install -g typescript
 
+#backend
+
+npm install express body-parser mysql nodemailer bcrypt nodemon dotenv
+
+
 #애플리케이션 시작
 npm start
 
