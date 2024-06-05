@@ -7,7 +7,7 @@ type UseAuthType = {
   authenticated: boolean;
   currentUser: CurrentUserType | null;
   logout: () => void;
-  login: (user: CurrentUserType, accessToken: string) => void;
+  login: (user: CurrentUserType, accessToken: string, saveToCache: boolean) => void;
   updateUserInfo: (user: CurrentUserType) => void;
   updateToken: (accessToken: string) => void;
 };
@@ -17,16 +17,18 @@ export const useAuth = (): UseAuthType => {
 
   const authenticated = isAuthenticated();
   
+  const login = (user: CurrentUserType, accessToken: string, saveToCache: boolean) => {
+    setCurrentUser(user);
+    setAccessToken(accessToken);
+    if (saveToCache) {
+      saveUserToCache(user);
+    }
+  };
+
   const logout = () => {
     setCurrentUser(null);
     clearUserFromCache();
     clearAccessToken();
-  };
-
-  const login = (user: CurrentUserType, accessToken: string) => {
-    setCurrentUser(user);
-    saveUserToCache(user);
-    setAccessToken(accessToken);
   };
 
   const updateUserInfo = (user: CurrentUserType) => {

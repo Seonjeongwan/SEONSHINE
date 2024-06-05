@@ -10,6 +10,7 @@ import { login } from '@/api/auth';
 import loginBanner from '../../assets/images/login-banner.png';
 import logo from '../../assets/images/Logo-Shinhan-Bank.webp';
 import { LoginSchema, LoginSchemaType } from './schemas';
+import { useLoginApi } from '@/api/hooks/authApi.hook';
 
 const LoginPage = () => {
   const {
@@ -31,20 +32,10 @@ const LoginPage = () => {
 
   console.log('errors', errors);
 
-  const mutation = useMutation({
-    mutationFn: async (data: LoginSchemaType) => {
-      return login(data.employeeId, data.password);
-    },
-    onSuccess: (data) => {
-      console.log('Login successful', data);
-    },
-    onError: (error) => {
-      console.error('Login failed', error);
-    }
-  });
+  const { mutate: login, isPending } = useLoginApi();
 
   const submitForm = (data: LoginSchemaType) => {
-    mutation.mutate(data);
+    login(data);
   };
 
 return (
@@ -147,7 +138,7 @@ return (
                   fullWidth
                   className="mt-4 text-lg"
                   type="submit"
-                  disabled={mutation.isPending}
+                  disabled={isPending}
                 >
                   Login
                 </Button>
