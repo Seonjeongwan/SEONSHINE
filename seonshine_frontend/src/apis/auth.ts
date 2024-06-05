@@ -1,4 +1,4 @@
-import axiosInstance from './axios';
+import axiosInstance from "@/config/axios";
 
 export type LoginResponseType = {
   token: string;

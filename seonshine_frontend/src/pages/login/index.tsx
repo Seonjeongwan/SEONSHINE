@@ -6,11 +6,11 @@ import { useMutation } from '@tanstack/react-query';
 
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
-import { login } from '@/api/auth';
+import { login } from '@/apis/auth';
 import loginBanner from '../../assets/images/login-banner.png';
 import logo from '../../assets/images/Logo-Shinhan-Bank.webp';
 import { LoginSchema, LoginSchemaType } from './schemas';
-import { useLoginApi } from '@/api/hooks/authApi.hook';
+import { useLoginApi } from '@/apis/hooks/authApi.hook';
 
 const LoginPage = () => {
   const {
