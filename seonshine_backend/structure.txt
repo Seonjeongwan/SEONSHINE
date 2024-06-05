@@ -1,4 +1,4 @@
-project_root/
+seonshine_backend/
 │
 ├── .env
 ├── package.json
