@@ -101,7 +101,7 @@ const LoginPage = () => {
 
                 <h3 className="text-3xl font-bold mt-14 lg:mt-7">Login</h3>
 
-                <Box className="grid gap-2 mt-4">
+                <Box className="grid gap-4 mt-4">
                   <Stack
                     direction="column"
                     className="gap-2"
@@ -159,7 +159,12 @@ const LoginPage = () => {
                       },
                     }}
                   />
-                  <Link href="/forgot-password">Forgot Password?</Link>
+                  <Link
+                    href="/forgot-password"
+                    className="text-sm"
+                  >
+                    Forgot Password?
+                  </Link>
                 </Stack>
                 <Button
                   variant="contained"
@@ -172,8 +177,18 @@ const LoginPage = () => {
                 </Button>
                 <hr className="w-full my-4" />
                 <Stack>
-                  <Typography component="span">No account yet?&nbsp;</Typography>
-                  <Link href="/sign-up">Sign Up</Link>
+                  <Typography
+                    component="span"
+                    fontSize="13px"
+                  >
+                    No account yet?&nbsp;
+                  </Typography>
+                  <Link
+                    href="/sign-up"
+                    className="text-sm"
+                  >
+                    Sign Up
+                  </Link>
                 </Stack>
               </Stack>
             </form>
