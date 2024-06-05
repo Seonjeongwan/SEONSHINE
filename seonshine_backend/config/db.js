@@ -8,5 +8,5 @@ module.exports = {
   commonDatabase: process.env.COMMON_DB_NAME,
   restaurantDatabase: process.env.RESTAURANT_DB_NAME,
   orderDatabase: process.env.ORDER_DB_NAME,
-  port: 3360,
+  port: 3306,
 };
