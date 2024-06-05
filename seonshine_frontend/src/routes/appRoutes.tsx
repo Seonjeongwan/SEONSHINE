@@ -5,34 +5,28 @@ import LoginPage from '@/pages/login';
 import SignUpPage from '@/pages/signUp';
 import TestPage from '@/pages/testPage';
 
-import AuthenticateLayout from './guards/AuthenticateLayout';
-import ProtectedRoute from './guards/ProtectedLayout';
 import { paths } from './paths';
 
 const AppRoutes = () => {
   return (
     <Router>
       <Routes>
-        <Route element={<AuthenticateLayout />}>
-          <Route
-            path={paths.login}
-            element={<LoginPage />}
-          />
-          <Route
-            path={paths.forgotPassword}
-            element={<ForgotPasswordPage />}
-          />
-          <Route
-            path={paths.signUp}
-            element={<SignUpPage />}
-          />
-        </Route>
-        <Route element={<ProtectedRoute />}>
-          <Route
-            path={paths.test}
-            element={<TestPage />}
-          />
-        </Route>
+        <Route
+          path={paths.login}
+          element={<LoginPage />}
+        />
+        <Route
+          path={paths.forgotPassword}
+          element={<ForgotPasswordPage />}
+        />
+        <Route
+          path={paths.signUp}
+          element={<SignUpPage />}
+        />
+        <Route
+          path={paths.test}
+          element={<TestPage />}
+        />
         <Route
           index
           element={
