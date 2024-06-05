@@ -20,7 +20,7 @@ export const useLoginApi = (): UseMutationResult<LoginResponseType, unknown, Log
       navigate('/test');
     },
     onError: () => {
-      toast.error(errorMessages.loginFailed);
+      toast.error('Login failed!');
     },
   });
 };
