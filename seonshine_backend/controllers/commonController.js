@@ -27,6 +27,6 @@ exports.getBranch = (req, res) => {
     if (err) {
       return res.status(500).send({ message: "Database error", error: err });
     }
-    res.status(200).send({ branches: result });
+    res.status(200).send({ branches: result, status: 200 });
   });
 };

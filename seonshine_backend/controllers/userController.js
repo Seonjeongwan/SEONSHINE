@@ -117,7 +117,9 @@ exports.checkIdEmail = (req, res) => {
   const { user_id, email } = req.body;
 
   if (!user_id && !email) {
-    return res.status(400).send({ message: "User ID or Email is required" });
+    return res
+      .status(400)
+      .send({ message: "User ID or Email is required", status: 400 });
   }
 
   const duplicateQuery =
@@ -129,9 +131,11 @@ exports.checkIdEmail = (req, res) => {
     if (results.length > 0) {
       return res
         .status(409)
-        .send({ message: "User ID or Email already exists" });
+        .send({ message: "User ID or Email already exists", status: 409 });
     }
-    res.status(200).send({ message: "User ID and Email are available" });
+    res
+      .status(200)
+      .send({ message: "User ID and Email are available", status: 200 });
   });
 };
 
