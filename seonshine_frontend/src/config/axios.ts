@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 import { useAuth } from '@/hooks/useAuth';
 import { getAccessToken } from '@/utils/persistCache/token';
 
@@ -20,7 +21,7 @@ axiosInstance.interceptors.request.use(
     if (error.response.status === 401) {
       console.log('logout');
     }
-  }
+  },
 );
 
 export default axiosInstance;

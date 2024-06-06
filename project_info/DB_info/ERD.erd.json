@@ -4,8 +4,8 @@
   "settings": {
     "width": 2000,
     "height": 2000,
-    "scrollTop": -609,
-    "scrollLeft": 0,
+    "scrollTop": -383,
+    "scrollLeft": -13,
     "zoomLevel": 1,
     "show": 431,
     "database": 4,
@@ -67,14 +67,14 @@
         "columnIds": [
           "mHtW7ZdnUxYlVrsfgOZUZ",
           "xWbQqCWlWEayyUs8nploS",
-          "eiabHGOn1QFPUyBXPmUqE",
-          "WBs5Oc5St5bSGy2JuPU9m"
+          "WBs5Oc5St5bSGy2JuPU9m",
+          "eiabHGOn1QFPUyBXPmUqE"
         ],
         "seqColumnIds": [
           "mHtW7ZdnUxYlVrsfgOZUZ",
           "xWbQqCWlWEayyUs8nploS",
-          "eiabHGOn1QFPUyBXPmUqE",
-          "WBs5Oc5St5bSGy2JuPU9m"
+          "WBs5Oc5St5bSGy2JuPU9m",
+          "eiabHGOn1QFPUyBXPmUqE"
         ],
         "ui": {
           "x": 50,
@@ -85,7 +85,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1717474846152,
+          "updateAt": 1717572907578,
           "createAt": 1717474846152
         }
       },
@@ -1372,20 +1372,20 @@
       "Icm4cT4OzXhbVoiXB371a": {
         "id": "Icm4cT4OzXhbVoiXB371a",
         "tableId": "YOVBi-9KuLNoIEbVAP8c9",
-        "name": "order_branch",
+        "name": "branch_id",
         "comment": "나중에 부서별 확장성을 위해 놔둠",
         "dataType": "INT",
         "default": "",
         "options": 0,
         "ui": {
           "keys": 2,
-          "widthName": 78,
+          "widthName": 60,
           "widthComment": 161,
           "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1717474846154,
+          "updateAt": 1717573178196,
           "createAt": 1717474846154
         }
       },
@@ -2097,7 +2097,7 @@
           "columnIds": [
             "54czMm_euF9-cGSkVzOGe"
           ],
-          "x": 1108.5,
+          "x": 1108,
           "y": 930,
           "direction": 8
         },
@@ -2304,6 +2304,14 @@
       -1,
       1717474865792,
       {}
+    ],
+    "Icm4cT4OzXhbVoiXB371a": [
+      "tableColumnEntities",
+      -1,
+      -1,
+      {
+        "name": 1717573178195
+      }
     ]
   }
 }
