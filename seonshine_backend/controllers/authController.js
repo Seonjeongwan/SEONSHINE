@@ -15,9 +15,7 @@ exports.requestCode = (req, res) => {
 
       emailUtil.sendVerificationCode(email, code, (error, result) => {
         if (error) {
-          return res
-            .status(500)
-            .send({ message: "Email sending error", error: error });
+          return res.status(500).send({ message: "Email sending error" });
         }
         res
           .status(200)
@@ -39,8 +37,13 @@ exports.verifyCode = (req, res) => {
         return res.send({ success: false, status: 401 });
 
       const record = results[0];
-      if (Date.now() > record.expiration) {
-        return res.send({ success: false, status: 401 });
+      const currentTime = Date.now();
+
+      if (currentTime > record.expiration) {
+        return res.send({
+          success: false,
+          status: 401,
+        });
       }
 
       res.send({ success: true, status: 200 });
