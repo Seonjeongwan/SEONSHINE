@@ -22,7 +22,7 @@ const componentsConfig: Components = {
     styleOverrides: {
       root: {
         marginLeft: '0',
-        fontSize: '11px',
+        fontSize: '12px',
       },
     },
   },

@@ -1,10 +1,20 @@
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box, Button, Checkbox, FormControlLabel, Link, Stack } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Box, Button, Checkbox, FormControlLabel, IconButton, Link, Stack, Typography } from '@mui/material';
 
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
+
+import { useAuth } from '@/hooks/useAuth';
+import { paths } from '@/routes/paths';
+
+import { useLoginApi } from '@/apis/hooks/authApi.hook';
+import { useLoadingStore } from '@/store/loading.store';
 
 import loginBanner from '../../assets/images/login-banner.png';
 import logo from '../../assets/images/Logo-Shinhan-Bank.webp';
@@ -12,12 +22,7 @@ import { LoginSchema, LoginSchemaType } from './schemas';
 
 const LoginPage = () => {
   const {
-    control,
-    trigger,
     handleSubmit,
-    getValues,
-    setValue,
-    clearErrors,
     register,
     formState: { errors },
   } = useForm<LoginSchemaType>({
@@ -27,20 +32,47 @@ const LoginPage = () => {
       password: '',
     },
   });
+  const navigate = useNavigate();
 
-  console.log('errors', errors);
+  const { mutate: exeLogin, isPending } = useLoginApi();
+  const { login: handleLoginSuccess } = useAuth();
+
+  const setLoading = useLoadingStore((state) => state.setLoading);
+
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  const rememberCheckboxRef = useRef<HTMLInputElement>(null);
+
+  const handleClickShowPassword = () => setShowPassword((prev) => !prev);
+
+  const handleLogin = (data: LoginSchemaType) => {
+    exeLogin(data, {
+      onSuccess: (data) => {
+        setLoading(false);
+        handleLoginSuccess(data, data.token, !!rememberCheckboxRef.current?.checked);
+        navigate('/test');
+      },
+      onError: () => {
+        toast.error('Login failed!');
+      },
+    });
+  };
 
   const submitForm = (data: LoginSchemaType) => {
-    debugger;
+    handleLogin(data);
   };
+
+  useEffect(() => {
+    setLoading(isPending);
+  }, [isPending]);
 
   return (
     <Stack
       justifyContent="center"
       alignItems="center"
-      className="w-screen h-screen bg-gray-100"
+      className="w-screen h-screen"
     >
-      <Stack className="w-full h-full bg-white shadow-md lg:rounded-md shadow-gray-300 lg:w-194 lg:h-120">
+      <Stack className="w-full h-full bg-white shadow-md lg:rounded-md shadow-gray-300 lg:w-194 lg:h-auto py-8">
         <Box className="grid w-full h-full grid-cols-1 lg:grid-cols-2">
           <Box className="hidden h-full lg:flex lg:items-center lg:justify-center">
             <img
@@ -72,12 +104,12 @@ const LoginPage = () => {
                   />
                 </Stack>
 
-                <h3 className="text-2xl font-bold mt-14 lg:mt-7">Login</h3>
+                <h3 className="text-3xl font-bold mt-14 lg:mt-7">Login</h3>
 
-                <Box className="grid gap-2 mt-4">
+                <Box className="grid gap-4 mt-4">
                   <Stack
                     direction="column"
-                    className="gap-0.5"
+                    className="gap-2"
                   >
                     <FormLabel
                       title="Employee ID"
@@ -93,7 +125,7 @@ const LoginPage = () => {
                   </Stack>
                   <Stack
                     direction="column"
-                    className="gap-0.5"
+                    className="gap-2"
                   >
                     <FormLabel
                       title="Password"
@@ -104,7 +136,12 @@ const LoginPage = () => {
                       register={register}
                       placeholder="Password"
                       error={errors.password}
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
+                      endAdornment={
+                        <IconButton onClick={handleClickShowPassword}>
+                          {showPassword ? <Visibility /> : <VisibilityOff />}
+                        </IconButton>
+                      }
                     />
                   </Stack>
                 </Box>
@@ -114,7 +151,12 @@ const LoginPage = () => {
                   alignItems="center"
                 >
                   <FormControlLabel
-                    control={<Checkbox size="small" />}
+                    control={
+                      <Checkbox
+                        size="small"
+                        inputRef={rememberCheckboxRef}
+                      />
+                    }
                     label="Remember me"
                     sx={{
                       '.MuiFormControlLabel-label': {
@@ -123,7 +165,7 @@ const LoginPage = () => {
                     }}
                   />
                   <Link
-                    href="#"
+                    href={paths.forgotPassword}
                     className="text-sm"
                   >
                     Forgot Password?
@@ -134,16 +176,25 @@ const LoginPage = () => {
                   fullWidth
                   className="mt-4 text-lg"
                   type="submit"
+                  disabled={isPending}
                 >
                   Login
                 </Button>
                 <hr className="w-full my-4" />
-                <Link
-                  href="#"
-                  className="text-sm"
-                >
-                  No account yet? Sign Up
-                </Link>
+                <Stack>
+                  <Typography
+                    component="span"
+                    fontSize="13px"
+                  >
+                    No account yet?&nbsp;
+                  </Typography>
+                  <Link
+                    href={paths.signUp}
+                    className="text-sm"
+                  >
+                    Sign Up
+                  </Link>
+                </Stack>
               </Stack>
             </form>
           </Stack>
