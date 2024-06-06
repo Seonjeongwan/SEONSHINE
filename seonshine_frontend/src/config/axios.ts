@@ -18,7 +18,9 @@ axiosInstance.interceptors.request.use(
     }
     return config;
   },
-  (error) => {},
+  (error) => {
+    return Promise.reject(error);
+  },
 );
 
 axiosInstance.interceptors.response.use(
@@ -27,12 +29,12 @@ axiosInstance.interceptors.response.use(
   },
   (error) => {
     console.log('error', error);
-    if (error.response && error.response.status === 403) {
+    if (error.response && (error.response.status === 403 || error.response.status === 401)) {
       const { logout } = useAuth();
 
       logout();
 
-      console.log('kick out');
+      window.location.href = paths.login;
     }
     return Promise.reject(error);
   },

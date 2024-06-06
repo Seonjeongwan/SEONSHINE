@@ -1,4 +1,3 @@
-
 export enum RoleEnum {
   ADMIN = "admin",
   USER = "user",
@@ -7,7 +6,7 @@ export enum RoleEnum {
 
 export type CurrentUserType = {
     user_id: string,
-    role_id: string,
+    role_id: RoleEnum,
     username: string,
     phone_number: string,
     branch_id: string,

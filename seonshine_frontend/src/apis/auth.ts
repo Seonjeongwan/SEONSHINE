@@ -1,9 +1,10 @@
 import axiosInstance from '@/config/axios';
+import { RoleEnum } from '@/types/user';
 
 export type LoginResponseType = {
   token: string;
   user_id: string;
-  role_id: string;
+  role_id: RoleEnum;
   username: string;
   phone_number: string;
   branch_id: string;

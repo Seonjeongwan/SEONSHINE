@@ -8,7 +8,7 @@ const TestPage = () => {
   return (
     <div>
       TestPage
-      <Link to={paths.signUp}>GO TO</Link>;
+      <Link to={paths.forgotPassword}>GO TO</Link>;
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { CurrentUserType } from '@/types/user';
-import { clearUserFromCache, saveUserToCache, saveUserToSession } from '@/utils/persistCache/auth';
+import { clearUserFromCache, saveUserToCache } from '@/utils/persistCache/auth';
 import { clearAccessToken, setAccessToken } from '@/utils/persistCache/token';
 
 import useAuthStore from '@/store/auth.store';
@@ -18,13 +18,10 @@ export const useAuth = (): UseAuthType => {
 
   const authenticated = isAuthenticated();
 
-  const login = (user: CurrentUserType, accessToken: string, saveToCache: boolean) => {
+  const login = (user: CurrentUserType, accessToken: string, rememberMe: boolean) => {
     setCurrentUser(user);
-    setAccessToken(accessToken);
-    saveUserToSession(user);
-    if (saveToCache) {
-      saveUserToCache(user);
-    }
+    setAccessToken(accessToken, rememberMe);
+    saveUserToCache(user, rememberMe);
   };
 
   const logout = () => {
@@ -35,7 +32,7 @@ export const useAuth = (): UseAuthType => {
 
   const updateUserInfo = (user: CurrentUserType) => {
     setCurrentUser(user);
-    saveUserToCache(user);
+    saveUserToCache(user, true);
   };
 
   const updateToken = (accessToken: string) => {

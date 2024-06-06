@@ -1,14 +1,19 @@
 class PersistCache {
-  static save(key: string, value: string): void {
-    localStorage.setItem(key, value);
+  static save(key: string, value: string, rememberMe?: boolean) {
+    if (rememberMe) {
+      localStorage.setItem(key, value);
+    } else {
+      sessionStorage.setItem(key, value);
+    }
   }
 
   static read(key: string): string | null {
-    return localStorage.getItem(key);
+    return localStorage.getItem(key) || sessionStorage.getItem(key);
   }
 
-  static remove(key: string): void {
+  static remove(key: string) {
     localStorage.removeItem(key);
+    sessionStorage.removeItem(key);
   }
 }
 
