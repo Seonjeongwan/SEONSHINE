@@ -6,7 +6,6 @@ import { customTypographyVariants } from './typography';
 const theme = createTheme({
   spacing: 4,
   typography: {
-    fontSize: 14,
     fontFamily: 'Calibri',
     fontWeightLight: 300,
     fontWeightRegular: 400,
