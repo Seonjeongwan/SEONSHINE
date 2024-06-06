@@ -35,6 +35,10 @@ const AppRoutes = () => {
           element={<ForgotPasswordPage />}
         />
         <Route
+          path={paths.forgotPassword}
+          element={<ForgotPasswordPage />}
+        />
+        <Route
           index
           element={
             <Navigate
