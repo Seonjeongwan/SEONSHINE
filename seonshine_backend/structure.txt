@@ -1,18 +1,25 @@
 seonshine_backend/
 │
-├── .env
-├── package.json
-├── server.js
-├── config/
-│   ├── db.js
-│   └── mailer.js
-├── db/
-│   └── connection.js
-├── routes/
-│   ├── authRoutes.js
-│   └── userRoutes.js
 ├── controllers/
 │   ├── authController.js
+│   ├── commonController.js
+│   ├── orderController.js
 │   └── userController.js
-└── utils/
-    └── emailUtil.js
+│
+├── db/
+│   └── connection.js
+│
+├── routes/
+│   ├── authRoutes.js
+│   ├── commonRoutes.js
+│   ├── orderRoutes.js
+│   └── userRoutes.js
+│
+├── utils/
+│   └── emailUtil.js
+│
+├── .env
+├── initializeDb.js
+├── package.json
+├── package-lock.json
+└── server.js

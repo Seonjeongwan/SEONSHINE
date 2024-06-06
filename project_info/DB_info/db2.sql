@@ -50,7 +50,7 @@ CREATE TABLE user_profiles (
 CREATE TABLE IF NOT EXISTS verification (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL COMMENT '인증 이메일',
-    code VARCHAR(5) NOT NULL COMMENT '인증번호',
+    code VARCHAR(10) NOT NULL COMMENT '인증번호',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expiration BIGINT NOT NULL COMMENT '만료시간'
 ) COMMENT '이메일 인증 테이블';
@@ -101,7 +101,7 @@ USE order_db;
 -- 주문 기본 정보 테이블
 CREATE TABLE order_history (
   order_id VARCHAR(100) COMMENT '주문 ID : 주문일자 + 부서번호 + 식당번호',
-  order_branch INT COMMENT '나중에 부서별 확장성을 위해 놔둠',
+  branch_id INT COMMENT '나중에 부서별 확장성을 위해 놔둠',
   restaurant_id VARCHAR(20) NOT NULL COMMENT '식당 ID',
   order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '주문일자',
   total_amount INT NOT NULL COMMENT '주문 갯수',
@@ -111,7 +111,7 @@ CREATE TABLE order_history (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (order_id),
   FOREIGN KEY (restaurant_id) REFERENCES user_db.users(user_id) ON DELETE NO ACTION,
-  FOREIGN KEY (order_branch) REFERENCES common_db.branch_info(branch_id) ON DELETE NO ACTION
+  FOREIGN KEY (branch_id) REFERENCES common_db.branch_info(branch_id) ON DELETE NO ACTION
 ) COMMENT '주문 기본 정보 테이블';
 
 -- 주문 항목 테이블
@@ -119,7 +119,7 @@ CREATE TABLE order_items (
   order_item_id VARCHAR(100) PRIMARY KEY COMMENT '주문 메뉴 ID : 주문일자 + 부서번호 + 아이디번호 + 식당번호 + 메뉴번호',
   order_id VARCHAR(100) NOT NULL COMMENT '주문 번호',
   user_id VARCHAR(20) COMMENT '이용자 ID',
-  order_branch INT COMMENT '부서번호',
+  branch_id INT COMMENT '부서번호',
   restaurant_id VARCHAR(20) NOT NULL COMMENT '식당 ID',
   item_id INT NOT NULL,
   quantity INT COMMENT '갯수인데 확장성 위해 보류',
@@ -131,7 +131,7 @@ CREATE TABLE order_items (
   FOREIGN KEY (user_id) REFERENCES user_db.users(user_id) ON DELETE NO ACTION,
   FOREIGN KEY (restaurant_id) REFERENCES restaurant_db.menu_items(restaurant_id) ON DELETE NO ACTION,
   FOREIGN KEY (item_id) REFERENCES restaurant_db.menu_items(item_id) ON DELETE NO ACTION,
-  FOREIGN KEY (order_branch) REFERENCES common_db.branch_info(branch_id) ON DELETE NO ACTION
+  FOREIGN KEY (branch_id) REFERENCES common_db.branch_info(branch_id) ON DELETE NO ACTION
 ) COMMENT '주문 항목 테이블';
 
 -- 권한 부여

@@ -10,7 +10,6 @@ exports.signUp = async (req, res) => {
     branch_id,
     email,
     password,
-    confirm_yn,
   } = req.body;
 
   if (
@@ -39,7 +38,6 @@ exports.signUp = async (req, res) => {
         branch_id,
         email,
         hashedPassword,
-        confirm_yn,
       ],
       (err, result) => {
         if (err) {
@@ -72,18 +70,89 @@ exports.login = (req, res) => {
         user.password_hash
       );
       if (isPasswordValid) {
-        if (user.confirm_yn === "1") {
-          res
-            .status(200)
-            .send({ message: "Login successful", user, status: 200 });
-        } else {
-          res
-            .status(401)
-            .send({ message: "Please verify your email first", status: 401 });
+        switch (user.confirm_yn) {
+          case "0":
+            res.status(403).send({
+              message: "Admin confirmation needed",
+              status: 403,
+              confirm_yn: user.confirm_yn,
+            });
+            break;
+          case "1":
+            res.status(200).send({
+              message: "Login successful",
+              user,
+              status: 200,
+              confirm_yn: user.confirm_yn,
+            });
+            break;
+          case "2":
+            res.status(403).send({
+              message: "Account reactivation needed",
+              status: 403,
+              confirm_yn: user.confirm_yn,
+            });
+            break;
+          case "9":
+            res.status(403).send({
+              message: "Account suspended",
+              status: 403,
+              confirm_yn: user.confirm_yn,
+            });
+            break;
+          default:
+            res
+              .status(500)
+              .send({ message: "Unknown account status", status: 500 });
+            break;
         }
       } else {
         res.status(401).send({ message: "Invalid credentials", status: 401 });
       }
     }
+  });
+};
+
+exports.checkIdEmail = (req, res) => {
+  const { user_id, email } = req.body;
+
+  if (!user_id && !email) {
+    return res.status(400).send({ message: "User ID or Email is required" });
+  }
+
+  const duplicateQuery =
+    "SELECT * FROM user_db.users WHERE user_id = ? OR email = ?";
+  userDb.query(duplicateQuery, [user_id, email], (err, results) => {
+    if (err) {
+      return res.status(500).send({ message: "Database error", error: err });
+    }
+    if (results.length > 0) {
+      return res
+        .status(409)
+        .send({ message: "User ID or Email already exists" });
+    }
+    res.status(200).send({ message: "User ID and Email are available" });
+  });
+};
+
+exports.confirmSignin = (req, res) => {
+  const { user_id } = req.body;
+
+  if (!user_id) {
+    return res.status(400).send({ message: "User ID is required" });
+  }
+
+  const query =
+    "UPDATE user_db.users SET confirm_yn = '1', updated_at = NOW() WHERE user_id = ?";
+  userDb.query(query, [user_id], (err, result) => {
+    if (err) {
+      return res.status(500).send({ message: "Database error", error: err });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).send({ message: "User not found" });
+    }
+    res
+      .status(200)
+      .send({ message: "User confirmed successfully", status: 200 });
   });
 };

@@ -7,15 +7,17 @@ exports.requestCode = (req, res) => {
   const expiration = Date.now() + 5 * 60 * 1000; // 5 minutes
 
   userDb.query(
-    "INSERT INTO user_db.verification (email, code, expiration) VALUES (?, ?, ?)",
+    "INSERT INTO user_db.verification (email, code, created_at,expiration) VALUES (?, ?, NOW(), ?)",
     [email, code, expiration],
-    (err) => {
+    (err, result) => {
       if (err)
         return res.status(500).send({ message: "Database insert error" });
 
-      emailUtil.sendVerificationCode(email, code, (error) => {
+      emailUtil.sendVerificationCode(email, code, (error, result) => {
         if (error) {
-          return res.status(500).send({ message: "Email sending error" });
+          return res
+            .status(500)
+            .send({ message: "Email sending error", error: error });
         }
         res
           .status(200)
