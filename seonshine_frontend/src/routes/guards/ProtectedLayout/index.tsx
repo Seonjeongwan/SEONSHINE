@@ -1,23 +1,35 @@
-import { useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
+
+import { paths } from '@/routes/paths';
+import { getAccessToken } from '@/utils/persistCache/token';
+
 import useAuthStore from '@/store/auth.store';
+import { callme } from '@/apis/auth';
 
-const ProtectedLayoutView = () => {
-  const { isAuthenticated } = useAuthStore(); // Sử dụng hook từ store Zustand
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login', { replace: true });
-      console.log("back to login")
-    }
-  }, [isAuthenticated]);
-
-  return (
-    <>
-      <Outlet />
-    </>
-  );
+type ProtectedLayoutProps = {
+  children: React.ReactNode;
 };
 
-export default ProtectedLayoutView;
+const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({ children }) => {
+  const { isAuthenticated } = useAuthStore();
+  const authenticated = isAuthenticated();
+  const token = getAccessToken();
+
+  useEffect(() => {
+    callme();
+  }, [token.accessToken]);
+
+  if (!authenticated) {
+    return (
+      <Navigate
+        to={paths.login}
+        replace
+      />
+    );
+  }
+
+  return <>{children}</>;
+};
+
+export default ProtectedLayout;

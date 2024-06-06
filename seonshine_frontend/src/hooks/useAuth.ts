@@ -1,7 +1,8 @@
-import useAuthStore from '@/store/auth.store';
 import { CurrentUserType } from '@/types/user';
-import { clearUserFromCache, saveUserToCache } from '@/utils/persistCache/auth';
+import { clearUserFromCache, saveUserToCache, saveUserToSession } from '@/utils/persistCache/auth';
 import { clearAccessToken, setAccessToken } from '@/utils/persistCache/token';
+
+import useAuthStore from '@/store/auth.store';
 
 type UseAuthType = {
   authenticated: boolean;
@@ -16,10 +17,11 @@ export const useAuth = (): UseAuthType => {
   const { currentUser, setCurrentUser, isAuthenticated } = useAuthStore();
 
   const authenticated = isAuthenticated();
-  
+
   const login = (user: CurrentUserType, accessToken: string, saveToCache: boolean) => {
     setCurrentUser(user);
     setAccessToken(accessToken);
+    saveUserToSession(user);
     if (saveToCache) {
       saveUserToCache(user);
     }

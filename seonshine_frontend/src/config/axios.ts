@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 import { useAuth } from '@/hooks/useAuth';
-import { getAccessToken } from '@/utils/persistCache/token';
+import { paths } from '@/routes/paths';
+import { clearAccessToken, getAccessToken } from '@/utils/persistCache/token';
 
 const axiosInstance = axios.create({
   baseURL: 'https://dummyjson.com',
@@ -17,11 +18,23 @@ axiosInstance.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    if (error.response.status === 401) {
-      console.log('logout');
-    }
-  },
+  (error) => {},
 );
 
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    console.log('error', error);
+    if (error.response && error.response.status === 403) {
+      const { logout } = useAuth();
+
+      logout();
+
+      console.log('kick out');
+    }
+    return Promise.reject(error);
+  },
+);
 export default axiosInstance;

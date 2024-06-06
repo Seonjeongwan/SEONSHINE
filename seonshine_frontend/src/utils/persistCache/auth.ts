@@ -6,8 +6,12 @@ export const saveUserToCache = (data: CurrentUserType) => {
   PersistCache.save(USER_INFO_KEY, JSON.stringify(data));
 };
 
+export const saveUserToSession = (data: CurrentUserType) => {
+  sessionStorage.setItem(USER_INFO_KEY, JSON.stringify(data));
+};
+
 export const getUserFromCache = (): CurrentUserType => {
-  return JSON.parse(PersistCache.read(USER_INFO_KEY) || '{}');
+  return JSON.parse(PersistCache.read(USER_INFO_KEY) || sessionStorage.getItem(USER_INFO_KEY) || '{}');
 };
 
 export const clearUserFromCache = (): void => {
