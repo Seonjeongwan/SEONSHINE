@@ -2,7 +2,7 @@ import { ACCESS_TOKEN_KEY } from '@/constants/authentications';
 import PersistCache from '.';
 
 export const setAccessToken = (accessToken: string) => {
-  PersistCache.save(ACCESS_TOKEN_KEY, JSON.stringify({ accessToken }), { expires: 365 });
+  PersistCache.save(ACCESS_TOKEN_KEY, JSON.stringify({ accessToken }), { expires: 3 });
 };
 
 export const getAccessToken = (): { accessToken: string } => {

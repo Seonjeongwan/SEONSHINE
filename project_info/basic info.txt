@@ -2,4 +2,6 @@ DB 사용자
 seonshine_mgr
 seonshine@2
 
+admin 00000000 / admin
+
 root / admin

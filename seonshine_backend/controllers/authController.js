@@ -7,13 +7,13 @@ exports.requestCode = (req, res) => {
   const expiration = Date.now() + 5 * 60 * 1000; // 5 minutes
 
   userDb.query(
-    "INSERT INTO user_db.verification (email, code, expiration) VALUES (?, ?, ?)",
+    "INSERT INTO user_db.verification (email, code, created_at,expiration) VALUES (?, ?, NOW(), ?)",
     [email, code, expiration],
-    (err) => {
+    (err, result) => {
       if (err)
         return res.status(500).send({ message: "Database insert error" });
 
-      emailUtil.sendVerificationCode(email, code, (error) => {
+      emailUtil.sendVerificationCode(email, code, (error, result) => {
         if (error) {
           return res.status(500).send({ message: "Email sending error" });
         }
@@ -37,8 +37,13 @@ exports.verifyCode = (req, res) => {
         return res.send({ success: false, status: 401 });
 
       const record = results[0];
-      if (Date.now() > record.expiration) {
-        return res.send({ success: false, status: 401 });
+      const currentTime = Date.now();
+
+      if (currentTime > record.expiration) {
+        return res.send({
+          success: false,
+          status: 401,
+        });
       }
 
       res.send({ success: true, status: 200 });

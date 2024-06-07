@@ -69,6 +69,7 @@ export default {
       150: '37.5rem',
       180: '45rem',
       194: '48.5rem',
+      240: '60rem',
     }),
     height: (theme) => ({
       auto: 'auto',

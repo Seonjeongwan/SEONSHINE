@@ -1,7 +1,7 @@
 export enum RoleEnum {
-  ADMIN = "admin",
-  USER = "user",
-  RESTAURANT = "restaurant"
+  ADMIN = 'admin',
+  USER = 'user',
+  RESTAURANT = 'restaurant',
 }
 
 export type CurrentUserType = {
