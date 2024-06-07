@@ -138,10 +138,10 @@ CREATE TABLE order_items (
 ) COMMENT '주문 항목 테이블';
 
 -- 권한 부여
-GRANT ALL PRIVILEGES ON common_db.* TO 'seonshine_mgr'@'localhost';
-GRANT ALL PRIVILEGES ON user_db.* TO 'seonshine_mgr'@'localhost';
-GRANT ALL PRIVILEGES ON restaurant_db.* TO 'seonshine_mgr'@'localhost';
-GRANT ALL PRIVILEGES ON order_db.* TO 'seonshine_mgr'@'localhost';
+GRANT ALL PRIVILEGES ON common_db.* TO 'seonshine_mgr'@'%';
+GRANT ALL PRIVILEGES ON user_db.* TO 'seonshine_mgr'@'%';
+GRANT ALL PRIVILEGES ON restaurant_db.* TO 'seonshine_mgr'@'%';
+GRANT ALL PRIVILEGES ON order_db.* TO 'seonshine_mgr'@'%';
 
 -- 권한 적용
 FLUSH PRIVILEGES;
