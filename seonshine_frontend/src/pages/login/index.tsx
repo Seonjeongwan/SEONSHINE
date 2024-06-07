@@ -72,7 +72,7 @@ const LoginPage = () => {
       alignItems="center"
       className="w-screen h-screen"
     >
-      <Stack className="w-full h-full bg-white shadow-md lg:rounded-md shadow-gray-300 lg:w-194 lg:h-auto py-8">
+      <Stack className="w-full h-full bg-white shadow-md lg:rounded-md shadow-black-100 lg:w-194 lg:h-auto py-8">
         <Box className="grid w-full h-full grid-cols-1 lg:grid-cols-2">
           <Box className="hidden h-full lg:flex lg:items-center lg:justify-center">
             <img

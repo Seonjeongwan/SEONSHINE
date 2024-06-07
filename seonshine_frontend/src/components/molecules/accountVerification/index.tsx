@@ -155,7 +155,7 @@ const AccountVerification = ({
           <Typography
             component="span"
             variant="subtitleS"
-            className="text-red-600 text-center"
+            className="text-red-500 text-center"
           >
             Your OTP has expired. Please click resend OTP and try again
           </Typography>
@@ -188,7 +188,7 @@ const AccountVerification = ({
         </Button>
         <Button
           variant="text"
-          className="text-center w-max font-bold text-md text-black"
+          className="text-center w-max font-bold text-md text-black-500"
           disabled={isActive}
           onClick={hanldeClickResendOtp}
         >

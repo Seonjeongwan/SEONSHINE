@@ -1,4 +1,5 @@
 const colors = require('tailwindcss/colors');
+const customColors = require('./src/theme/colors');
 
 export default {
   // corePlugins: {
@@ -22,14 +23,14 @@ export default {
     colors: {
       transparent: 'transparent',
       current: 'currentColor',
-      black: colors.black,
-      green: colors.green,
       white: colors.white,
       gray: colors.neutral,
       indigo: colors.indigo,
-      red: colors.rose,
-      blue: colors.blue,
-      yellow: colors.amber,
+      blue: customColors.blue,
+      green: customColors.green,
+      yellow: customColors.yellow,
+      red: customColors.red,
+      black: customColors.black,
     },
     width: (theme) => ({
       auto: 'auto',
