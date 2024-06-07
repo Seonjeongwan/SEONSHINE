@@ -26,7 +26,7 @@ const AccountVerificationLayout: React.FC<AccountVerificationLayoutProps> = ({ t
         direction="column"
         gap="24px"
         alignItems="center"
-        className="w-full p-24 bg-white rounded-lg shadow-md lg:w-max max-w-screen "
+        className="w-full p-24 bg-white rounded-lg shadow-md md:w-max xl:w-240 max-w-screen"
       >
         <Typography
           variant="heading2"

@@ -5,6 +5,7 @@ import AccountVerification from '@/components/molecules/accountVerification';
 const ForgotPasswordPage = () => {
   return (
     <AccountVerification
+      title="Reset Password"
       handleSubmitOtp={(otp) => {
         console.log({ otp });
       }}

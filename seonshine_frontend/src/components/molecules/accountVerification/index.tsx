@@ -6,6 +6,8 @@ import { Box, Button, FormHelperText, Stack, TextField, Typography } from '@mui/
 
 import { OtpSchema, OtpSchemaType } from '@/pages/login/schemas';
 
+import { digitRegex } from '@/constants/regex';
+
 import AccountVerificationLayout from './accountVerificationLayout';
 
 type AccountVerificationProps = {
@@ -35,19 +37,15 @@ const AccountVerification: React.FC<AccountVerificationProps> = ({
   const [isActive, setIsActive] = useState<boolean>(true);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleOtpChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    index: number,
-    onChange: (value: string) => void,
-  ) => {
+  const handleOtpChange = (e: ChangeEvent<HTMLInputElement>, index: number, onChange: (value: string) => void) => {
     const value = e.target.value;
-    if (!/^[0-9]$/.test(value) && value !== '') return;
+    if (!digitRegex.test(value) && value !== '') return;
 
     const currentOtp = getValues('otp').split('');
     currentOtp[index] = value || ' ';
-    const newOtp = currentOtp.join('');
-    onChange(newOtp);
+    onChange(currentOtp.join(''));
 
     if (value !== '' && index < 5) {
       inputRefs.current[index + 1]?.focus();
@@ -59,13 +57,14 @@ const AccountVerification: React.FC<AccountVerificationProps> = ({
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>, onChange: (value: string) => void) => {
     e.preventDefault();
     const pasteData = e.clipboardData.getData('text').slice(0, 6);
-    if (!/^\d+$/.test(pasteData)) return;
+    if (!digitRegex.test(pasteData)) return;
 
     const newOtp = pasteData.padEnd(6, ' ').split('');
     onChange(newOtp.join(''));
     newOtp.forEach((value, index) => {
       if (inputRefs.current[index]) {
         inputRefs.current[index].value = value;
+        value !== ' ' && inputRefs.current[index].focus();
       }
     });
   };
@@ -80,23 +79,31 @@ const AccountVerification: React.FC<AccountVerificationProps> = ({
     }
   };
 
-  const onSubmit = (data: OtpSchemaType) => {
-    console.log('OTP Submitted:', data.otp);
-    handleSubmitOtp(data.otp);
+  const hanldeClickResendOtp = () => {
+    resetTimer();
+    handleResendOtp();
   };
 
+  const resetTimer = () => {
+    setSeconds(secondsCountdown);
+    setIsActive(true);
+  };
+
+  const onSubmit = (data: OtpSchemaType) => handleSubmitOtp(data.otp);
+
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
     if (isActive && seconds > 0) {
-      interval = setInterval(() => {
-        setSeconds((seconds) => seconds - 1);
-      }, 1000);
+      intervalRef.current = setInterval(() => setSeconds((seconds) => seconds - 1), 1000);
     } else if (seconds === 0) {
       setIsActive(false);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
     }
+
     return () => {
-      if (interval) {
-        clearInterval(interval);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
       }
     };
   }, [isActive, seconds]);
@@ -104,7 +111,7 @@ const AccountVerification: React.FC<AccountVerificationProps> = ({
   return (
     <AccountVerificationLayout
       title={title}
-      description={'An OTP has been sent to your email. Please enter the OTP to verify your account.'}
+      description="An OTP has been sent to your email. Please enter the OTP to verify your account."
     >
       <Stack
         direction="column"
@@ -133,16 +140,7 @@ const AccountVerification: React.FC<AccountVerificationProps> = ({
                   onChange={(e: ChangeEvent<HTMLInputElement>) => handleOtpChange(e, index, onChange)}
                   onFocus={(e) => e.target.select()}
                   onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => handleKeyDown(e, index)}
-                  sx={{
-                    input: {
-                      fontWeight: '500',
-                      fontSize: {
-                        xs: '40px',
-                        md: '64px',
-                      },
-                      textAlign: 'center',
-                    },
-                  }}
+                  sx={{ input: { fontWeight: '500', fontSize: { xs: '40px', md: '64px' }, textAlign: 'center' } }}
                 />
               ))}
             </Stack>
@@ -150,30 +148,27 @@ const AccountVerification: React.FC<AccountVerificationProps> = ({
         />
         <FormHelperText
           error={!!errors.otp}
-          sx={{
-            marginTop: 1,
-          }}
+          sx={{ marginTop: 1 }}
         >
           {errors?.otp?.message}
         </FormHelperText>
+        {!isActive && seconds === 0 && (
+          <Typography
+            component="span"
+            variant="subtitleS"
+            className="text-red-600 text-center"
+          >
+            Your OTP has expired. Please click resend OTP and try again
+          </Typography>
+        )}
       </Stack>
-
-      {isActive === false && seconds === 0 && (
-        <Typography
-          component="span"
-          variant="subtitleS"
-          className="text-red-600 text-center"
-        >
-          Your OTP has expired. Please click resend OTP and try again
-        </Typography>
-      )}
 
       <Box>
         <Typography
           component="span"
           variant="timer"
         >
-          {`${seconds / 60 < 10 ? '0' : ''}${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`}
+          {`${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`}
         </Typography>
       </Box>
 
@@ -187,15 +182,16 @@ const AccountVerification: React.FC<AccountVerificationProps> = ({
           color="primary"
           fullWidth
           onClick={handleSubmit(onSubmit)}
+          disabled={!isActive}
           className="w-80 md:w-120 h-12"
         >
           <Typography variant="buttonM">Verify</Typography>
         </Button>
         <Button
           variant="text"
-          className="text-center w-max font-bold text-md text-[#21272A]"
+          className="text-center w-max font-bold text-md text-black"
           disabled={isActive}
-          onClick={handleResendOtp}
+          onClick={hanldeClickResendOtp}
         >
           Resend OTP
         </Button>
