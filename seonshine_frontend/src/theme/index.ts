@@ -1,9 +1,11 @@
 import { createTheme } from '@mui/material/styles';
 
 import componentsConfig from './components';
+import paletteConfig from './palatte';
 import { customTypographyVariants } from './typography';
 
 const theme = createTheme({
+  palette: paletteConfig,
   spacing: 4,
   typography: {
     fontFamily: 'Calibri',

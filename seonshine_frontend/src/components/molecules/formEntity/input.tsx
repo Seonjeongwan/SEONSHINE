@@ -45,9 +45,14 @@ const FormInput = ({
         error={!!error}
         placeholder={placeholder}
         size={size}
-        className="block"
+        className={className}
         fullWidth
         type={type}
+        sx={({ palette }) => ({
+          '.MuiInputBase-root': {
+            backgroundColor: palette.black[100],
+          },
+        })}
         InputProps={{
           startAdornment: startAdornment ? (
             <InputAdornment
