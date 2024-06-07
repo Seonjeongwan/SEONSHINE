@@ -31,14 +31,6 @@ const AppRoutes = () => {
           element={<TestPage />}
         />
         <Route
-          path={paths.forgotPassword}
-          element={<ForgotPasswordPage />}
-        />
-        <Route
-          path={paths.forgotPassword}
-          element={<ForgotPasswordPage />}
-        />
-        <Route
           index
           element={
             <Navigate
