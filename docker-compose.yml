@@ -18,10 +18,10 @@ services:
       - DB_HOST=db
       - DB_USER=seonshine_mgr
       - DB_PASSWORD=seonshine@2
-      - USER_DB_NAME=seonshine_user_db
-      - COMMON_DB_NAME=seonshine_common_db
-      - RESTAURANT_DB_NAME=seonshine_restaurant_db
-      - ORDER_DB_NAME=seonshine_order_db
+      - USER_DB_NAME=user_db
+      - COMMON_DB_NAME=common_db
+      - RESTAURANT_DB_NAME=restaurant_db
+      - ORDER_DB_NAME=order_db
     ports:
       - "5050:5050"
     depends_on:
@@ -46,8 +46,8 @@ services:
       - ./seonshine_db/schema:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost --silent"]
-      interval: 10s
-      timeout: 5s
+      interval: 20s
+      timeout: 10s
       retries: 5
       start_period: 30s
 
