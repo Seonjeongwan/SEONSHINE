@@ -22,11 +22,7 @@ declare module '@mui/material/styles' {
 }
 
 const paletteConfig: PaletteOptions = {
-  blue: colors.blue,
-  green: colors.green,
-  yellow: colors.yellow,
-  red: colors.red,
-  black: colors.black,
+  ...colors,
   primary: {
     main: colors.blue[500],
   },
