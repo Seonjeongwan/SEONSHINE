@@ -13,36 +13,43 @@ services:
 
   backend:
     build: ./seonshine_backend
-    #   # command: bash -c 'while !</dev/tcp/db/3306; do sleep 1; done; node server.js'
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=db
+      - DB_USER=seonshine_mgr
+      - DB_PASSWORD=seonshine@2
+      - USER_DB_NAME=seonshine_user_db
+      - COMMON_DB_NAME=seonshine_common_db
+      - RESTAURANT_DB_NAME=seonshine_restaurant_db
+      - ORDER_DB_NAME=seonshine_order_db
     ports:
       - "5050:5050"
     depends_on:
-      # - db
       db:
         condition: service_healthy
-    env_file:
-      - ./seonshine_backend/.env
+    # env_file:
+    #   - ./seonshine_backend/.env
   # stdin_open: true
   # tty: true
 
   db:
-    image: mysql:8.0
+    build: ./seonshine_db
+    image: mysql:8.0.36
     ports:
       - "3306:3306"
     environment:
       MYSQL_USER: seonshine_mgr
       MYSQL_PASSWORD: seonshine@2
       MYSQL_ROOT_PASSWORD: seonshine@2
-      # MYSQL_ROOT_HOST: "%"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./seonshine_db/schema:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost --silent"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
-    volumes:
-      - mysql-data:/var/lib/mysql
-      - ./project_info/DB_info/db2.sql:/docker-entrypoint-initdb.d/init.sql
 
   # fileserver:
   #   build: ./seonshine_fileserver
