@@ -16,7 +16,10 @@ const useAuthStore = create<AuthStateType>((set, get) => ({
   currentUser: null,
   setCurrentUser: (userInfo: CurrentUserType | null) => set({ currentUser: userInfo }),
   getCurrentUser: () => get().currentUser,
-  isAuthenticated: () => !!get().currentUser,
+  isAuthenticated: () => {
+    const user = getUserFromCache();
+    return !!user && JSON.stringify(user) !== '{}';
+  },
   hasRole: (roles: RoleEnum[]) => roles.includes(get().currentUser?.role_id as RoleEnum),
 }));
 

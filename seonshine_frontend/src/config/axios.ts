@@ -2,7 +2,8 @@ import axios from 'axios';
 
 import { useAuth } from '@/hooks/useAuth';
 import { paths } from '@/routes/paths';
-import { clearAccessToken, getAccessToken } from '@/utils/persistCache/token';
+import { getAccessToken } from '@/utils/persistCache/token';
+import { FORBIDDEN, UNAUTHORIZED } from '@/constants/http';
 
 const axiosInstance = axios.create({
   baseURL: 'https://dummyjson.com',
@@ -29,7 +30,7 @@ axiosInstance.interceptors.response.use(
   },
   (error) => {
     console.log('error', error);
-    if (error.response && (error.response.status === 403 || error.response.status === 401)) {
+    if (error.response && (error.response.status === UNAUTHORIZED || error.response.status === FORBIDDEN)) {
       const { logout } = useAuth();
 
       logout();

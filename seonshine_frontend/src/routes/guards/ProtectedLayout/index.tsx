@@ -3,11 +3,11 @@ import { Navigate } from 'react-router-dom';
 
 import { paths } from '@/routes/paths';
 import { RoleEnum } from '@/types/user';
-import { getAccessToken } from '@/utils/persistCache/token';
+import { getUserFromCache } from '@/utils/persistCache/auth';
 
 import useAuthStore from '@/store/auth.store';
 
-type AllowedRole = RoleEnum | 'Admin' | 'User' | 'Restaurant' | '';
+type AllowedRole = RoleEnum;
 
 type ProtectedLayoutPropsType = {
   children: React.ReactNode;
@@ -15,10 +15,10 @@ type ProtectedLayoutPropsType = {
 };
 
 const ProtectedLayout: React.FC<ProtectedLayoutPropsType> = ({ children, allowedRoles }) => {
-  const token = getAccessToken()?.accessToken;
-  const { currentUser } = useAuthStore();
+  const { currentUser, isAuthenticated } = useAuthStore();
+  const authenticate = isAuthenticated();
 
-  if (!token) {
+  if (!authenticate) {
     return (
       <Navigate
         to={paths.login}
@@ -27,16 +27,7 @@ const ProtectedLayout: React.FC<ProtectedLayoutPropsType> = ({ children, allowed
     );
   }
 
-  if (!currentUser?.role_id) {
-    return (
-      <Navigate
-        to={paths.main}
-        replace
-      />
-    );
-  }
-
-  if (!allowedRoles.includes(currentUser?.role_id as AllowedRole)) {
+  if (currentUser && !allowedRoles.includes(currentUser.role_id)) {
     return (
       <Navigate
         to={paths.main}

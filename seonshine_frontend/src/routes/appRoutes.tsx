@@ -6,17 +6,17 @@ import LoginPage from '@/pages/login';
 import MainPage from '@/pages/main';
 import PageNotFound from '@/pages/pageNotFound';
 import SignUpPage from '@/pages/signUp';
-import TestPage from '@/pages/testPage';
-
-import { getAccessToken } from '@/utils/persistCache/token';
+import { RoleEnum } from '@/types/user';
 
 import AuthenticateLayout from './guards/AuthenticateLayout';
 import ProtectedLayout from './guards/ProtectedLayout';
 import { paths } from './paths';
+import useAuthStore from '@/store/auth.store';
 
 const App: React.FC = () => {
-  const token = getAccessToken()?.accessToken;
-  const isAuthenticated = !!token;
+
+  const { isAuthenticated } = useAuthStore();
+  const authenticate = isAuthenticated();
 
   return (
     <Router>
@@ -24,21 +24,21 @@ const App: React.FC = () => {
         <Route element={<AuthenticateLayout />}>
           <Route
             path={paths.login}
-            element={isAuthenticated ? <Navigate to={paths.main} /> : <LoginPage />}
+            element={authenticate ? <Navigate to={paths.main} /> : <LoginPage />}
           />
           <Route
             path={paths.forgotPassword}
-            element={isAuthenticated ? <Navigate to={paths.main} /> : <ForgotPasswordPage />}
+            element={authenticate ? <Navigate to={paths.main} /> : <ForgotPasswordPage />}
           />
           <Route
             path={paths.signUp}
-            element={isAuthenticated ? <Navigate to={paths.main} /> : <SignUpPage />}
+            element={authenticate ? <Navigate to={paths.main} /> : <SignUpPage />}
           />
         </Route>
 
         <Route
           path={paths.main}
-          element={<MainPage />}
+          element={authenticate ? <MainPage /> : <Navigate to={paths.login} />}
         />
         <Route
           path={paths.pageNotFound}
@@ -48,7 +48,7 @@ const App: React.FC = () => {
         <Route
           index
           element={
-            isAuthenticated ? (
+            authenticate ? (
               <Navigate
                 to={paths.main}
                 replace
@@ -65,7 +65,7 @@ const App: React.FC = () => {
         <Route
           path={'*'}
           element={
-            isAuthenticated ? (
+            authenticate ? (
               <Navigate
                 to={paths.pageNotFound}
                 replace
@@ -83,7 +83,7 @@ const App: React.FC = () => {
           path={paths.admin}
           element={
             <ProtectedLayout
-              allowedRoles={['']}
+              allowedRoles={[RoleEnum.ADMIN]}
               children={<AdminPage />}
             />
           }

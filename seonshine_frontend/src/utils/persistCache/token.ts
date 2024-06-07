@@ -1,11 +1,11 @@
 import { ACCESS_TOKEN_KEY } from '@/constants/authentications';
-import PersistCache from '@/utils/persistCache';
+import PersistCache from '.';
 
-export const setAccessToken = (accessToken: string, rememberMe?: boolean) => {
-  PersistCache.save(ACCESS_TOKEN_KEY, JSON.stringify({ accessToken }), rememberMe);
+export const setAccessToken = (accessToken: string) => {
+  PersistCache.save(ACCESS_TOKEN_KEY, JSON.stringify({ accessToken }), { expires: 365 });
 };
 
-export const getAccessToken = (): { accessToken: string } | null => {
+export const getAccessToken = (): { accessToken: string } => {
   let response;
   try {
     response = JSON.parse(PersistCache.read(ACCESS_TOKEN_KEY) || '');
