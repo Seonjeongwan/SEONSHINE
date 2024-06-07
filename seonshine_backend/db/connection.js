@@ -1,8 +1,8 @@
-const mysql = require("mysql2/promise");
+const mysql = require("mysql2");
 const dbConfig = require("../config/db");
 
-const createConnection = async (database) => {
-  const connection = await mysql.createConnection({
+const createConnection = (database) => {
+  const connection = mysql.createConnection({
     host: "localhost",
     user: "seonshine_mgr",
     password: "seonshine@2",
