@@ -19,16 +19,16 @@ services:
 
   db:
     build: ./seonshine_db
-    image: mysql:8.0
+    image: mysql:8.0.36
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: seonshine
-      MYSQL_USER: seonshine_mgr
-      MYSQL_PASSWORD: seonshine@2
+      MYSQL_ROOT_PASSWORD: root
+      #MYSQL_USER: seonshine_mgr
+      #MYSQL_PASSWORD: seonshine@2
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./seonshine_db/schema:/docker-entrypoint-initdb.d
 
   fileserver:
     build: ./seonshine_fileserver
