@@ -1,41 +1,90 @@
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
+import AdminPage from '@/pages/admin';
 import ForgotPasswordPage from '@/pages/forgotPassword';
 import LoginPage from '@/pages/login';
+import MainPage from '@/pages/main';
+import PageNotFound from '@/pages/pageNotFound';
 import SignUpPage from '@/pages/signUp';
-import TestPage from '@/pages/testPage';
+import { RoleEnum } from '@/types/user';
 
-import AuthenticateLayout from './guards/authenticateLayout';
+import AuthenticateLayout from './guards/AuthenticateLayout';
+import ProtectedLayout from './guards/ProtectedLayout';
 import { paths } from './paths';
+import useAuthStore from '@/store/auth.store';
 
-const AppRoutes = () => {
+const App: React.FC = () => {
+
+  const { isAuthenticated } = useAuthStore();
+  const authenticate = isAuthenticated();
+
   return (
     <Router>
       <Routes>
         <Route element={<AuthenticateLayout />}>
           <Route
             path={paths.login}
-            element={<LoginPage />}
+            element={authenticate ? <Navigate to={paths.main} /> : <LoginPage />}
           />
           <Route
             path={paths.forgotPassword}
-            element={<ForgotPasswordPage />}
+            element={authenticate ? <Navigate to={paths.main} /> : <ForgotPasswordPage />}
           />
           <Route
             path={paths.signUp}
-            element={<SignUpPage />}
+            element={authenticate ? <Navigate to={paths.main} /> : <SignUpPage />}
           />
         </Route>
+
         <Route
-          path={paths.test}
-          element={<TestPage />}
+          path={paths.main}
+          element={authenticate ? <MainPage /> : <Navigate to={paths.login} />}
         />
+        <Route
+          path={paths.pageNotFound}
+          element={<PageNotFound />}
+        />
+
         <Route
           index
           element={
-            <Navigate
-              to={paths.login}
-              replace
+            authenticate ? (
+              <Navigate
+                to={paths.main}
+                replace
+              />
+            ) : (
+              <Navigate
+                to={paths.login}
+                replace
+              />
+            )
+          }
+        />
+
+        <Route
+          path={'*'}
+          element={
+            authenticate ? (
+              <Navigate
+                to={paths.pageNotFound}
+                replace
+              />
+            ) : (
+              <Navigate
+                to={paths.login}
+                replace
+              />
+            )
+          }
+        />
+        {/* Access Control List  routing example*/}
+        <Route
+          path={paths.admin}
+          element={
+            <ProtectedLayout
+              allowedRoles={[RoleEnum.ADMIN]}
+              children={<AdminPage />}
             />
           }
         />
@@ -44,4 +93,4 @@ const AppRoutes = () => {
   );
 };
 
-export default AppRoutes;
+export default App;

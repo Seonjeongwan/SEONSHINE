@@ -1,27 +1,28 @@
-import useAuthStore from '@/store/auth.store';
+import { USER_INFO_KEY } from '@/constants/authentications';
 import { CurrentUserType } from '@/types/user';
 import { clearUserFromCache, saveUserToCache } from '@/utils/persistCache/auth';
 import { clearAccessToken, setAccessToken } from '@/utils/persistCache/token';
+import SessionCache from '@/utils/sessionCache';
+
+import useAuthStore from '@/store/auth.store';
 
 type UseAuthType = {
-  authenticated: boolean;
   currentUser: CurrentUserType | null;
   logout: () => void;
-  login: (user: CurrentUserType, accessToken: string, saveToCache: boolean) => void;
+  login: (user: CurrentUserType, accessToken: string, rememberMe: boolean) => void;
   updateUserInfo: (user: CurrentUserType) => void;
   updateToken: (accessToken: string) => void;
 };
 
 export const useAuth = (): UseAuthType => {
-  const { currentUser, setCurrentUser, isAuthenticated } = useAuthStore();
+  const { currentUser, setCurrentUser } = useAuthStore();
 
-  const authenticated = isAuthenticated();
-  
-  const login = (user: CurrentUserType, accessToken: string, saveToCache: boolean) => {
-    setCurrentUser(user);
+  const login = (user: CurrentUserType, accessToken: string, rememberMe: boolean) => {
     setAccessToken(accessToken);
-    if (saveToCache) {
+    if (rememberMe) {
       saveUserToCache(user);
+    } else {
+      SessionCache.save(USER_INFO_KEY, JSON.stringify(user));
     }
   };
 
@@ -29,6 +30,7 @@ export const useAuth = (): UseAuthType => {
     setCurrentUser(null);
     clearUserFromCache();
     clearAccessToken();
+    SessionCache.remove(USER_INFO_KEY);
   };
 
   const updateUserInfo = (user: CurrentUserType) => {
@@ -41,7 +43,6 @@ export const useAuth = (): UseAuthType => {
   };
 
   return {
-    authenticated,
     currentUser,
     login,
     logout,
