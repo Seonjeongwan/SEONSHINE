@@ -10,8 +10,9 @@ const ForgotPasswordPage = () => {
         console.log({ otp });
       }}
       secondsCountdown={10}
-      handleResendOtp={() => {
+      handleResendOtp={(resetTimer) => {
         console.log('resend Otp');
+        resetTimer();
       }}
     />
   );

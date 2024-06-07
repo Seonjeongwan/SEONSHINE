@@ -8,11 +8,10 @@ type AccountVerificationLayoutProps = {
   children: ReactNode;
 };
 
-const AccountVerificationLayout: React.FC<AccountVerificationLayoutProps> = ({ title, description, children }) => {
-  const splitDescription = description.split('. ').map((text, index, array) => (
+const AccountVerificationLayout = ({ title, description, children }: AccountVerificationLayoutProps) => {
+  const renderDescription = description.split('. ').map((text, index, array) => (
     <React.Fragment key={index}>
-      {text}
-      {index < array.length - 1 ? '.' : ''}
+      {`${text}${index < array.length - 1 ? '.' : ''}`}
       <br />
     </React.Fragment>
   ));
@@ -39,7 +38,7 @@ const AccountVerificationLayout: React.FC<AccountVerificationLayoutProps> = ({ t
           variant="bodyS"
           className="text-center min-w-max"
         >
-          {splitDescription}
+          {renderDescription}
         </Typography>
         {children}
       </Stack>

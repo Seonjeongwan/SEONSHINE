@@ -4,25 +4,25 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Button, FormHelperText, Stack, TextField, Typography } from '@mui/material';
 
+import AccountVerificationLayout from '@/components/organims/accountVerification/accountVerificationLayout';
+
 import { OtpSchema, OtpSchemaType } from '@/pages/login/schemas';
 
 import { digitRegex } from '@/constants/regex';
-
-import AccountVerificationLayout from './accountVerificationLayout';
 
 type AccountVerificationProps = {
   title?: string;
   secondsCountdown: number;
   handleSubmitOtp: (otp: string) => void;
-  handleResendOtp: () => void;
+  handleResendOtp: (resetTimer: () => void) => void;
 };
 
-const AccountVerification: React.FC<AccountVerificationProps> = ({
+const AccountVerification = ({
   title = 'Account Verification',
   handleSubmitOtp,
   secondsCountdown,
   handleResendOtp,
-}) => {
+}: AccountVerificationProps) => {
   const {
     handleSubmit,
     control,
@@ -80,8 +80,7 @@ const AccountVerification: React.FC<AccountVerificationProps> = ({
   };
 
   const hanldeClickResendOtp = () => {
-    resetTimer();
-    handleResendOtp();
+    handleResendOtp(resetTimer);
   };
 
   const resetTimer = () => {
