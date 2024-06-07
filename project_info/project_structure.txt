@@ -1,24 +1,68 @@
-my-project/
-├── react-app/
-│   ├── Dockerfile
+SEONSHINE/
+│
+├── seonshine_frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── App.tsx
+│   │   ├── index.tsx
+│   │   └── ...
+│   ├── public/
+│   ├── node_modules/
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── ...
+│
+├── seonshine_backend/
+│   ├── controllers/
+│   │   ├── authController.js
+│   │   ├── commonController.js
+│   │   ├── orderController.js
+│   │   ├── userController.js
+│   │   └── ...
+│   ├── db/
+│   │   ├── connection.js
+│   │   ├── db.js
+│   │   ├── initialize.js
+│   │   └── ...
+│   ├── routes/
+│   │   ├── authRoutes.js
+│   │   ├── commonRoutes.js
+│   │   ├── orderRoutes.js
+│   │   ├── userRoutes.js
+│   │   └── ...
+│   ├── utils/
+│   │   ├── emailUtil.js
+│   │   └── ...
+│   ├── config/
+│   │   ├── mailer.js
+│   │   ├── db.js
+│   │   └── ...
+│   ├── .env
+│   ├── initializeDb.js
 │   ├── package.json
 │   ├── package-lock.json
-│   └── src/
-│       ├── index.js
-│       └── ...
-├── api-server/
-│   ├── Dockerfile
+│   ├── server.js
+│   └── ...
+│
+├── seonshine_db/
+│   ├── schema/
+│   │   ├── create_tables.sql
+│   │   ├── seed_data.sql
+│   │   └── ...
+│   ├── backups/
+│   │   ├── backup_2024_01_01.sql
+│   │   └── ...
+│   └── README.md
+│
+├── seonshine_fileserver/
+│   ├── uploads/
+│   │   ├── images/
+│   │   ├── documents/
+│   │   └── ...
+│   ├── server.js
 │   ├── package.json
-│   ├── package-lock.json
-│   └── src/
-│       ├── index.js
-│       └── ...
-├── file-server/
-│   ├── Dockerfile
-│   └── files/
-│       └── ...
-├── docker-compose.yml
-├── .github/
-│   └── workflows/
-│       └── deploy.yml
+│   └── ...
+│
 └── README.md
