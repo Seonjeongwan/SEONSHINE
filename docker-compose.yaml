@@ -1,15 +1,36 @@
 version: "3.8"
 services:
-  frontend:
-    build: ./seonshine_frontend
+  # backend:
+  #   build: ./seonshine_backend
+  #   ports:
+  #     - "5050:5050"
+  #   depends_on:
+  #     - localhost
+  #   env_file:
+  #     - ./seonshine_backend/.env
+  # frontend:
+  #   build: ./seonshine_frontend
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./seonshine_frontend/src:/app/src
+  #     - /app/node_modules
+  #   # For -it:
+  #   # stdin_open: true
+  #   # tty: true
+  #   environment:
+  #     - CHOKIDAR_USEPOLLING=true # Ensures polling for file changes. Trick for Windows
+  localhost: # Because DB_HOST variable using in backend environment file has value is localhost. Consider using db instead
+    image: mysql:latest
+    # restart: always
+    env_file:
+      - ./env/db.env
     ports:
-      - "3000:3000"
+      - "3306:3306"
     volumes:
-      - ./seonshine_frontend/src:/app/src
-      - /app/node_modules
-    # For -it:
-    # stdin_open: true
-    # tty: true
-    environment:
-      - CHOKIDAR_USEPOLLING=true # Ensures polling for file changes. Trick for Windows
+      - db_data:/var/lib/mysql
+      - ./db_init:/docker-entrypoint-initdb.d
+    # command: --default-authentication-plugin=mysql_native_password
 
+volumes:
+  db_data:

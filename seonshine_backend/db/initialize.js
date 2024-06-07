@@ -3,11 +3,20 @@ require("dotenv").config();
 
 async function initializeDb() {
   const connection = await mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
+    host: "localhost",
+    port: "3306",
+    user: "seonshine_mgr",
+    password: "seonshine@2",
     multipleStatements: true,
   });
+
+  connection.connect((err) => {
+    if(err) {
+      console.log('error connecting to the database :>> ', err);
+      return;
+    }
+    console.log('Connected to the MySQL successfully');
+  })
 
   try {
     await connection.query(`
@@ -96,8 +105,7 @@ async function initializeDb() {
                 price INT COMMENT '가격',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                UNIQUE (restaurant_id, item_id),
-                FOREIGN KEY (restaurant_id) REFERENCES user_db.Users(user_id) ON DELETE NO ACTION
+                FOREIGN KEY (restaurant_id) REFERENCES user_db.users(user_id) ON DELETE NO ACTION
             ) COMMENT '음식 메뉴 항목 테이블';
 
             -- order database: order_db
@@ -134,7 +142,7 @@ async function initializeDb() {
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 FOREIGN KEY (order_id) REFERENCES order_history(order_id) ON DELETE CASCADE,
                 FOREIGN KEY (user_id) REFERENCES user_db.users(user_id) ON DELETE NO ACTION,
-                FOREIGN KEY (restaurant_id) REFERENCES restaurant_db.menu_items(restaurant_id) ON DELETE NO ACTION,
+                FOREIGN KEY (restaurant_id) REFERENCES user_db.users(user_id) ON DELETE NO ACTION,
                 FOREIGN KEY (item_id) REFERENCES restaurant_db.menu_items(item_id) ON DELETE NO ACTION,
                 FOREIGN KEY (branch_id) REFERENCES common_db.branch_info(branch_id) ON DELETE NO ACTION
             ) COMMENT '주문 항목 테이블';
