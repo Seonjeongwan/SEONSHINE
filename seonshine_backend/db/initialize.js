@@ -36,7 +36,7 @@ async function initializeDb() {
                 branch_id INT COMMENT '부서정보',
                 email VARCHAR(100) UNIQUE NOT NULL COMMENT '신한메일 / 식당메일',
                 password_hash VARCHAR(255) NOT NULL COMMENT 'hash 변환된 비밀 번호',
-                confirm_yn VARCHAR(10) NOT NULL COMMENT '승인 여부 0:승인대기 1:승인 2:정지 9:강제정지',
+                user_status VARCHAR(10) NOT NULL COMMENT '승인 여부 0:승인대기 1:승인 2:정지 9:강제정지',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '생성일자',
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '변경일자',
                 FOREIGN KEY (branch_id) REFERENCES common_db.branch_info(branch_id) ON DELETE NO ACTION

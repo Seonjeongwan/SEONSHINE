@@ -27,7 +27,7 @@ exports.signUp = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const query =
-      "INSERT INTO user_db.users (user_id, role_id, username, phone_number, branch_id, email, password_hash, confirm_yn, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, '0', NOW(), NOW())";
+      "INSERT INTO user_db.users (user_id, role_id, username, phone_number, branch_id, email, password_hash, user_status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, '0', NOW(), NOW())";
     userDb.query(
       query,
       [
@@ -70,34 +70,30 @@ exports.login = (req, res) => {
         user.password_hash
       );
       if (isPasswordValid) {
-        switch (user.confirm_yn) {
+        switch (user.user_status) {
           case "0":
-            res.status(403).send({
+            res.status(200).send({
               message: "Admin confirmation needed",
-              status: 403,
-              confirm_yn: user.confirm_yn,
+              user_status: user.user_status,
             });
             break;
           case "1":
             res.status(200).send({
               message: "Login successful",
               user,
-              status: 200,
-              confirm_yn: user.confirm_yn,
+              user_status: user.user_status,
             });
             break;
           case "2":
-            res.status(403).send({
+            res.status(200).send({
               message: "Account reactivation needed",
-              status: 403,
-              confirm_yn: user.confirm_yn,
+              user_status: user.user_status,
             });
             break;
           case "9":
-            res.status(403).send({
+            res.status(200).send({
               message: "Account suspended",
-              status: 403,
-              confirm_yn: user.confirm_yn,
+              user_status: user.user_status,
             });
             break;
           default:
@@ -147,7 +143,7 @@ exports.confirmSignin = (req, res) => {
   }
 
   const query =
-    "UPDATE user_db.users SET confirm_yn = '1', updated_at = NOW() WHERE user_id = ?";
+    "UPDATE user_db.users SET user_status = '1', updated_at = NOW() WHERE user_id = ?";
   userDb.query(query, [user_id], (err, result) => {
     if (err) {
       return res.status(500).send({ message: "Database error", error: err });
