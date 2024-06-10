@@ -46,10 +46,10 @@ services:
       - ./seonshine_db/schema:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost --silent"]
-      interval: 20s
+      interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 30s
+      start_period: 5s
 
   # fileserver:
   #   build: ./seonshine_fileserver
