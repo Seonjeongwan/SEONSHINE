@@ -8,10 +8,10 @@ import PageNotFound from '@/pages/pageNotFound';
 import SignUpPage from '@/pages/signUp';
 import { RoleEnum } from '@/types/user';
 
+import useAuthStore from '@/store/auth.store';
 import AuthenticateLayout from './guards/AuthenticateLayout';
 import ProtectedLayout from './guards/ProtectedLayout';
 import { paths } from './paths';
-import useAuthStore from '@/store/auth.store';
 
 const App: React.FC = () => {
 
