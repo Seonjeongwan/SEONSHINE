@@ -2,7 +2,11 @@ DB 사용자
 seonshine_mgr
 seonshine@2
 
+github
+sunnythek@naver.com
+
 docker
+seonshinevn
 seonshine
 seonshine@2
 
@@ -25,4 +29,7 @@ backup codes
 2418 5127
 1303 9961
 5021 0901
+
+로컬
+192.168.57.96
 
