@@ -6,15 +6,18 @@ import LoginPage from '@/pages/login';
 import MainPage from '@/pages/main';
 import PageNotFound from '@/pages/pageNotFound';
 import SignUpPage from '@/pages/signUp';
+import ChooseUserType from '@/pages/signUp/ChooseUserType';
+
 import { RoleEnum } from '@/types/user';
+
+import useAuthStore from '@/store/auth.store';
 
 import AuthenticateLayout from './guards/AuthenticateLayout';
 import ProtectedLayout from './guards/ProtectedLayout';
 import { paths } from './paths';
-import useAuthStore from '@/store/auth.store';
+import ProfileRegistration from '@/pages/signUp/ProfileRegistration';
 
 const App: React.FC = () => {
-
   const { isAuthenticated } = useAuthStore();
   const authenticate = isAuthenticated();
 
@@ -32,7 +35,7 @@ const App: React.FC = () => {
           />
           <Route
             path={paths.signUp}
-            element={authenticate ? <Navigate to={paths.main} /> : <SignUpPage />}
+            element={authenticate ? <Navigate to={paths.main} /> : <ProfileRegistration />}
           />
         </Route>
 
