@@ -4,4 +4,7 @@ export const paths = {
   forgotPassword: '/forgot-password',
   signUp: '/sign-up',
   test: '/test',
+  pageNotFound: '/404',
+  main: '/main',
+  admin: '/admin',
 };

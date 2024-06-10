@@ -1,5 +1,7 @@
 import { Components } from '@mui/material';
 
+import colors from './colors';
+
 const componentsConfig: Components = {
   MuiButton: {
     defaultProps: {
@@ -23,6 +25,7 @@ const componentsConfig: Components = {
       root: {
         marginLeft: '0',
         fontSize: '12px',
+        color: `${colors.red[500]} !important`,
       },
     },
   },

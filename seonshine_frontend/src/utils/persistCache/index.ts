@@ -1,14 +1,16 @@
+import Cookies from 'js-cookie';
+
 class PersistCache {
-  static save(key: string, value: string): void {
-    localStorage.setItem(key, value);
+  static save(key: string, value: string, options: Cookies.CookieAttributes = {}): void {
+    Cookies.set(key, value, options);
   }
 
-  static read(key: string): string | null {
-    return localStorage.getItem(key);
+  static read(key: string): string | undefined {
+    return Cookies.get(key);
   }
 
   static remove(key: string): void {
-    localStorage.removeItem(key);
+    Cookies.remove(key);
   }
 }
 
