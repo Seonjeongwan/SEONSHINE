@@ -16,8 +16,8 @@ import { paths } from '@/routes/paths';
 import { useLoginApi } from '@/apis/hooks/authApi.hook';
 import { useLoadingStore } from '@/store/loading.store';
 
-import loginBanner from '../../assets/images/login-banner.png';
-import logo from '../../assets/images/Logo-Shinhan-Bank.webp';
+import loginBanner from '../../assets/images/seonshine_banner.png';
+import logo from '../../assets/images/seonshine_logo.png';
 import { LoginSchema, LoginSchemaType } from './schemas';
 
 const LoginPage = () => {
@@ -72,18 +72,18 @@ const LoginPage = () => {
       alignItems="center"
       className="w-screen h-screen"
     >
-      <Stack className="w-full h-full bg-white shadow-md lg:rounded-md shadow-black-100 lg:w-194 lg:h-auto py-8">
+      <Stack className="w-full h-full bg-white shadow-md lg:rounded-md shadow-black-100 lg:w-280 lg:h-200">
         <Box className="grid w-full h-full grid-cols-1 lg:grid-cols-2">
-          <Box className="hidden h-full lg:flex lg:items-center lg:justify-center">
+          <Box className="hidden h-full lg:flex lg:items-center lg:justify-center bg-gradient-to-br from-blue-500 to-yellow-500 opacity-90 z-0">
             <img
               src={loginBanner}
-              className="w-full"
+              className="w-full z-10"
             />
           </Box>
           <Stack
             justifyContent="center"
             alignItems="center"
-            className="h-full px-8"
+            className="h-full px-8 py-8"
           >
             <form
               onSubmit={handleSubmit(submitForm)}
@@ -95,16 +95,49 @@ const LoginPage = () => {
                 className="h-full"
               >
                 <Stack
-                  direction="row"
                   justifyContent="center"
+                  alignItems="center"
                 >
-                  <img
-                    src={logo}
-                    className="h-8 mt-3"
-                  />
+                  <Stack
+                    className="lg:hidden"
+                    sx={{
+                      width: {
+                        xs: '80px',
+                        md: '120px',
+                      },
+                      height: {
+                        xs: '80px',
+                        md: '120px',
+                      },
+                    }}
+                  >
+                    <img
+                      src={logo}
+                      className="object-cover"
+                    />
+                  </Stack>
+                  <Typography
+                    variant="heading1"
+                    component="h1"
+                    className="text-center tracking-wider"
+                    sx={{
+                      fontSize: {
+                        xs: '48px',
+                        md: '64px',
+                      },
+                    }}
+                  >
+                    Seonshine
+                  </Typography>
                 </Stack>
 
-                <h3 className="text-3xl font-bold mt-14 lg:mt-7">Login</h3>
+                <Typography
+                  variant="heading2"
+                  component="h3"
+                  className="mt-14 lg:mt-8 mb-8"
+                >
+                  Log In
+                </Typography>
 
                 <Box className="grid gap-4 mt-4">
                   <Stack

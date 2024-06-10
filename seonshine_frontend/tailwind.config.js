@@ -71,6 +71,7 @@ export default {
       180: '45rem',
       194: '48.5rem',
       240: '60rem',
+      280: '70rem',
     }),
     height: (theme) => ({
       auto: 'auto',
@@ -99,6 +100,7 @@ export default {
       109: '27.25rem',
       120: '30rem',
       145: '36.25rem',
+      200: '50rem',
       fit: 'fit-content',
     }),
     extend: {},
