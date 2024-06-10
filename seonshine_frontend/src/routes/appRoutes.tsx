@@ -15,7 +15,7 @@ import AuthenticateLayout from './guards/AuthenticateLayout';
 import ProtectedLayout from './guards/ProtectedLayout';
 import { paths } from './paths';
 
-const App: React.FC = () => {
+const AppRoutes = () => {
   const { isAuthenticated } = useAuthStore();
   const authenticate = isAuthenticated();
 
@@ -94,4 +94,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default AppRoutes;
