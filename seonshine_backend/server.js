@@ -32,9 +32,20 @@ app.use("/common", commonRoutes);
 // app.use("/order", orderRoutes);
 
 // Initialize the database
-initializeDb();
+async function startServer() {
+  try {
+    // Initialize the database connections
+    await initializeDb();
 
-// Start the server on the specified port
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+    // Start the server on the specified port
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Error initializing databases:", error);
+    setTimeout(startServer, 5000); // Retry after 5 seconds if initialization fails
+  }
+}
+
+// Start the server
+startServer();

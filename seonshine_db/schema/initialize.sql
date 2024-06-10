@@ -129,16 +129,16 @@ CREATE TABLE order_items (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (order_id) REFERENCES order_history(order_id) ON DELETE CASCADE,
   FOREIGN KEY (user_id) REFERENCES user_db.users(user_id) ON DELETE NO ACTION,
-  FOREIGN KEY (restaurant_id) REFERENCES restaurant_db.menu_items(restaurant_id) ON DELETE NO ACTION,
+  FOREIGN KEY (restaurant_id) REFERENCES user_db.users(user_id) ON DELETE NO ACTION,
   FOREIGN KEY (item_id) REFERENCES restaurant_db.menu_items(item_id) ON DELETE NO ACTION,
   FOREIGN KEY (branch_id) REFERENCES common_db.branch_info(branch_id) ON DELETE NO ACTION
 ) COMMENT '주문 항목 테이블';
 
 -- 권한 부여
-GRANT ALL PRIVILEGES ON common_db.* TO 'seonshine_mgr'@'localhost';
-GRANT ALL PRIVILEGES ON user_db.* TO 'seonshine_mgr'@'localhost';
-GRANT ALL PRIVILEGES ON restaurant_db.* TO 'seonshine_mgr'@'localhost';
-GRANT ALL PRIVILEGES ON order_db.* TO 'seonshine_mgr'@'localhost';
+GRANT ALL PRIVILEGES ON common_db.* TO 'seonshine_mgr'@'%';
+GRANT ALL PRIVILEGES ON user_db.* TO 'seonshine_mgr'@'%';
+GRANT ALL PRIVILEGES ON restaurant_db.* TO 'seonshine_mgr'@'%';
+GRANT ALL PRIVILEGES ON order_db.* TO 'seonshine_mgr'@'%';
 
 -- 권한 적용
 FLUSH PRIVILEGES;
