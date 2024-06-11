@@ -92,13 +92,11 @@ jobs:
             echo "SSH connection successful"
             if [ ! -d /home/ubuntu ]; then
               mkdir -p /home/ubuntu
-            fi
-            cd /home/ubuntu/
-            if [ -d .git ]; then
-              git pull origin main
-            else
               git clone https://github.com/Seonjeongwan/SEONSHINE.git
+            else
+              cd /home/ubuntu
+              git pull origin main
             fi
-            sudo chmod 666 /var/run/docker.sock
+            export COMPOSE_HTTP_TIMEOUT=300
             docker-compose -f ./SEONSHINE/docker-compose.yml pull
             docker-compose -f ./SEONSHINE/docker-compose.yml up -d
