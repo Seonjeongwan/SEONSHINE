@@ -1,12 +1,15 @@
 const mysql = require("mysql2/promise");
+const dbConfig = require("../config/db");
 require("dotenv").config();
 
 async function initializeDb() {
+  const { host, user, password } = dbConfig;
+
   try {
     const connection = await mysql.createConnection({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
+      host,
+      user,
+      password,
       multipleStatements: true,
     });
 

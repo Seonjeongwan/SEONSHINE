@@ -1,32 +1,35 @@
-const { commonDb } = require("../db/connection");
+import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
+import Branch from "../models/branch.js";
+import { getResponseErrors } from "../utils/responseParser.js";
 
-exports.addBranch = (req, res) => {
-  const { branch_name } = req.body;
-
-  if (!branch_name) {
-    return res.status(400).send({ message: "Branch name is required" });
-  }
-
-  const query =
-    "INSERT INTO branch_info (branch_name, created_at, updated_at) VALUES (?, NOW(), NOW())";
-  commonDb.query(query, [branch_name], (err, result) => {
-    if (err) {
-      res.status(500).send({ message: "Database error", error: err });
-    } else {
-      res.status(200).send({
-        message: "Branch added successfully",
-        branchId: result.insertId,
-      });
-    }
-  });
+export const getAllBranch = async (req, res) => {
+  const branches = await Branch.findAll();
+  res.status(httpStatusCodes.success).send(branches);
 };
 
-exports.getBranch = (req, res) => {
-  const query = "select branch_id, branch_name FROM branch_info";
-  commonDb.query(query, (err, result) => {
-    if (err) {
-      return res.status(500).send({ message: "Database error", error: err });
+export const getBranchById = async (req, res) => {
+  try {
+    const branch = await Branch.findByPk(req.params.id, { raw: true });
+    if (branch) {
+      res.status(httpStatusCodes.success).json(branch);
+    } else {
+      res
+        .status(httpStatusCodes.badRequest)
+        .json({ error: "Branch not found" });
     }
-    res.status(200).send({ branches: result, status: 200 });
-  });
+  } catch (error) {
+    res
+      .status(httpStatusCodes.internalServerError)
+      .json({ error: httpStatusErrors.internalServerError });
+  }
+};
+
+export const addBranch = async (req, res) => {
+  try {
+    const branch = await Branch.create(req.body);
+    res.status(httpStatusCodes.created).json(branch);
+  } catch (error) {
+    const response = getResponseErrors(error);
+    res.status(response.status).json({ errors: response.errors });
+  }
 };
