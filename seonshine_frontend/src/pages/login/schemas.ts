@@ -20,9 +20,3 @@ export const LoginSchema = zod.object({
 });
 
 export type LoginSchemaType = zod.infer<typeof LoginSchema>;
-
-export const OtpSchema = zod.object({
-  otp: zod.string().trim().regex(otpRegex, 'OTP must have 6 digits'),
-});
-
-export type OtpSchemaType = zod.infer<typeof OtpSchema>;
