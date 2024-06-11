@@ -88,8 +88,11 @@ jobs:
             if [ ! -d /home/ubuntu/SEONSHINE_PROJECT ]; then
               mkdir -p /home/ubuntu/SEONSHINE_PROJECT
             fi
-            rsync -avz -e "ssh -i private_key" . ubuntu@${{ secrets.SSH_HOST }}:/home/ec2-user/project/
             cd /home/ubuntu/SEONSHINE_PROJECT
-            git pull origin main
+            if [ -d .git ]; then
+              git pull origin main
+            else
+              git clone https://github.com/Seonjeongwan/SEONSHINE.git
+            fi
             docker-compose -f docker-compose.yml pull
             docker-compose -f docker-compose.yml up -d
