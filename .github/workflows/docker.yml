@@ -72,6 +72,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Set up SSH key
+        run: |
+          echo "${{ secrets.SSH_KEY }}" > private_key
+          chmod 600 private_key
+
       - name: SSH into server
         uses: appleboy/ssh-action@v0.1.4
         with:
@@ -79,5 +84,6 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
+            echo "SSH connection successful"
             docker-compose -f docker-compose.yml pull
             docker-compose -f docker-compose.yml up -d
