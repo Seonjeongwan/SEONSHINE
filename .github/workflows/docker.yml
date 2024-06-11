@@ -90,12 +90,18 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             echo "SSH connection successful"
-            if [ ! -d /home/ubuntu ]; then
-              mkdir -p /home/ubuntu
+            if [ ! -d /home/ubuntu/Project ]; then
+              mkdir -p /home/ubuntu/Project
               git clone https://github.com/Seonjeongwan/SEONSHINE.git
-            else
-              cd /home/ubuntu
+            fi
+            cd /home/ubuntu/Project
+            if [ -d .git ]; then
+              git reset --hard HEAD
               git pull origin main
+            else
+              rm -rf /home/ubuntu/Project/*
+              git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/Project
+              cd /home/ubuntu/Project
             fi
             export COMPOSE_HTTP_TIMEOUT=300
             docker-compose -f ./SEONSHINE/docker-compose.yml pull
