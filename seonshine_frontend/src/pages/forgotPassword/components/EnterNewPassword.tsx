@@ -30,8 +30,9 @@ const EnterNewPassword = ({ handleSubmitPassword }: EnterNewPasswordPropsType) =
 
   const onSubmit = (data: PasswordSchemaType) => handleSubmitPassword(data.password);
 
-  const handleClickShowPassword = () => setShowPassword((prev) => !prev);
-  const handleClickShowConfirmPassword = () => setShowConfirmPassword((prev) => !prev);
+  const handleShowPassword = () => setShowPassword((prev) => !prev);
+
+  const handleShowConfirmPassword = () => setShowConfirmPassword((prev) => !prev);
 
   return (
     <AccountVerificationLayout
@@ -68,7 +69,10 @@ const EnterNewPassword = ({ handleSubmitPassword }: EnterNewPasswordPropsType) =
               error={errors.password}
               type={showPassword ? 'text' : 'password'}
               endAdornment={
-                <IconButton onClick={handleClickShowPassword}>
+                <IconButton
+                  onMouseDown={handleShowPassword}
+                  onMouseUp={handleShowPassword}
+                >
                   {showPassword ? <Visibility /> : <VisibilityOff />}
                 </IconButton>
               }
@@ -90,7 +94,10 @@ const EnterNewPassword = ({ handleSubmitPassword }: EnterNewPasswordPropsType) =
               error={errors.confirmPassword}
               type={showConfirmPassword ? 'text' : 'password'}
               endAdornment={
-                <IconButton onClick={handleClickShowConfirmPassword}>
+                <IconButton
+                  onMouseDown={handleShowConfirmPassword}
+                  onMouseUp={handleShowConfirmPassword}
+                >
                   {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
                 </IconButton>
               }

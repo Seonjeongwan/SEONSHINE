@@ -43,7 +43,7 @@ const LoginPage = () => {
 
   const rememberCheckboxRef = useRef<HTMLInputElement>(null);
 
-  const handleClickShowPassword = () => setShowPassword((prev) => !prev);
+  const handleShowPassword = () => setShowPassword((prev) => !prev);
 
   const handleLogin = (data: LoginSchemaType) => {
     exeLogin(data, {
@@ -173,7 +173,10 @@ const LoginPage = () => {
                       error={errors.password}
                       type={showPassword ? 'text' : 'password'}
                       endAdornment={
-                        <IconButton onClick={handleClickShowPassword}>
+                        <IconButton
+                          onMouseDown={handleShowPassword}
+                          onMouseUp={handleShowPassword}
+                        >
                           {showPassword ? <Visibility /> : <VisibilityOff />}
                         </IconButton>
                       }
