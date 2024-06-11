@@ -94,5 +94,5 @@ jobs:
             else
               git clone https://github.com/Seonjeongwan/SEONSHINE.git
             fi
-            docker-compose -f .docker-compose.yml pull
-            docker-compose -f docker-compose.yml up -d
+            docker-compose -f ./SEONSHINE/docker-compose.yml pull
+            docker-compose -f ./SEONSHINE/docker-compose.yml up -d
