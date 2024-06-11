@@ -1,6 +1,8 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
+import MainLayout from '@/components/templates/mainLyout';
+
 import { paths } from '@/routes/paths';
 import { RoleEnum } from '@/types/user';
 import { getUserFromCache } from '@/utils/persistCache/auth';
@@ -27,16 +29,16 @@ const ProtectedLayout: React.FC<ProtectedLayoutPropsType> = ({ children, allowed
     );
   }
 
-  if (currentUser && !allowedRoles.includes(currentUser.role_id)) {
-    return (
-      <Navigate
-        to={paths.main}
-        replace
-      />
-    );
-  }
+  // if (currentUser && !allowedRoles.includes(currentUser.role_id)) {
+  //   return (
+  //     <Navigate
+  //       to={paths.main}
+  //       replace
+  //     />
+  //   );
+  // }
 
-  return <>{children}</>;
+  return <MainLayout role={RoleEnum.ADMIN}>{children}</MainLayout>;
 };
 
 export default ProtectedLayout;
