@@ -107,4 +107,4 @@ jobs:
             docker-compose -f ./docker-compose.yml pull
             docker-compose -f ./docker-compose.yml up -d
 
-      #dockercompose -f ./docker-compose.yml down 은 모두 제거후 실행
+      #dockercompose -f ./docker-compose.yml down 은 모두 제거후
