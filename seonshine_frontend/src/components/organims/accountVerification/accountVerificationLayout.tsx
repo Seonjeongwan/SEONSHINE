@@ -33,8 +33,8 @@ const AccountVerificationLayout = ({
         justifyContent="center"
         gap="24px"
         alignItems="center"
-        className={`w-full h-screen p-24 bg-white rounded-lg shadow-md md:w-max xl:w-240 max-w-screen relative ${
-          size === 'normal' ? 'md:h-[600px]' : 'md:h-[460px]'
+        className={`w-full h-screen p-24 bg-white rounded-lg shadow-md max-w-screen relative ${
+          size === 'normal' ? 'md:h-171 md:w-240' : 'md:h-131 md:w-194'
         }`}
       >
         <Typography

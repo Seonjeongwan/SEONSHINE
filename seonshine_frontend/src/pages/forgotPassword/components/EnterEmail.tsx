@@ -2,16 +2,13 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 
 import FormInput from '@/components/molecules/formEntity/input';
 import AccountVerificationLayout from '@/components/organims/accountVerification/accountVerificationLayout';
 
 import { EmailSchema, EmailSchemaType } from '../schema';
-
-type EnterEmailPropsType = {
-  handleSubmitEmail: (email: string) => void;
-};
+import { EnterEmailPropsType } from '../types';
 
 const EnterEmail = ({ handleSubmitEmail }: EnterEmailPropsType) => {
   const {
@@ -44,7 +41,7 @@ const EnterEmail = ({ handleSubmitEmail }: EnterEmailPropsType) => {
               xs: '320px',
               sm: '475px',
             },
-            padding: '24px 0px 0px 0px',
+            padding: '24px 0 0 0',
           }}
         >
           <FormInput

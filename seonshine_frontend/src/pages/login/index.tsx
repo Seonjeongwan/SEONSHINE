@@ -72,12 +72,13 @@ const LoginPage = () => {
       alignItems="center"
       className="w-screen h-screen"
     >
-      <Stack className="w-full h-full bg-white shadow-md lg:rounded-md shadow-black-100 lg:w-280 lg:h-200">
-        <Box className="grid w-full h-full grid-cols-1 lg:grid-cols-2">
-          <Box className="hidden h-full lg:flex lg:items-center lg:justify-center bg-gradient-to-br from-blue-500 to-yellow-500 opacity-90 z-0">
+      <Stack className="w-full h-full bg-white shadow-md md:rounded-md shadow-black-100 md:w-280 md:h-200">
+        <Box className="grid w-full h-full grid-cols-1 md:grid-cols-2">
+          <Box className="hidden h-full md:flex md:items-center md:justify-center bg-gradient-to-br from-blue-500 to-yellow-500 opacity-90 z-0">
             <img
               src={loginBanner}
               className="w-full z-10"
+              alt="Login banner"
             />
           </Box>
           <Stack
@@ -98,8 +99,8 @@ const LoginPage = () => {
                   justifyContent="center"
                   alignItems="center"
                 >
-                  <Stack
-                    className="lg:hidden"
+                  <Box
+                    className="hidden xs:block md:hidden"
                     sx={{
                       width: {
                         xs: '80px',
@@ -113,9 +114,10 @@ const LoginPage = () => {
                   >
                     <img
                       src={logo}
+                      alt="Logo"
                       className="object-cover"
                     />
-                  </Stack>
+                  </Box>
                   <Typography
                     variant="heading1"
                     component="h1"
@@ -134,7 +136,7 @@ const LoginPage = () => {
                 <Typography
                   variant="heading2"
                   component="h3"
-                  className="mt-14 lg:mt-8 mb-8"
+                  className="mt-14 md:mt-8 mb-8 text-center"
                 >
                   Log In
                 </Typography>

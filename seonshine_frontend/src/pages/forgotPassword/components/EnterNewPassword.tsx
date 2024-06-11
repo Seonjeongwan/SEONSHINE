@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,10 +10,7 @@ import { FormLabel } from '@/components/molecules/formEntity/label';
 import AccountVerificationLayout from '@/components/organims/accountVerification/accountVerificationLayout';
 
 import { PasswordSchema, PasswordSchemaType } from '../schema';
-
-type EnterNewPasswordPropsType = {
-  handleSubmitPassword: (password: string) => void;
-};
+import { EnterNewPasswordPropsType } from '../types';
 
 const EnterNewPassword = ({ handleSubmitPassword }: EnterNewPasswordPropsType) => {
   const {
@@ -33,13 +30,8 @@ const EnterNewPassword = ({ handleSubmitPassword }: EnterNewPasswordPropsType) =
 
   const onSubmit = (data: PasswordSchemaType) => handleSubmitPassword(data.password);
 
-  const handleClickShowPassword = () => {
-    setShowPassword((prev) => !prev);
-  };
-
-  const handleClickShowConfirmPassword = () => {
-    setShowConfirmPassword((prev) => !prev);
-  };
+  const handleClickShowPassword = () => setShowPassword((prev) => !prev);
+  const handleClickShowConfirmPassword = () => setShowConfirmPassword((prev) => !prev);
 
   return (
     <AccountVerificationLayout
@@ -58,12 +50,12 @@ const EnterNewPassword = ({ handleSubmitPassword }: EnterNewPasswordPropsType) =
               xs: '320px',
               sm: '475px',
             },
-            padding: '24px 0px 0px 0px',
+            padding: '24px 0 0 0',
           }}
         >
           <Stack
             direction="column"
-            className="gap-2"
+            gap={2}
           >
             <FormLabel
               title="New Password"
@@ -71,7 +63,6 @@ const EnterNewPassword = ({ handleSubmitPassword }: EnterNewPasswordPropsType) =
             />
             <FormInput
               name="password"
-              autoFocus
               register={register}
               placeholder="Enter your new password"
               error={errors.password}
@@ -85,7 +76,7 @@ const EnterNewPassword = ({ handleSubmitPassword }: EnterNewPasswordPropsType) =
           </Stack>
           <Stack
             direction="column"
-            className="gap-2"
+            gap={2}
           >
             <FormLabel
               title="Confirm New Password"
@@ -110,7 +101,7 @@ const EnterNewPassword = ({ handleSubmitPassword }: EnterNewPasswordPropsType) =
             variant="contained"
             color="primary"
             fullWidth
-            onClick={handleSubmit(onSubmit)}
+            type="submit"
             className="h-12"
           >
             <Typography variant="buttonM">Reset Password</Typography>
