@@ -1,0 +1,29 @@
+name: SSH Connection Test
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-ssh:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up SSH key
+        run: |
+          echo "${{ secrets.SSH_KEY }}" > private_key
+          chmod 600 private_key
+
+      - name: Test SSH connection
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            echo "SSH connection successful"
+            ls -la
