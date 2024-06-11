@@ -17,6 +17,8 @@ jobs:
         run: |
           echo "${{ secrets.SSH_KEY }}" > private_key
           chmod 600 private_key
+          echo "Private key:"
+          cat private_key  # This should be removed after debugging
 
       - name: Test SSH connection
         uses: appleboy/ssh-action@v0.1.4
