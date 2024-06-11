@@ -7,7 +7,7 @@ import { Button, IconButton, Stack, Typography } from '@mui/material';
 
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
-import AccountVerificationLayout from '@/components/organims/accountVerification/accountVerificationLayout';
+import AccountVerificationLayout from '@/components/organims/accountVerification';
 
 import { PasswordSchema, PasswordSchemaType } from '../schema';
 import { EnterNewPasswordPropsType } from '../types';

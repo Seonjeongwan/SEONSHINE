@@ -4,7 +4,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Button, FormHelperText, Stack, TextField, Typography } from '@mui/material';
 
-import AccountVerificationLayout from '@/components/organims/accountVerification/accountVerificationLayout';
+import AccountVerificationLayout from '@/components/organims/accountVerification';
 
 import { digitRegex } from '@/constants/regex';
 

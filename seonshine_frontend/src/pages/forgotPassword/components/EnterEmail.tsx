@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Stack, Typography } from '@mui/material';
 
 import FormInput from '@/components/molecules/formEntity/input';
-import AccountVerificationLayout from '@/components/organims/accountVerification/accountVerificationLayout';
+import AccountVerificationLayout from '@/components/organims/accountVerification';
 
 import { EmailSchema, EmailSchemaType } from '../schema';
 import { EnterEmailPropsType } from '../types';
