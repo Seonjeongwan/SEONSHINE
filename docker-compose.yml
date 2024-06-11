@@ -2,7 +2,8 @@ version: "3.8"
 
 services:
   frontend:
-    build: ./seonshine_frontend
+    image: seonshinevn/seonshine_frontend:latest
+    #build: ./seonshine_frontend
     ports:
       - "3000:3000"
     volumes:
@@ -12,7 +13,8 @@ services:
       - backend
 
   backend:
-    build: ./seonshine_backend
+    image: seonshinevn/seonshine_backend:latest
+    # build: ./seonshine_backend
     environment:
       - NODE_ENV=production
       - DB_HOST=db
@@ -33,7 +35,7 @@ services:
   # tty: true
 
   db:
-    build: ./seonshine_db
+    #build: ./seonshine_db
     image: mysql:8.0.36
     ports:
       - "3306:3306"
@@ -52,7 +54,8 @@ services:
       start_period: 5s
 
   fileserver:
-    build: ./seonshine_fileserver
+    image: seonshinevn/seonshine_fileserver:latest
+    # build: ./seonshine_fileserver
     ports:
       - "4000:4000"
     volumes:
