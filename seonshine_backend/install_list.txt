@@ -10,3 +10,28 @@ npm install express body-parser cors mysql nodemailer bcrypt nodemon dotenv
 #애플리케이션 시작
 npm start
 
+#aws
+sudo apt update
+sudo apt upgrade -y
+sudo apt install -y curl git
+
+# Docker의 설치 스크립트를 실행합니다.
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+
+# Docker가 정상적으로 설치되었는지 확인합니다.
+sudo docker --version
+
+# Docker Compose의 최신 버전을 다운로드합니다.
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+# 실행 권한을 부여합니다.
+sudo chmod +x /usr/local/bin/docker-compose
+
+# Docker Compose가 정상적으로 설치되었는지 확인합니다.
+docker-compose --version
+
+sudo usermod -aG docker $USER
+newgrp docker
+
+sudo apt-get install -y curl wget vim nano
