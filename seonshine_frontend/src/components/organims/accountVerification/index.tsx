@@ -6,9 +6,9 @@ import { Box, Button, FormHelperText, Stack, TextField, Typography } from '@mui/
 
 import AccountVerificationLayout from '@/components/organims/accountVerification/accountVerificationLayout';
 
-import { OtpSchema, OtpSchemaType } from '@/pages/login/schemas';
-
 import { digitRegex } from '@/constants/regex';
+
+import { OtpSchema, OtpSchemaType } from './schema';
 
 type AccountVerificationProps = {
   title?: string;

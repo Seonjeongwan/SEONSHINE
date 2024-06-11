@@ -17,6 +17,7 @@ const componentsConfig: Components = {
     styleOverrides: {
       input: {
         paddingTop: '15px !important',
+        fontSize: '16px',
       },
     },
   },

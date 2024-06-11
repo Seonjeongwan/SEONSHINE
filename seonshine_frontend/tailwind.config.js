@@ -6,6 +6,13 @@ export default {
   //   preflight: false,
   // },
   theme: {
+    screens: {
+      xs: '400px',
+      sm: '600px',
+      md: '960px',
+      lg: '1280px',
+      xl: '1920px',
+    },
     fontSize: {
       xs: '11px',
       sm: '13px',
@@ -71,6 +78,7 @@ export default {
       180: '45rem',
       194: '48.5rem',
       240: '60rem',
+      280: '70rem',
     }),
     height: (theme) => ({
       auto: 'auto',
@@ -96,9 +104,11 @@ export default {
       screen: '100vh',
       58: '14.5rem',
       109: '27.25rem',
-      109: '27.25rem',
       120: '30rem',
+      131: '32.86rem',
       145: '36.25rem',
+      171: '42.86rem',
+      200: '50rem',
       fit: 'fit-content',
     }),
     extend: {},

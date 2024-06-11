@@ -6,15 +6,22 @@ type AccountVerificationLayoutProps = {
   title?: string;
   description: string;
   children: ReactNode;
+  size?: 'small' | 'normal';
 };
 
-const AccountVerificationLayout = ({ title, description, children }: AccountVerificationLayoutProps) => {
+const AccountVerificationLayout = ({
+  title,
+  description,
+  children,
+  size = 'normal',
+}: AccountVerificationLayoutProps) => {
   const renderDescription = description.split('. ').map((text, index, array) => (
     <React.Fragment key={index}>
       {`${text}${index < array.length - 1 ? '.' : ''}`}
       <br />
     </React.Fragment>
   ));
+
   return (
     <Stack
       alignItems="center"
@@ -23,9 +30,12 @@ const AccountVerificationLayout = ({ title, description, children }: AccountVeri
     >
       <Stack
         direction="column"
-        gap="24px"
+        justifyContent="center"
+        gap={6}
         alignItems="center"
-        className="w-full p-24 bg-white rounded-lg shadow-md md:w-max xl:w-240 max-w-screen"
+        className={`w-full h-screen p-24 bg-white rounded-lg shadow-md max-w-screen relative ${
+          size === 'normal' ? 'md:h-171 md:w-240' : 'md:h-131 md:w-194'
+        }`}
       >
         <Typography
           variant="heading2"
