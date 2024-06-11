@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Stack, Typography } from '@mui/material';
 
 import FormInput from '@/components/molecules/formEntity/input';
-import AccountVerificationLayout from '@/components/organims/accountVerification';
+import AccountVerificationLayout from '@/components/organims/accountVerification/accountVerificationLayout';
 
 import { EmailSchema, EmailSchemaType } from '../schema';
 import { EnterEmailPropsType } from '../types';
@@ -35,14 +35,14 @@ const EnterEmail = ({ handleSubmitEmail }: EnterEmailPropsType) => {
       >
         <Stack
           direction="column"
-          gap="24px"
+          gap={6}
           sx={{
             width: {
               xs: '320px',
               sm: '475px',
             },
-            padding: '24px 0 0 0',
           }}
+          className="p-0 pt-6"
         >
           <FormInput
             name="email"

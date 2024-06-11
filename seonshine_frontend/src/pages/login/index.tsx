@@ -10,14 +10,14 @@ import { Box, Button, Checkbox, FormControlLabel, IconButton, Link, Stack, Typog
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
 
+import loginBanner from '@/assets/images/login-banner.png';
+import logo from '@/assets/images/logo.png';
 import { useAuth } from '@/hooks/useAuth';
 import { paths } from '@/routes/paths';
 
 import { useLoginApi } from '@/apis/hooks/authApi.hook';
 import { useLoadingStore } from '@/store/loading.store';
 
-import loginBanner from '../../assets/images/seonshine_banner.png';
-import logo from '../../assets/images/seonshine_logo.png';
 import { LoginSchema, LoginSchemaType } from './schemas';
 
 const LoginPage = () => {
@@ -43,7 +43,7 @@ const LoginPage = () => {
 
   const rememberCheckboxRef = useRef<HTMLInputElement>(null);
 
-  const handleShowPassword = () => setShowPassword((prev) => !prev);
+  const handleTogglePassword = () => setShowPassword((prev) => !prev);
 
   const handleLogin = (data: LoginSchemaType) => {
     exeLogin(data, {
@@ -174,8 +174,8 @@ const LoginPage = () => {
                       type={showPassword ? 'text' : 'password'}
                       endAdornment={
                         <IconButton
-                          onMouseDown={handleShowPassword}
-                          onMouseUp={handleShowPassword}
+                          onMouseDown={handleTogglePassword}
+                          onMouseUp={handleTogglePassword}
                         >
                           {showPassword ? <Visibility /> : <VisibilityOff />}
                         </IconButton>

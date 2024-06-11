@@ -7,7 +7,7 @@ import { Button, IconButton, Stack, Typography } from '@mui/material';
 
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
-import AccountVerificationLayout from '@/components/organims/accountVerification';
+import AccountVerificationLayout from '@/components/organims/accountVerification/accountVerificationLayout';
 
 import { PasswordSchema, PasswordSchemaType } from '../schema';
 import { EnterNewPasswordPropsType } from '../types';
@@ -30,9 +30,9 @@ const EnterNewPassword = ({ handleSubmitPassword }: EnterNewPasswordPropsType) =
 
   const onSubmit = (data: PasswordSchemaType) => handleSubmitPassword(data.password);
 
-  const handleShowPassword = () => setShowPassword((prev) => !prev);
+  const handleTogglePassword = () => setShowPassword((prev) => !prev);
 
-  const handleShowConfirmPassword = () => setShowConfirmPassword((prev) => !prev);
+  const handleToggleConfirmPassword = () => setShowConfirmPassword((prev) => !prev);
 
   return (
     <AccountVerificationLayout
@@ -45,14 +45,14 @@ const EnterNewPassword = ({ handleSubmitPassword }: EnterNewPasswordPropsType) =
       >
         <Stack
           direction="column"
-          gap="24px"
+          gap={6}
           sx={{
             width: {
               xs: '320px',
               sm: '475px',
             },
-            padding: '24px 0 0 0',
           }}
+          className="p-0 pt-6"
         >
           <Stack
             direction="column"
@@ -70,8 +70,8 @@ const EnterNewPassword = ({ handleSubmitPassword }: EnterNewPasswordPropsType) =
               type={showPassword ? 'text' : 'password'}
               endAdornment={
                 <IconButton
-                  onMouseDown={handleShowPassword}
-                  onMouseUp={handleShowPassword}
+                  onMouseDown={handleTogglePassword}
+                  onMouseUp={handleTogglePassword}
                 >
                   {showPassword ? <Visibility /> : <VisibilityOff />}
                 </IconButton>
@@ -95,8 +95,8 @@ const EnterNewPassword = ({ handleSubmitPassword }: EnterNewPasswordPropsType) =
               type={showConfirmPassword ? 'text' : 'password'}
               endAdornment={
                 <IconButton
-                  onMouseDown={handleShowConfirmPassword}
-                  onMouseUp={handleShowConfirmPassword}
+                  onMouseDown={handleToggleConfirmPassword}
+                  onMouseUp={handleToggleConfirmPassword}
                 >
                   {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
                 </IconButton>
