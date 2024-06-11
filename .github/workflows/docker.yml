@@ -34,14 +34,14 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # - name: Build and push frontend image
-      #   if: matrix.service == 'frontend'
-      #   uses: docker/build-push-action@v2
-      #   with:
-      #     context: ./seonshine_frontend
-      #     push: true
-      #   platforms: linux/amd64,linux/arm64
-      #   tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_frontend:latest
+      - name: Build and push frontend image
+        if: matrix.service == 'frontend'
+        uses: docker/build-push-action@v2
+        with:
+          context: ./seonshine_frontend
+          push: true
+        platforms: linux/amd64,linux/arm64
+        tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_frontend:latest
 
       - name: Build and push backend image
         if: matrix.service == 'backend'
@@ -103,7 +103,7 @@ jobs:
               git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/Project
               cd /home/ubuntu/SEONSHINE
             fi
-            export COMPOSE_HTTP_TIMEOUT=300
+            export COMPOSE_HTTP_TIMEOUT=240
             docker-compose -f ./docker-compose.yml pull
             docker-compose -f ./docker-compose.yml up -d
 
