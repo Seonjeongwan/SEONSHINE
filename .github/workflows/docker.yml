@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+    # paths:
+    #   - "seonshine_frontend/**"
+    #   - "seonshine_backend/**"
+    #   - "seonshine_db/**"
+    #   - "seonshine_fileserver/**"
 
 jobs:
   build-and-push:
@@ -29,14 +34,14 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # - name: Build and push frontend image
-      #   if: matrix.service == 'frontend'
-      #   uses: docker/build-push-action@v2
-      #   with:
-      #     context: ./seonshine_frontend
-      #     push: true
-      #     platforms: linux/amd64,linux/arm64
-      #     tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_frontend:latest
+      - name: Build and push frontend image
+        if: matrix.service == 'frontend'
+        uses: docker/build-push-action@v2
+        with:
+          context: ./seonshine_frontend
+          push: true
+          # platforms: linux/amd64,linux/arm64
+          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_frontend:latest
 
       - name: Build and push backend image
         if: matrix.service == 'backend'
@@ -44,7 +49,7 @@ jobs:
         with:
           context: ./seonshine_backend
           push: true
-          platforms: linux/amd64,linux/arm64
+          # platforms: linux/amd64,linux/arm64
           tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_backend:latest
 
       - name: Build and push db image
@@ -53,7 +58,7 @@ jobs:
         with:
           context: ./seonshine_db
           push: true
-          platforms: linux/amd64,linux/arm64
+          # platforms: linux/amd64,linux/arm64
           tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_db:latest
 
       - name: Build and push fileserver image
@@ -62,7 +67,7 @@ jobs:
         with:
           context: ./seonshine_fileserver
           push: true
-          platforms: linux/amd64,linux/arm64
+          # platforms: linux/amd64,linux/arm64
           tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_fileserver:latest
 
   deploy:
@@ -78,12 +83,28 @@ jobs:
           chmod 600 private_key
 
       - name: SSH into server
-        uses: appleboy/ssh-action@v0.1.4
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
             echo "SSH connection successful"
-            docker-compose -f docker-compose.yml pull
-            docker-compose -f docker-compose.yml up -d
+            if [ ! -d /home/ubuntu/SEONSHINE ]; then
+              mkdir -p /home/ubuntu/SEONSHINE
+              git clone https://github.com/Seonjeongwan/SEONSHINE.git
+            fi
+            cd /home/ubuntu/SEONSHINE
+            if [ -d .git ]; then
+              git reset --hard HEAD
+              git pull origin main
+            else
+              rm -rf /home/ubuntu/SEONSHINE/*
+              git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/Project
+              cd /home/ubuntu/SEONSHINE
+            fi
+            export COMPOSE_HTTP_TIMEOUT=240
+            docker-compose -f ./docker-compose.yml pull
+            docker-compose -f ./docker-compose.yml up -d
+
+      #dockercompose -f ./docker-compose.yml down 은 모두 제거후
