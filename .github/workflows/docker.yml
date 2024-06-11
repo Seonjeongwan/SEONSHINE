@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "seonshine_frontend/**"
+      - "seonshine_backend/**"
+      - "seonshine_db/**"
+      - "seonshine_fileserver/**"
 
 jobs:
   build-and-push:
@@ -37,8 +42,6 @@ jobs:
       #     push: true
       #   platforms: linux/amd64,linux/arm64
       #   tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_frontend:latest
-      # paths:
-      #   - 'seonshine_frontend/**'
 
       - name: Build and push backend image
         if: matrix.service == 'backend'
@@ -48,8 +51,6 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_backend:latest
-        paths:
-          - "seonshine_backend/**"
 
       - name: Build and push db image
         if: matrix.service == 'db'
@@ -59,8 +60,6 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_db:latest
-        paths:
-          - "seonshine_db/**"
 
       - name: Build and push fileserver image
         if: matrix.service == 'fileserver'
@@ -70,8 +69,6 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_fileserver:latest
-        paths:
-          - "seonshine_fileserver/**"
 
   deploy:
     runs-on: ubuntu-latest
