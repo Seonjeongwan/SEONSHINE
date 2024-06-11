@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "seonshine_frontend/**"
-      - "seonshine_backend/**"
-      - "seonshine_db/**"
-      - "seonshine_fileserver/**"
+    # paths:
+    #   - "seonshine_frontend/**"
+    #   - "seonshine_backend/**"
+    #   - "seonshine_db/**"
+    #   - "seonshine_fileserver/**"
 
 jobs:
   build-and-push:
