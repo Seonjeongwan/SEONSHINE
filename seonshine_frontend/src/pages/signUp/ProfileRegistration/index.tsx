@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box, Button, Checkbox, FormControlLabel, FormLabel, Link, Stack, Typography } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
 
 import FormInput from '@/components/molecules/formEntity/input';
+import { FormLabel } from '@/components/molecules/formEntity/label';
 
 import { LoginSchema, LoginSchemaType } from '@/pages/login/schemas';
 
 const ProfileRegistration = () => {
   const {
-    handleSubmit,
     register,
     formState: { errors },
   } = useForm<LoginSchemaType>({
@@ -20,6 +21,11 @@ const ProfileRegistration = () => {
       password: '',
     },
   });
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+  const handleClickShowPassword = () => setShowPassword((prev) => !prev);
+  const handleClickShowConfirmPassword = () => setShowConfirmPassword((prev) => !prev);
+
   return (
     <Stack
       alignItems="center"
@@ -28,19 +34,17 @@ const ProfileRegistration = () => {
     >
       <Stack
         direction="column"
-        gap="24px"
         alignItems="center"
-        className="w-full p-8 bg-white rounded-lg shadow-md md:w-max xl:w-240 max-w-screen"
+        className="w-full px-24 bg-white rounded-lg shadow-md sm:w-150 md:w-150 xl:w-150 max-w-screen"
       >
-        <Typography
-          variant="heading2"
-          component="h2"
-          className="text-center"
-        >
-          Sign Up
-        </Typography>
-
         <Box className="grid w-full h-full grid-cols-1 lg:grid-cols-1">
+          <Typography
+            variant="heading2"
+            component="h2"
+            className="text-center pt-8"
+          >
+            Sign Up
+          </Typography>
           <Stack
             justifyContent="center"
             alignItems="center"
@@ -55,20 +59,8 @@ const ProfileRegistration = () => {
                 flexDirection="column"
                 className="h-full"
               >
-                <Stack
-                  direction="row"
-                  justifyContent="center"
-                >
-                  <img
-                    // src={logo}
-                    className="h-8 mt-3"
-                  />
-                </Stack>
-                <Box className="grid gap-4 mt-4">
-                  <Stack
-                    direction="column"
-                    className="gap-2"
-                  >
+                <Box className="grid gap-2 mt-4">
+                  <Stack direction="column">
                     <FormLabel
                       title="Employee ID"
                       required
@@ -78,13 +70,10 @@ const ProfileRegistration = () => {
                       autoFocus
                       register={register}
                       placeholder="Employee ID"
-                      // error={errors.employeeId}
+                      error={errors.employeeId}
                     />
                   </Stack>
-                  <Stack
-                    direction="column"
-                    className="gap-2"
-                  >
+                  <Stack direction="column">
                     <FormLabel
                       title="Password"
                       required
@@ -93,122 +82,123 @@ const ProfileRegistration = () => {
                       name="password"
                       register={register}
                       placeholder="Password"
-                      // error={errors.password}
-                      // type={showPassword ? 'text' : 'password'}
-                      // endAdornment={
-                      //   <IconButton onClick={handleClickShowPassword}>
-                      //     {showPassword ? <Visibility /> : <VisibilityOff />}
-                      //   </IconButton>
-                      // }
+                      type={showPassword ? 'text' : 'password'}
+                      endAdornment={
+                        <IconButton
+                          onMouseDown={handleClickShowPassword}
+                          onMouseUp={handleClickShowPassword}
+                        >
+                          {showPassword ? <Visibility /> : <VisibilityOff />}
+                        </IconButton>
+                      }
+                      error={errors.password}
                     />
                   </Stack>
-                  <Stack
-                    direction="column"
-                    className="gap-2"
-                  >
+                  <Stack direction="column">
                     <FormLabel
-                      title="Password"
+                      title="Confirm Password"
                       required
                     />
                     <FormInput
-                      name="password"
+                      name="confirmPassword"
+                      autoFocus
                       register={register}
-                      placeholder="Password"
-                      // error={errors.password}
-                      // type={showPassword ? 'text' : 'password'}
-                      // endAdornment={
-                      //   <IconButton onClick={handleClickShowPassword}>
-                      //     {showPassword ? <Visibility /> : <VisibilityOff />}
-                      //   </IconButton>
-                      // }
+                      placeholder="Confirm Password"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      endAdornment={
+                        <IconButton
+                          onMouseDown={handleClickShowConfirmPassword}
+                          onMouseUp={handleClickShowConfirmPassword}
+                        >
+                          {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
+                        </IconButton>
+                      }
+                      error={errors.employeeId}
                     />
                   </Stack>
-                  <Stack
-                    direction="column"
-                    className="gap-2"
-                  >
+                  <Stack direction="column">
                     <FormLabel
-                      title="Password"
+                      title="Full name"
                       required
                     />
                     <FormInput
-                      name="password"
+                      name="fullName"
+                      autoFocus
                       register={register}
-                      placeholder="Password"
-                      // error={errors.password}
-                      // type={showPassword ? 'text' : 'password'}
-                      // endAdornment={
-                      //   <IconButton onClick={handleClickShowPassword}>
-                      //     {showPassword ? <Visibility /> : <VisibilityOff />}
-                      //   </IconButton>
-                      // }
+                      placeholder="Full name"
+                      error={errors.employeeId}
                     />
                   </Stack>
-                  <Stack
-                    direction="column"
-                    className="gap-2"
-                  >
-                    <FormLabel
-                      title="Password"
-                      required
-                    />
-                    <FormInput
-                      name="password"
-                      register={register}
-                      placeholder="Password"
-                      // error={errors.password}
-                      // type={showPassword ? 'text' : 'password'}
-                      // endAdornment={
-                      //   <IconButton onClick={handleClickShowPassword}>
-                      //     {showPassword ? <Visibility /> : <VisibilityOff />}
-                      //   </IconButton>
-                      // }
-                    />
+                  <Stack>
+                    <Stack
+                      className="mr-2"
+                      direction="column"
+                    >
+                      <FormLabel
+                        title="Email"
+                        required
+                      />
+                      <FormInput
+                        name="email"
+                        autoFocus
+                        register={register}
+                        placeholder="Email"
+                        error={errors.employeeId}
+                      />
+                    </Stack>
+                    <Stack direction="column">
+                      <FormLabel />
+                      <FormInput
+                        name="emailExtension"
+                        register={register}
+                        disabled
+                        placeholder="@seonshine.com"
+                      />
+                    </Stack>
                   </Stack>
-                  <Stack
-                    direction="column"
-                    className="gap-2"
-                  >
-                    <FormLabel
-                      title="Password"
-                      required
-                    />
-                    <FormInput
-                      name="password"
-                      register={register}
-                      placeholder="Password"
-                      // error={errors.password}
-                      // type={showPassword ? 'text' : 'password'}
-                      // endAdornment={
-                      //   <IconButton onClick={handleClickShowPassword}>
-                      //     {showPassword ? <Visibility /> : <VisibilityOff />}
-                      //   </IconButton>
-                      // }
-                    />
+                  <Stack>
+                    <Stack
+                      className="mr-2"
+                      direction="column"
+                    >
+                      <FormLabel
+                        title="Phone number"
+                        required
+                      />
+                      <FormInput
+                        name="phoneNumber"
+                        autoFocus
+                        register={register}
+                        placeholder="Phone Number"
+                        error={errors.employeeId}
+                      />
+                    </Stack>
+                    <Stack direction="column">
+                      <FormLabel
+                        title="Branch name"
+                        required
+                      />
+                      <FormInput
+                        name="branchName"
+                        autoFocus
+                        register={register}
+                        placeholder="Branch name"
+                        error={errors.employeeId}
+                      />
+                    </Stack>
                   </Stack>
                 </Box>
-                <Stack
-                  marginTop={2}
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Link
-                    // href={paths.forgotPassword}
-                    className="text-sm"
+                <Stack className="pb-10 pt-10">
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    className="text-lg"
+                    type="submit"
+                    // disabled={isPending}
                   >
-                    Forgot Password?
-                  </Link>
+                    Next
+                  </Button>
                 </Stack>
-                <Button
-                  variant="contained"
-                  fullWidth
-                  className="mt-4 text-lg"
-                  type="submit"
-                  // disabled={isPending}
-                >
-                  Next
-                </Button>
-                <hr className="w-full my-4" />
               </Stack>
             </form>
           </Stack>

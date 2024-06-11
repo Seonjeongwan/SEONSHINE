@@ -10,14 +10,14 @@ import { Box, Button, Checkbox, FormControlLabel, IconButton, Link, Stack, Typog
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
 
+import loginBanner from '@/assets/images/login-banner.png';
+import logo from '@/assets/images/logo.png';
 import { useAuth } from '@/hooks/useAuth';
 import { paths } from '@/routes/paths';
 
 import { useLoginApi } from '@/apis/hooks/authApi.hook';
 import { useLoadingStore } from '@/store/loading.store';
 
-import loginBanner from '../../assets/images/login-banner.png';
-import logo from '../../assets/images/Logo-Shinhan-Bank.webp';
 import { LoginSchema, LoginSchemaType } from './schemas';
 
 const LoginPage = () => {
@@ -43,7 +43,7 @@ const LoginPage = () => {
 
   const rememberCheckboxRef = useRef<HTMLInputElement>(null);
 
-  const handleClickShowPassword = () => setShowPassword((prev) => !prev);
+  const handleTogglePassword = () => setShowPassword((prev) => !prev);
 
   const handleLogin = (data: LoginSchemaType) => {
     exeLogin(data, {
@@ -72,18 +72,19 @@ const LoginPage = () => {
       alignItems="center"
       className="w-screen h-screen"
     >
-      <Stack className="w-full h-full bg-white shadow-md lg:rounded-md shadow-black-100 lg:w-194 lg:h-auto py-8">
-        <Box className="grid w-full h-full grid-cols-1 lg:grid-cols-2">
-          <Box className="hidden h-full lg:flex lg:items-center lg:justify-center">
+      <Stack className="w-full h-full bg-white shadow-md md:rounded-md shadow-black-100 md:w-280 md:h-200">
+        <Box className="grid w-full h-full grid-cols-1 md:grid-cols-2">
+          <Box className="hidden h-full md:flex md:items-center md:justify-center bg-gradient-to-br from-blue-500 to-yellow-500 opacity-90 z-0">
             <img
               src={loginBanner}
-              className="w-full"
+              className="w-full z-10"
+              alt="Login banner"
             />
           </Box>
           <Stack
             justifyContent="center"
             alignItems="center"
-            className="h-full px-8"
+            className="h-full px-8 py-8"
           >
             <form
               onSubmit={handleSubmit(submitForm)}
@@ -95,16 +96,50 @@ const LoginPage = () => {
                 className="h-full"
               >
                 <Stack
-                  direction="row"
                   justifyContent="center"
+                  alignItems="center"
                 >
-                  <img
-                    src={logo}
-                    className="h-8 mt-3"
-                  />
+                  <Box
+                    className="hidden xs:block md:hidden"
+                    sx={{
+                      width: {
+                        xs: '80px',
+                        md: '120px',
+                      },
+                      height: {
+                        xs: '80px',
+                        md: '120px',
+                      },
+                    }}
+                  >
+                    <img
+                      src={logo}
+                      alt="Logo"
+                      className="object-cover"
+                    />
+                  </Box>
+                  <Typography
+                    variant="heading1"
+                    component="h1"
+                    className="text-center tracking-wider"
+                    sx={{
+                      fontSize: {
+                        xs: '48px',
+                        md: '64px',
+                      },
+                    }}
+                  >
+                    Seonshine
+                  </Typography>
                 </Stack>
 
-                <h3 className="text-3xl font-bold mt-14 lg:mt-7">Login</h3>
+                <Typography
+                  variant="heading2"
+                  component="h3"
+                  className="mt-14 md:mt-8 mb-8 text-center"
+                >
+                  Log In
+                </Typography>
 
                 <Box className="grid gap-4 mt-4">
                   <Stack
@@ -138,7 +173,10 @@ const LoginPage = () => {
                       error={errors.password}
                       type={showPassword ? 'text' : 'password'}
                       endAdornment={
-                        <IconButton onClick={handleClickShowPassword}>
+                        <IconButton
+                          onMouseDown={handleTogglePassword}
+                          onMouseUp={handleTogglePassword}
+                        >
                           {showPassword ? <Visibility /> : <VisibilityOff />}
                         </IconButton>
                       }

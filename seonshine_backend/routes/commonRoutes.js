@@ -1,8 +1,11 @@
-const express = require("express");
-const router = express.Router();
-const commonController = require("../controllers/commonController");
 
-router.post("/add-branch", commonController.addBranch);
-router.get("/get-branch", commonController.getBranch);
+import express from 'express';
+import { addBranch, getAllBranch, getBranchById } from '../controllers/commonController.js';
 
-module.exports = router;
+const commonRouter = express.Router();
+
+commonRouter.post("/branches", addBranch);
+commonRouter.get("/branches", getAllBranch);
+commonRouter.get("/branches/:id", getBranchById);
+
+export default commonRouter;

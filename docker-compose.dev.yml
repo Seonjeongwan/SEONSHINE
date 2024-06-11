@@ -1,0 +1,64 @@
+version: "3.8"
+
+services:
+  # frontend:
+  #   image: seonshinevn/seonshine_frontend:latest
+  #   build: ./seonshine_frontend
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./seonshine_frontend/src:/app/src
+  #     - /app/node_modules
+  #   depends_on:
+  #     - backend
+  backend:
+    build: ./seonshine_backend
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=db
+      - DB_USER=seonshine_mgr
+      - DB_PASSWORD=seonshine@2
+      - USER_DB_NAME=user_db
+      - COMMON_DB_NAME=common_db
+      - RESTAURANT_DB_NAME=restaurant_db
+      - ORDER_DB_NAME=order_db
+    ports:
+      - "5050:5050"
+    command: sh -c "npm run seed:all && npm start"
+    depends_on:
+      db:
+        condition: service_healthy
+    # env_file:
+    #   - ./seonshine_backend/.env
+  # stdin_open: true
+  # tty: true
+
+  db:
+    image: mysql:8.0.36
+    #build: ./seonshine_db
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_USER: seonshine_mgr
+      MYSQL_PASSWORD: seonshine@2
+      MYSQL_ROOT_PASSWORD: seonshine@2
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./seonshine_db/schema:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost --silent"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+
+  # fileserver:
+  #   image: seonshinevn/seonshine_fileserver:latest
+  #   build: ./seonshine_fileserver
+  #   ports:
+  #     - "4000:4000"
+  #   volumes:
+  #     - ./seonshine_fileserver/uploads:/app/uploads
+
+volumes:
+  mysql-data:

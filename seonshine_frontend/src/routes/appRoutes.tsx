@@ -6,7 +6,6 @@ import LoginPage from '@/pages/login';
 import MainPage from '@/pages/main';
 import PageNotFound from '@/pages/pageNotFound';
 import SignUpPage from '@/pages/signUp';
-import ChooseUserType from '@/pages/signUp/ChooseUserType';
 
 import { RoleEnum } from '@/types/user';
 
@@ -17,7 +16,7 @@ import ProtectedLayout from './guards/ProtectedLayout';
 import { paths } from './paths';
 import ProfileRegistration from '@/pages/signUp/ProfileRegistration';
 
-const App: React.FC = () => {
+const AppRoutes = () => {
   const { isAuthenticated } = useAuthStore();
   const authenticate = isAuthenticated();
 
@@ -96,4 +95,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default AppRoutes;
