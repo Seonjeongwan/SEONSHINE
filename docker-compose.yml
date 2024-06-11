@@ -3,7 +3,7 @@ version: "3.8"
 services:
   frontend:
     image: seonshinevn/seonshine_frontend:latest
-    build: ./seonshine_frontend
+    #build: ./seonshine_frontend
     ports:
       - "3000:3000"
     volumes:
@@ -14,7 +14,7 @@ services:
 
   backend:
     image: seonshinevn/seonshine_backend:latest
-    build: ./seonshine_backend
+    #build: ./seonshine_backend
     environment:
       - NODE_ENV=production
       - DB_HOST=db
@@ -55,7 +55,7 @@ services:
 
   fileserver:
     image: seonshinevn/seonshine_fileserver:latest
-    build: ./seonshine_fileserver
+    #build: ./seonshine_fileserver
     ports:
       - "4000:4000"
     volumes:

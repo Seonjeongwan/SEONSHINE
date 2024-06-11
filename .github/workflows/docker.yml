@@ -40,7 +40,7 @@ jobs:
         with:
           context: ./seonshine_frontend
           push: true
-          # platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64
           tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_frontend:latest
 
       - name: Build and push backend image
@@ -100,11 +100,11 @@ jobs:
               git pull origin main
             else
               rm -rf /home/ubuntu/SEONSHINE/*
-              git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/Project
+              git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
               cd /home/ubuntu/SEONSHINE
             fi
             export COMPOSE_HTTP_TIMEOUT=240
-            docker-compose -f ./docker-compose.yml pull            
-            # docker-compose -f ./docker-compose.yml up -d
+            docker-compose -f ./docker-compose.yml pull
+            #docker-compose -f ./docker-compose.yml up -d
 
       #dockercompose -f ./docker-compose.yml down 은 모두 제거후 사용
