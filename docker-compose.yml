@@ -10,6 +10,7 @@ services:
     volumes:
       - ./seonshine_frontend/src:/app/src
       - /app/node_modules
+      - /app/build # Build 결과를 캐싱
     depends_on:
       - backend
     restart: always
