@@ -1,10 +1,14 @@
 # Build stage
 FROM node:22.2.0-alpine AS builder
 
+WORKDIR /app
+
 # Yarn 설치
 RUN apk add --no-cache yarn
 
-WORKDIR /app
+# Yarn 설정 업데이트
+RUN yarn config set network-timeout 600000
+RUN yarn config set registry "https://registry.yarnpkg.com"
 
 # 패키지 파일 복사
 COPY package.json yarn.lock ./
@@ -21,10 +25,10 @@ RUN yarn build
 # Production stage
 FROM node:22.2.0-alpine
 
+WORKDIR /app
+
 # Yarn 설치
 RUN apk add --no-cache yarn
-
-WORKDIR /app
 
 # 빌드된 파일 복사
 COPY --from=builder /app/dist /app/dist
