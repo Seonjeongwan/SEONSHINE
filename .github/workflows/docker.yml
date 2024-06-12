@@ -5,11 +5,11 @@ on:
     branches:
       - main
       - develop
-    # paths:
-    #   - "seonshine_frontend/**"
-    #   - "seonshine_backend/**"
-    #   - "seonshine_db/**"
-    #   - "seonshine_fileserver/**"
+    paths:
+      - "seonshine_frontend/**"
+      - "seonshine_backend/**"
+      - "seonshine_db/**"
+      - "seonshine_fileserver/**"
 
 jobs:
   build-and-push:
@@ -28,6 +28,7 @@ jobs:
         run: |
           docker buildx create --name mybuilder --use
           docker buildx inspect --bootstrap
+          echo "Docker Buildx builder created"
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
@@ -45,27 +46,23 @@ jobs:
 
       - name: Build and push image for main
         if: github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@v2
-        with:
-          #context: ./seonshine_${{ matrix.service }}
-          dockerfile: ./seonshine_backend/Dockerfile.prod
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:prod
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
+        run: |
+          docker buildx build \
+            --file ./seonshine_${{ matrix.service }}/Dockerfile.prod \
+            --platform linux/amd64,linux/arm64 \
+            --tag ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:prod \
+            --push \
+            ./seonshine_${{ matrix.service }} | tee build.log
 
       - name: Build and push image for develop
         if: github.ref == 'refs/heads/develop'
-        uses: docker/build-push-action@v2
-        with:
-          #context: ./seonshine_${{ matrix.service }}
-          dockerfile: ./seonshine_${{ matrix.service }}/Dockerfile.dev
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:dev
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
+        run: |
+          docker buildx build \
+            --file ./seonshine_${{ matrix.service }}/Dockerfile.dev \
+            --platform linux/amd64,linux/arm64 \
+            --tag ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:dev \
+            --push \
+            ./seonshine_${{ matrix.service }} | tee build.log
 
   deploy:
     runs-on: ubuntu-latest
@@ -104,8 +101,8 @@ jobs:
               git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
             fi
             export COMPOSE_HTTP_TIMEOUT=240
-            docker-compose -f docker-compose.prod.yml pull
-            docker-compose -f docker-compose.prod.yml up -d ${{ matrix.service }}
+            docker-compose -f docker-compose.prod.yml pull | tee docker-pull.log
+            docker-compose -f docker-compose.prod.yml up -d ${{ matrix.service }} | tee docker-up.log
 
       - name: SSH into server for develop
         if: github.ref == 'refs/heads/develop'
@@ -129,5 +126,5 @@ jobs:
               git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
             fi
             export COMPOSE_HTTP_TIMEOUT=240
-            docker-compose -f docker-compose.dev.yml pull
-            docker-compose -f docker-compose.dev.yml up -d ${{ matrix.service }}
+            docker-compose -f docker-compose.dev.yml pull | tee docker-pull.log
+            docker-compose -f docker-compose.dev.yml up -d ${{ matrix.service }} | tee docker-up.log
