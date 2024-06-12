@@ -31,7 +31,7 @@ WORKDIR /app
 RUN apk add --no-cache yarn
 
 # 빌드된 파일 복사
-COPY --from=builder /app/dist /app/dist
+COPY --from=builder /app/build /app/build
 COPY --from=builder /app/package.json /app/yarn.lock ./
 
 # 프로덕션 의존성 설치
