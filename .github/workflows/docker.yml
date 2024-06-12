@@ -44,6 +44,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-${{ matrix.service }}-
 
+      - name: Clear previous cache (if any)
+        run: |
+          rm -rf /tmp/.buildx-cache
+
       - name: Build and push image for main
         if: github.ref == 'refs/heads/main'
         uses: docker/build-push-action@v2
@@ -105,8 +109,8 @@ jobs:
               git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
             fi
             export COMPOSE_HTTP_TIMEOUT=240
-            docker-compose -f docker-compose.prod.yml pull | tee docker-pull.log
-            docker-compose -f docker-compose.prod.yml up -d ${{ matrix.service }} | tee docker-up.log
+            docker-compose -f docker-compose.prod.yml pull
+            docker-compose -f docker-compose.prod.yml up -d ${{ matrix.service }}
 
       - name: SSH into server for develop
         if: github.ref == 'refs/heads/develop'
@@ -130,5 +134,5 @@ jobs:
               git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
             fi
             export COMPOSE_HTTP_TIMEOUT=240
-            docker-compose -f docker-compose.dev.yml pull | tee docker-pull.log
-            docker-compose -f docker-compose.dev.yml up -d ${{ matrix.service }} | tee docker-up.log
+            docker-compose -f docker-compose.dev.yml pull
+            docker-compose -f docker-compose.dev.yml up -d ${{ matrix.service }}
