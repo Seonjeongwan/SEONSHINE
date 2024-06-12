@@ -5,7 +5,7 @@ export const UserStatus = {
   deleted: 9
 }
 
-export const Role = {
+export const UserRole = {
   admin: 0,
   user: 1,
   restaurant: 2

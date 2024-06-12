@@ -1,8 +1,10 @@
 import bcrypt from "bcrypt";
 import { UserStatus } from "../constants/auth.js";
 import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
-import User from "../models/user.js";
+import { statusWithMessageLogin } from "../constants/message.js";
+import User from "../models/userModel.js";
 import { getResponseErrors } from "../utils/responseParser.js";
+import { generateToken } from "../utils/token.js";
 // const { userDb } = require("../db/connection");
 
 export const getAllUsers = async (req, res) => {
@@ -29,108 +31,32 @@ export const login = async (req, res) => {
     const { user_id, password } = req.body;
     const user = await User.findByPk(user_id, { raw: true });
     if (user) {
-      console.log("password :>> ", password);
-      console.log("user :>> ", user);
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (isPasswordValid) {
-        switch (user.user_status) {
-          case "0":
-            res.status(200).send({
-              message: "Admin confirmation needed",
-              user_status: user.user_status,
-            });
-            break;
-          case "1":
-            res.status(200).send({
-              message: "Login successful",
-              user,
-              user_status: user.user_status,
-            });
-            break;
-          case "2":
-            res.status(200).send({
-              message: "Account reactivation needed",
-              user_status: user.user_status,
-            });
-            break;
-          case "9":
-            res.status(200).send({
-              message: "Account suspended",
-              user_status: user.user_status,
-            });
-            break;
-          default:
-            res
-              .status(500)
-              .send({ message: "Unknown account status", status: 500 });
-            break;
+        const userStatus = user.user_status;
+        const response = {};
+        response.message = statusWithMessageLogin[userStatus];
+        response.user_status = userStatus;
+        if (String(userStatus) === String(UserStatus.active)) {
+          const token = generateToken(user);
+          response.user = { ...user, token };
         }
+        res.status(httpStatusCodes.success).send(response);
       } else {
-        res.status(401).send({ message: "Invalid credentials", status: 401 });
+        res
+          .status(httpStatusCodes.unauthorized)
+          .send({ message: "Invalid credentials", status: 401 });
       }
-      // res.status(httpStatusCodes.success).json(user);
     } else {
       res
         .status(httpStatusCodes.badRequest)
         .json({ message: "User not exist" });
     }
   } catch (error) {
-    console.log("error :>> ", error);
     res
       .status(httpStatusCodes.internalServerError)
       .json({ error: httpStatusErrors.internalServerError });
   }
-
-  // const query = "SELECT * FROM user_db.users WHERE user_id = ?";
-  // userDb.query(query, [user_id], async (err, results) => {
-  //   if (err) {
-  //     res.status(500).send({ message: "Database error", error: err });
-  //   } else if (results.length === 0) {
-  //     res.status(401).send({ message: "Invalid credentials", status: 401 });
-  //   } else {
-  //     const user = results[0];
-  //     const isPasswordValid = await bcrypt.compare(
-  //       password,
-  //       user.password_hash
-  //     );
-  //     if (isPasswordValid) {
-  //       switch (user.user_status) {
-  //         case "0":
-  //           res.status(200).send({
-  //             message: "Admin confirmation needed",
-  //             user_status: user.user_status,
-  //           });
-  //           break;
-  //         case "1":
-  //           res.status(200).send({
-  //             message: "Login successful",
-  //             user,
-  //             user_status: user.user_status,
-  //           });
-  //           break;
-  //         case "2":
-  //           res.status(200).send({
-  //             message: "Account reactivation needed",
-  //             user_status: user.user_status,
-  //           });
-  //           break;
-  //         case "9":
-  //           res.status(200).send({
-  //             message: "Account suspended",
-  //             user_status: user.user_status,
-  //           });
-  //           break;
-  //         default:
-  //           res
-  //             .status(500)
-  //             .send({ message: "Unknown account status", status: 500 });
-  //           break;
-  //       }
-  //     } else {
-  //       res.status(401).send({ message: "Invalid credentials", status: 401 });
-  //     }
-  //   }
-  // });
 };
 
 // export const checkIdEmail = (req, res) => {
