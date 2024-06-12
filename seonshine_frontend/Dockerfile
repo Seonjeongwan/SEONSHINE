@@ -1,6 +1,9 @@
 # Build stage
 FROM node:22.2.0-alpine AS builder
 
+# Yarn 설치
+RUN apk add --no-cache yarn
+
 WORKDIR /app
 
 # Copy only package.json and yarn.lock to leverage Docker cache
