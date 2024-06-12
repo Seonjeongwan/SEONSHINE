@@ -48,7 +48,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./seonshine_${{ matrix.service }}
           file: ./seonshine_${{ matrix.service }}/Dockerfile.prod
           push: true
           platforms: linux/amd64,linux/arm64
@@ -60,7 +60,7 @@ jobs:
         if: github.ref == 'refs/heads/develop'
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./seonshine_${{ matrix.service }}
           file: ./seonshine_${{ matrix.service }}/Dockerfile.dev
           push: true
           platforms: linux/amd64,linux/arm64
