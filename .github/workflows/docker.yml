@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [frontend, backend, db, fileserver]
+        service: [frontend, backend, fileserver]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
