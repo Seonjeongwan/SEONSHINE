@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "start:dev": "nodemon server.js",
+    "dev": "nodemon server.js",
     "seed:branches": "npx sequelize db:seed:all --config config/common-db.mjs --seeders-path seeders/common-db",
     "seed:users": "npx sequelize db:seed:all --config config/user-db.mjs --seeders-path seeders/user-db",
     "seed:all": "npm run seed:branches && npm run seed:users",
