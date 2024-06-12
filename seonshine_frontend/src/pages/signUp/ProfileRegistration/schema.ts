@@ -5,6 +5,7 @@ import { employeeIdRegex, otpRegex, passwordRegex, phoneNumberRegex } from '@/co
 
 export const SignUpSchema = zod
   .object({
+    userType: zod.string(),
     employeeId: zod
       .string()
       .trim()
@@ -27,7 +28,11 @@ export const SignUpSchema = zod
       .refine((value) => phoneNumberRegex.test(value), {
         message: errorMessages.phoneNumberInvalid,
       }),
-    branchName: zod.string().min(1, { message: errorMessages.require }),
+    branch_id: zod.number(),
+  })
+  .refine((data) => data.userType !== '1' || (data.userType === '1' && data.branch_id), {
+    message: 'Branch field is required',
+    path: ['branch_id'],
   })
   .refine(
     (values) => {

@@ -2,16 +2,17 @@ import React from 'react';
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import FoodBankIcon from '@mui/icons-material/FoodBank';
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography, useMediaQuery } from '@mui/material';
 
 import { EnterUserTypePropsType } from '../types';
 
 const ChooseUserType = ({ handleSubmitUserType }: EnterUserTypePropsType) => {
+  const isMobile = useMediaQuery('(max-width:600px)');
   return (
     <Stack
       alignItems="center"
       justifyContent="center"
-      className="min-h-screen"
+      className="min-h-[80vh]"
     >
       <Stack
         direction="column"
@@ -38,13 +39,13 @@ const ChooseUserType = ({ handleSubmitUserType }: EnterUserTypePropsType) => {
           justifyContent="space-between"
           gap={6}
           width="100%"
-          className="w-full p-24 md:w-240 xl:w-240 max-w-screen"
+          flexDirection={isMobile ? 'column' : 'row'}
         >
           <Button
             variant="contained"
             className="bg-blue-100 hover:bg-blue-300 shadow-blue-300 shadow-md"
             fullWidth
-            onClick={() => handleSubmitUserType('shinhan_user')}
+            onClick={() => handleSubmitUserType('1')} //User
           >
             <Box
               display="flex"
@@ -75,7 +76,7 @@ const ChooseUserType = ({ handleSubmitUserType }: EnterUserTypePropsType) => {
             variant="contained"
             className="bg-yellow-100 hover:bg-yellow-300 shadow-yellow-300 shadow-md"
             fullWidth
-            onClick={() => handleSubmitUserType('restaurant')}
+            onClick={() => handleSubmitUserType('2')} //
           >
             <Box
               display="flex"

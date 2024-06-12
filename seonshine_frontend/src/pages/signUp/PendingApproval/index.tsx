@@ -15,9 +15,11 @@ const PendingApprovalPage = () => {
 
   return (
     <AccountVerificationLayout
-      title="Finish Registration"
-      description="Your Sign Up is pending approval. Please wait for the admin to approve your account."
+      title="Account Verification"
+      description="Your account is under approval process now.
+      Please wait for administrator’s confirmation before using the application"
       size="small"
+      clazzName="min-h-[80vh]"
     >
       <Box
         sx={{

@@ -16,11 +16,6 @@ export type LoginResponseType = {
 };
 
 export const login = async (employeeId: string, password: string): Promise<LoginResponseType> => {
-  const response = await axiosInstance.post<LoginResponseType>('/auth/login', { username: employeeId, password });
-  return response.data;
-};
-
-export const callme = async (): Promise<LoginResponseType> => {
-  const response = await axiosInstance.get<LoginResponseType>('/auth/me');
+  const response = await axiosInstance.post<LoginResponseType>('/user/login', { user_id: employeeId, password });
   return response.data;
 };

@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
+import { Box, Button, FormControl, IconButton, InputLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
 
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
+
+import { useSignUpApi } from '@/apis/hooks/signUpApi.hook';
+import { useGetBranches } from '@/apis/hooks/userApi.hook';
 
 import { EnterUserInformationPropsType } from '../types';
 import { SignUpSchema, SignUpSchemaType } from './schema';
@@ -18,34 +21,40 @@ const ProfileRegistration = ({
   const {
     handleSubmit,
     register,
+    setValue,
     formState: { errors },
   } = useForm<SignUpSchemaType>({
     resolver: zodResolver(SignUpSchema),
     defaultValues: {
+      userType,
       employeeId: '',
       password: '',
       confirmPassword: '',
       fullName: '',
       email: '',
       phoneNumber: '',
-      branchName: '',
+      branch_id: 0,
     },
   });
+  const { data: branchData } = useGetBranches({ enabled: true });
 
   const submitForm = (data: SignUpSchemaType) => {
-    handleSubmitInformation({ ...data, userType });
+    handleSubmitInformation({ ...data, userType, branch_id: selectedBranch });
   };
+  // will use custom hook useSignUp after having the API
+  // const { mutate: signUpUser } = useSignUpApi();
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const handleClickShowPassword = () => setShowPassword((prev) => !prev);
   const handleClickShowConfirmPassword = () => setShowConfirmPassword((prev) => !prev);
+  const [selectedBranch, setSelectedBranch] = useState('');
 
   return (
     <Stack
       alignItems="center"
       justifyContent="center"
-      className="min-h-screen py-8"
+      className="min-h-[80vh]"
     >
       <Stack
         direction="column"
@@ -77,13 +86,13 @@ const ProfileRegistration = ({
                 <Box className="grid gap-2 mt-4">
                   <Stack direction="column">
                     <FormLabel
-                      title="Employee ID"
+                      title={userType == '1' ? 'Employee Number' : 'ID'}
                       required
                     />
                     <FormInput
                       name="employeeId"
                       register={register}
-                      placeholder="Employee ID"
+                      placeholder={userType == '1' ? 'Employee Number' : 'ID'}
                       error={errors.employeeId}
                     />
                   </Stack>
@@ -141,8 +150,11 @@ const ProfileRegistration = ({
                       error={errors.fullName}
                     />
                   </Stack>
-                  <Stack>
-                    <Stack direction="column">
+                  <Stack direction={userType === '2' ? 'column' : 'row'}>
+                    <Stack
+                      direction="column"
+                      className={'w-full'}
+                    >
                       <FormLabel
                         title="Email"
                         required
@@ -152,22 +164,18 @@ const ProfileRegistration = ({
                         register={register}
                         placeholder="Email"
                         error={errors.email}
-                      />
-                    </Stack>
-                    <Stack direction="column">
-                      <FormLabel />
-                      <FormInput
-                        name="emailExtension"
-                        register={register}
-                        disabled
-                        placeholder="@shinhan.com"
+                        className="w-full"
+                        endAdornment={userType === '1' ? <Box>@shinhan.com</Box> : ''}
                       />
                     </Stack>
                   </Stack>
-                  <Stack>
+                  <Stack
+                    direction={userType === '2' ? 'column' : 'row'}
+                    justifyContent="space-between"
+                  >
                     <Stack
-                      className="mr-2"
                       direction="column"
+                      className={userType === '2' ? 'w-full' : 'mr-2 w-1/2'}
                     >
                       <FormLabel
                         title="Phone number"
@@ -178,20 +186,56 @@ const ProfileRegistration = ({
                         register={register}
                         placeholder="Phone Number"
                         error={errors.phoneNumber}
+                        className={userType === '2' ? 'w-full' : ''}
                       />
                     </Stack>
-                    <Stack direction="column">
-                      <FormLabel
-                        title="Branch name"
-                        required
-                      />
-                      <FormInput
-                        name="branchName"
-                        register={register}
-                        placeholder="Branch name"
-                        error={errors.branchName}
-                      />
-                    </Stack>
+                    {userType !== '2' && (
+                      <Stack
+                        direction="column"
+                        className="w-1/2"
+                      >
+                        <FormLabel
+                          title="Branch name"
+                          required
+                        />
+                        <FormControl>
+                          <Select
+                            placeholder="Branch Name"
+                            displayEmpty
+                            inputProps={{ 'aria-label': 'Without label' }}
+                            labelId="branch-select-label"
+                            value={selectedBranch}
+                            onChange={(e) => {
+                              setSelectedBranch(e.target.value);
+                              setValue('branch_id', parseInt(e.target.value));
+                            }}
+                            size="small"
+                            variant="filled"
+                            error={!!errors.branch_id}
+                            sx={{
+                              '& .MuiSelect-select': {
+                                backgroundColor: '#f2f4f8',
+                                borderRadius: '4px',
+                              },
+                              '& .MuiSelect-icon': {
+                                color: 'inherit',
+                              },
+                            }}
+                          >
+                            {Array.isArray(branchData) &&
+                              branchData.map((branch) => (
+                                <MenuItem
+                                  key={branch.branch_id}
+                                  value={branch.branch_id}
+                                >
+                                  {branch.branch_name}
+                                </MenuItem>
+                              ))}
+                          </Select>
+                        </FormControl>
+                        {errors.branch_id && <Typography color="error">{errors.branch_id.message}</Typography>}
+                      </Stack>
+                    )}
                   </Stack>
                 </Box>
                 <Stack className="pb-10 pt-10">
