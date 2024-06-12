@@ -55,7 +55,6 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:prod
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          load: true
 
       - name: Build and push image for develop
         if: github.ref == 'refs/heads/develop'
@@ -68,7 +67,6 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:dev
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          load: true
 
   deploy:
     runs-on: ubuntu-latest
