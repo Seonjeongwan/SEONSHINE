@@ -32,6 +32,7 @@ services:
       - ORDER_DB_NAME=order_db
     volumes:
       - ./seonshine_backend:/app
+      - /app/node_modules
     ports:
       - "5050:5050"
     depends_on:
