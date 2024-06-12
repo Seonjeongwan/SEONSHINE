@@ -7,7 +7,7 @@ import { endpoints } from "./endpoints.js";
 const userRouter = express.Router();
 
 userRouter.post(endpoints.signUp, signUp);
-userRouter.get(endpoints.getAllUser, authenticateToken({role: UserRole.restaurant}), getAllUsers);
+userRouter.get(endpoints.getAllUser, authenticateToken({role: UserRole.admin}), getAllUsers);
 userRouter.post(endpoints.login, login);
 // router.post("/check-id-email", checkIdEmail);
 // router.post("/confirm_signin", confirmSignin);

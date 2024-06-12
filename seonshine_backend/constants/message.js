@@ -6,3 +6,7 @@ export const statusWithMessageLogin = {
   [UserStatus.inactive]: "Account reactivation needed",
   [UserStatus.deleted]: "Account suspended",
 };
+
+export const messageErrors = {
+  idOrEmailExist: "User ID or Email already exists",
+};
