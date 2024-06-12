@@ -4,20 +4,20 @@ version: "3.8"
 services:
   frontend:
     image: seonshinevn/seonshine_frontend:latest
-    #build: ./seonshine_frontend
     ports:
       - "3000:3000"
     volumes:
       - ./seonshine_frontend/src:/app/src
       - /app/node_modules
-      - /app/build # Build 결과를 캐싱
+      - /app/build # Cache build results
     depends_on:
       - backend
     restart: always
+    environment:
+      - NODE_ENV=production
 
   backend:
     image: seonshinevn/seonshine_backend:latest
-    #build: ./seonshine_backend
     environment:
       - NODE_ENV=production
       - DB_HOST=db
@@ -43,9 +43,9 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_USER: seonshine_mgr
-      MYSQL_PASSWORD: seonshine@2
-      MYSQL_ROOT_PASSWORD: seonshine@2
+      - MYSQL_USER=seonshine_mgr
+      - MYSQL_PASSWORD=seonshine@2
+      - MYSQL_ROOT_PASSWORD=seonshine@2
     volumes:
       - mysql-data:/var/lib/mysql
       - ./seonshine_db/schema:/docker-entrypoint-initdb.d
@@ -59,12 +59,13 @@ services:
 
   fileserver:
     image: seonshinevn/seonshine_fileserver:latest
-    #build: ./seonshine_fileserver
     ports:
       - "4000:4000"
     volumes:
       - ./seonshine_fileserver/uploads:/app/uploads
     restart: always
+    environment:
+      - NODE_ENV=production
 
   portainer:
     image: portainer/portainer-ce:latest

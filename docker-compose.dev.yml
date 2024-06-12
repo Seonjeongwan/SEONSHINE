@@ -1,23 +1,26 @@
 version: "3.8"
 
 services:
-  # when you want to run frontend with the docker remove comment
-  # frontend:
-  #   image: seonshinevn/seonshine_frontend:latest
-  #   build: ./seonshine_frontend
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./seonshine_frontend/src:/app/src
-  #     - /app/node_modules
-  #     - /app/build # Build 결과를 캐싱
-  #   depends_on:
-  #     - backend
-  #   restart: always
+  frontend:
+    build:
+      context: ./seonshine_frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./seonshine_frontend/src:/app/src
+      - /app/node_modules
+      - /app/build
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+    restart: always
 
   backend:
-    image: seonshinevn/seonshine_backend:latest
-    build: ./seonshine_backend
+    build:
+      context: ./seonshine_backend
+      dockerfile: Dockerfile.dev
     environment:
       - NODE_ENV=development
       - DB_HOST=db
@@ -27,17 +30,16 @@ services:
       - COMMON_DB_NAME=common_db
       - RESTAURANT_DB_NAME=restaurant_db
       - ORDER_DB_NAME=order_db
+    volumes:
+      - ./seonshine_backend:/app
     ports:
       - "5050:5050"
-    command: sh -c "npm run seed:all && npm start"
     depends_on:
       db:
         condition: service_healthy
     restart: always
     # env_file:
     #   - ./seonshine_backend/.env
-  # stdin_open: true
-  # tty: true
 
   db:
     image: mysql:8.0.36
@@ -58,13 +60,28 @@ services:
       start_period: 5s
     restart: always
 
-  # fileserver:
-  #   image: seonshinevn/seonshine_fileserver:latest
-  #   build: ./seonshine_fileserver
-  #   ports:
-  #     - "4000:4000"
-  #   volumes:
-  #     - ./seonshine_fileserver/uploads:/app/uploads
+  fileserver:
+    build:
+      context: ./seonshine_fileserver
+      dockerfile: Dockerfile.dev
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./seonshine_fileserver/uploads:/app/uploads
+    environment:
+      - NODE_ENV=development
+    restart: always
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    command: -H unix:///var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    ports:
+      - "9000:9000"
+    restart: always
 
   redis:
     image: redis:6.2
@@ -73,3 +90,4 @@ services:
 
 volumes:
   mysql-data:
+  portainer_data:
