@@ -1,79 +1,97 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { AccountBox, History, Home, MenuBook, Restaurant, ShoppingCart } from '@mui/icons-material';
-import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Notifications } from '@mui/icons-material';
+import { Avatar, Badge, Box, IconButton, Stack, Typography } from '@mui/material';
 
-import { RoleEnum } from '@/types/user';
+import logo from '@/assets/images/logo.png';
+import { paths } from '@/routes/paths';
 
-type SidebarProps = {
-  role: RoleEnum;
-};
+import { iconMap, menuItems } from './constants';
+import { MenuItemType, SidebarPropsType } from './types';
 
-export const menuItems = [
-  {
-    name: 'Main Page',
-    icon: 'HomeIcon',
-    path: '/main',
-    permission: [RoleEnum.ADMIN, RoleEnum.USER, RoleEnum.RESTAURANT],
-  },
-  { name: 'User Management', icon: 'AccountBoxIcon', path: '/user-management', permission: [RoleEnum.ADMIN] },
-  {
-    name: 'Restaurant Management',
-    icon: 'RestaurantIcon',
-    path: '/restaurant-management',
-    permission: [RoleEnum.ADMIN],
-  },
-  {
-    name: 'Menu Management',
-    icon: 'MenuBookIcon',
-    path: '/menu-management',
-    permission: [RoleEnum.ADMIN, RoleEnum.RESTAURANT],
-  },
-  { name: 'Order', icon: 'ShoppingCartIcon', path: '/order', permission: [RoleEnum.USER, RoleEnum.RESTAURANT] },
-  { name: 'Order List', icon: 'ShoppingCartIcon', path: '/order-list', permission: [RoleEnum.RESTAURANT] },
-  { name: 'Order History', icon: 'HistoryIcon', path: '/order-history', permission: [RoleEnum.RESTAURANT] },
-];
-
-const iconMap: Record<string, React.ElementType> = {
-  HomeIcon: Home,
-  AccountBoxIcon: AccountBox,
-  RestaurantIcon: Restaurant,
-  MenuBookIcon: MenuBook,
-  ShoppingCartIcon: ShoppingCart,
-  HistoryIcon: History,
-};
-
-export type MenuItemType = {
-  name: string;
-  icon: string;
-  path: string;
-  permission: RoleEnum[];
-};
-
-const Sidebar: React.FC<SidebarProps> = ({ role }) => {
+const Sidebar = ({ role }: SidebarPropsType) => {
   const allowedMenuItems = menuItems.filter((item) => item.permission.includes(role));
 
   return (
-    <div className="bg-gray-800 text-white h-full p-4">
-      <List>
+    <Stack
+      direction="column"
+      alignItems="center"
+      gap={8}
+      className="bg-white text-black-500 h-full px-4 py-6"
+    >
+      <Link
+        to={paths.dashboard}
+        className="flex items-center"
+      >
+        <Box
+          sx={{
+            width: '52px',
+            height: '52px',
+          }}
+        >
+          <img
+            src={logo}
+            alt="Logo"
+            className="object-cover"
+          />
+        </Box>
+        <Typography
+          variant="heading4"
+          component="h4"
+          className="text-black-300"
+        >
+          SeonShine
+        </Typography>
+      </Link>
+
+      <Stack
+        justifyContent="center"
+        gap={2}
+      >
+        <IconButton
+          aria-label="notifications"
+          className="w-12 h-12"
+        >
+          <Avatar className="bg-gray-200" />
+        </IconButton>
+
+        <IconButton
+          aria-label="notifications"
+          className="w-12 h-12"
+        >
+          <Badge
+            badgeContent={9}
+            color="error"
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+          >
+            <Notifications
+              className="text-blue-700"
+              sx={{ fontSize: 24 }}
+            />
+          </Badge>
+        </IconButton>
+      </Stack>
+
+      <Stack direction="column">
         {allowedMenuItems.map((item: MenuItemType) => {
+          if (item.path === '/') return;
           const Icon = iconMap[item.icon];
           return (
-            <ListItem
-              component={Link}
+            <Link
               to={item.path}
               key={item.name}
+              className="flex py-4 px-4 gap-3 items-center hover:bg-black-100 rounded-sm border-b"
             >
-              <ListItemIcon className="text-white">
-                <Icon />
-              </ListItemIcon>
-              <ListItemText primary={item.name} />
-            </ListItem>
+              <Icon sx={{ fontSize: 24 }} />
+              <Typography variant="buttonM">{item.name}</Typography>
+            </Link>
           );
         })}
-      </List>
-    </div>
+      </Stack>
+    </Stack>
   );
 };
 

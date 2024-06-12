@@ -4,7 +4,7 @@ import { TypographyVariantsOptions } from '@mui/material/styles';
 
 type PartialRecord<K extends string | number | symbol, T> = { [P in K]?: T };
 
-type headingTypo = 'heading1' | 'heading2' | 'bodyS' | 'buttonM' | 'timer' | 'subtitleS';
+type headingTypo = 'heading1' | 'heading2' | 'heading4' | 'bodyS' | 'buttonM' | 'timer' | 'subtitleS';
 
 declare module '@mui/material/styles' {
   interface TypographyVariantsOptions extends PartialRecord<headingTypo, CSSProperties> {}
@@ -37,6 +37,12 @@ export const customTypographyVariants: TypographyVariantsOptions = {
     fontSize: '42px',
     fontWeight: fontWeightValue.Bold,
     lineHeight: '46px',
+  },
+  heading4: {
+    fontSize: '24px',
+    fontWeight: fontWeightValue.Bold,
+    lineHeight: '26px',
+    textTransform: 'uppercase',
   },
   bodyS: {
     fontSize: '14px',

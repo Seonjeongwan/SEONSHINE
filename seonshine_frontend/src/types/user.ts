@@ -5,14 +5,14 @@ export enum RoleEnum {
 }
 
 export type CurrentUserType = {
-    user_id: string,
-    role_id: RoleEnum,
-    username: string,
-    phone_number: string,
-    branch_id: string,
-    email: string,
-    password_hash: string,
-    confirm_yn: string,
-    created_at: string,
-    updated_at: string,
-}
+  user_id: string;
+  role_id: RoleEnum;
+  username: string;
+  phone_number: string;
+  branch_id: number;
+  email: string;
+  password_hash: string;
+  confirm_yn: string;
+  created_at: string;
+  updated_at: string;
+};

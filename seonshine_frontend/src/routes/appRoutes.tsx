@@ -6,6 +6,7 @@ import LoginPage from '@/pages/login';
 import MainPage from '@/pages/main';
 import PageNotFound from '@/pages/pageNotFound';
 import SignUpPage from '@/pages/signUp';
+import TestPage from '@/pages/testPage';
 
 import { RoleEnum } from '@/types/user';
 
@@ -25,42 +26,26 @@ const AppRoutes = () => {
         <Route element={<AuthenticateLayout />}>
           <Route
             path={paths.login}
-            element={authenticate ? <Navigate to={paths.main} /> : <LoginPage />}
+            element={<LoginPage />}
           />
           <Route
             path={paths.forgotPassword}
-            element={authenticate ? <Navigate to={paths.main} /> : <ForgotPasswordPage />}
+            element={<ForgotPasswordPage />}
           />
           <Route
             path={paths.signUp}
-            element={authenticate ? <Navigate to={paths.main} /> : <SignUpPage />}
+            element={<SignUpPage />}
           />
         </Route>
 
         <Route
-          path={paths.main}
-          element={authenticate ? <MainPage /> : <Navigate to={paths.login} />}
-        />
-        <Route
-          path={paths.pageNotFound}
-          element={<PageNotFound />}
+          index
+          element={<Navigate to={paths.dashboard} />}
         />
 
         <Route
-          index
-          element={
-            authenticate ? (
-              <Navigate
-                to={paths.main}
-                replace
-              />
-            ) : (
-              <Navigate
-                to={paths.login}
-                replace
-              />
-            )
-          }
+          path={paths.pageNotFound}
+          element={<PageNotFound />}
         />
 
         <Route
@@ -80,6 +65,16 @@ const AppRoutes = () => {
           }
         />
         {/* Access Control List  routing example*/}
+
+        <Route
+          path={paths.dashboard}
+          element={
+            <ProtectedLayout
+              allowedRoles={[RoleEnum.ADMIN, RoleEnum.USER, RoleEnum.RESTAURANT]}
+              children={<TestPage />}
+            />
+          }
+        />
         <Route
           path={paths.admin}
           element={

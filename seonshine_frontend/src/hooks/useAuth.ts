@@ -18,6 +18,7 @@ export const useAuth = (): UseAuthType => {
   const { currentUser, setCurrentUser } = useAuthStore();
 
   const login = (user: CurrentUserType, accessToken: string, rememberMe: boolean) => {
+    setCurrentUser(user);
     setAccessToken(accessToken);
     if (rememberMe) {
       saveUserToCache(user);

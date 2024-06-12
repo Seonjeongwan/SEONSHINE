@@ -49,8 +49,8 @@ const LoginPage = () => {
     exeLogin(data, {
       onSuccess: (data) => {
         setLoading(false);
-        handleLoginSuccess(data, data.token, !!rememberCheckboxRef.current?.checked);
-        navigate('/test');
+        handleLoginSuccess(data.user, data.token, !!rememberCheckboxRef.current?.checked);
+        navigate('/');
       },
       onError: () => {
         toast.error('Login failed!');
