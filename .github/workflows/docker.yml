@@ -46,10 +46,10 @@ jobs:
 
       - name: Build and push image for main
         if: github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v5
         with:
           context: ./seonshine_${{ matrix.service }}
-          dockerfile: ./seonshine_${{ matrix.service }}/Dockerfile_prod
+          dockerfile: ./seonshine_${{ matrix.service }}/Dockerfile.prod
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:prod
@@ -58,7 +58,7 @@ jobs:
 
       - name: Build and push image for develop
         if: github.ref == 'refs/heads/develop'
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v5
         with:
           context: ./seonshine_${{ matrix.service }}
           dockerfile: ./seonshine_${{ matrix.service }}/Dockerfile.dev
