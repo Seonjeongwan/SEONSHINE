@@ -33,10 +33,6 @@ const AccountVerification = ({
     defaultValues: { otp: ' '.repeat(6) },
   });
 
-  const someElement = document.getElementById('someElementId') as HTMLInputElement | null;
-  if (someElement !== null) {
-    someElement.value = 'some value';
-  }
   const [seconds, setSeconds] = useState<number>(secondsCountdown);
   const [isActive, setIsActive] = useState<boolean>(true);
 
@@ -67,8 +63,8 @@ const AccountVerification = ({
     onChange(newOtp.join(''));
     newOtp.forEach((value, index) => {
       if (inputRefs.current[index]) {
-        inputRefs.current[index].value = value;
-        value !== ' ' && inputRefs.current[index].focus();
+        inputRefs.current[index]!.value = value;
+        value !== ' ' && inputRefs.current[index]!.focus();
       }
     });
   };
