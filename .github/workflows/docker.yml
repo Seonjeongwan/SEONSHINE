@@ -44,9 +44,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-${{ matrix.service }}-
 
-      - name: Clear previous cache (if any)
+      - name: Verify Dockerfile path for main
+        if: github.ref == 'refs/heads/main'
         run: |
-          rm -rf /tmp/.buildx-cache
+          echo "Checking Dockerfile for ${{ matrix.service }} (main branch)"
+          ls -l ./seonshine_${{ matrix.service }}/Dockerfile.prod
+          cat ./seonshine_${{ matrix.service }}/Dockerfile.prod
 
       - name: Build and push image for main
         if: github.ref == 'refs/heads/main'
@@ -59,6 +62,13 @@ jobs:
           tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:prod
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: Verify Dockerfile path for develop
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          echo "Checking Dockerfile for ${{ matrix.service }} (develop branch)"
+          ls -l ./seonshine_${{ matrix.service }}/Dockerfile.dev
+          cat ./seonshine_${{ matrix.service }}/Dockerfile.dev
 
       - name: Build and push image for develop
         if: github.ref == 'refs/heads/develop'
