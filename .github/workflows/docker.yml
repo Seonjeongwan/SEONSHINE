@@ -42,43 +42,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Build and push frontend image
-        if: matrix.service == 'frontend'
+      - name: Build and push image
         uses: docker/build-push-action@v2
         with:
-          context: ./seonshine_frontend
+          context: ./seonshine_${{ matrix.service }}
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_frontend:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-
-      - name: Build and push backend image
-        if: matrix.service == 'backend'
-        uses: docker/build-push-action@v2
-        with:
-          context: ./seonshine_backend
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_backend:latest
-
-      - name: Build and push db image
-        if: matrix.service == 'db'
-        uses: docker/build-push-action@v2
-        with:
-          context: ./seonshine_db
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_db:latest
-
-      - name: Build and push fileserver image
-        if: matrix.service == 'fileserver'
-        uses: docker/build-push-action@v2
-        with:
-          context: ./seonshine_fileserver
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_fileserver:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -89,7 +61,7 @@ jobs:
 
       - name: Set up SSH key
         run: |
-          echo "${{ secrets.SSH_KEY }}" > private_key
+          echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > private_key
           chmod 600 private_key
 
       - name: SSH into server
@@ -102,7 +74,7 @@ jobs:
             echo "SSH connection successful"
             if [ ! -d /home/ubuntu/SEONSHINE ]; then
               mkdir -p /home/ubuntu/SEONSHINE
-              git clone https://github.com/Seonjeongwan/SEONSHINE.git
+              git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
             fi
             cd /home/ubuntu/SEONSHINE
             if [ -d .git ]; then
@@ -111,7 +83,6 @@ jobs:
             else
               rm -rf /home/ubuntu/SEONSHINE/*
               git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
-              cd /home/ubuntu/SEONSHINE
             fi
             export COMPOSE_HTTP_TIMEOUT=240
             docker-compose -f ./docker-compose.yml pull
