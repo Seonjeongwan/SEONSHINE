@@ -44,27 +44,91 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-${{ matrix.service }}-
 
+      - name: Determine changes
+        id: changes
+        run: |
+          echo "Checking for changes in the service directories"
+          git diff --name-only HEAD^ HEAD | tee changed_files.txt
+          if grep -q "^seonshine_frontend/" changed_files.txt; then
+            echo "frontend" >> services_to_build.txt
+          fi
+          if grep -q "^seonshine_backend/" changed_files.txt; then
+            echo "backend" >> services_to_build.txt
+          fi
+          if grep -q "^seonshine_fileserver/" changed_files.txt; then
+            echo "fileserver" >> services_to_build.txt
+          fi
+          cat services_to_build.txt
+
       - name: Build and push image for main
-        if: github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@v5
+        if: github.ref == 'refs/heads/main' && contains(steps.changes.outputs.services_to_build, 'frontend')
+        uses: docker/build-push-action@v2
         with:
-          context: ./seonshine_${{ matrix.service }}
-          file: ./seonshine_${{ matrix.service }}/Dockerfile.prod
+          context: ./seonshine_frontend
+          dockerfile: ./seonshine_frontend/Dockerfile.prod
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:prod
+          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_frontend:prod
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: Build and push image for main
+        if: github.ref == 'refs/heads/main' && contains(steps.changes.outputs.services_to_build, 'backend')
+        uses: docker/build-push-action@v2
+        with:
+          context: ./seonshine_backend
+          dockerfile: ./seonshine_backend/Dockerfile.prod
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_backend:prod
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: Build and push image for main
+        if: github.ref == 'refs/heads/main' && contains(steps.changes.outputs.services_to_build, 'fileserver')
+        uses: docker/build-push-action@v2
+        with:
+          context: ./seonshine_fileserver
+          dockerfile: ./seonshine_fileserver/Dockerfile.prod
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_fileserver:prod
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 
       - name: Build and push image for develop
-        if: github.ref == 'refs/heads/develop'
-        uses: docker/build-push-action@v5
+        if: github.ref == 'refs/heads/develop' && contains(steps.changes.outputs.services_to_build, 'frontend')
+        uses: docker/build-push-action@v2
         with:
-          context: ./seonshine_${{ matrix.service }}
-          file: ./seonshine_${{ matrix.service }}/Dockerfile.dev
+          context: ./seonshine_frontend
+          dockerfile: ./seonshine_frontend/Dockerfile.dev
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:dev
+          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_frontend:dev
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: Build and push image for develop
+        if: github.ref == 'refs/heads/develop' && contains(steps.changes.outputs.services_to_build, 'backend')
+        uses: docker/build-push-action@v2
+        with:
+          context: ./seonshine_backend
+          dockerfile: ./seonshine_backend/Dockerfile.dev
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_backend:dev
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: Build and push image for develop
+        if: github.ref == 'refs/heads/develop' && contains(steps.changes.outputs.services_to_build, 'fileserver')
+        uses: docker/build-push-action@v2
+        with:
+          context: ./seonshine_fileserver
+          dockerfile: ./seonshine_fileserver/Dockerfile.dev
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_fileserver:dev
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 
@@ -73,7 +137,7 @@ jobs:
     needs: build-and-push
     strategy:
       matrix:
-        service: [frontend, backend, db, fileserver]
+        service: [frontend, backend, fileserver]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -84,8 +148,8 @@ jobs:
           chmod 600 private_key
 
       - name: SSH into server for main
-        if: github.ref == 'refs/heads/main'
-        uses: appleboy/ssh-action@v1.0.3
+        if: github.ref == 'refs/heads/main' && contains(steps.changes.outputs.services_to_build, 'frontend')
+        uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -105,12 +169,12 @@ jobs:
               git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
             fi
             export COMPOSE_HTTP_TIMEOUT=240
-            docker-compose -f docker-compose.prod.yml pull
-            docker-compose -f docker-compose.prod.yml up -d ${{ matrix.service }}
+            docker-compose -f docker-compose.prod.yml pull | tee docker-pull.log
+            docker-compose -f docker-compose.prod.yml up -d frontend | tee docker-up.log
 
       - name: SSH into server for develop
-        if: github.ref == 'refs/heads/develop'
-        uses: appleboy/ssh-action@v1.0.3
+        if: github.ref == 'refs/heads/develop' && contains(steps.changes.outputs.services_to_build, 'frontend')
+        uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -130,5 +194,106 @@ jobs:
               git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
             fi
             export COMPOSE_HTTP_TIMEOUT=240
-            docker-compose -f docker-compose.dev.yml pull
-            docker-compose -f docker-compose.dev.yml up -d ${{ matrix.service }}
+            docker-compose -f docker-compose.dev.yml pull | tee docker-pull.log
+            docker-compose -f docker-compose.dev.yml up -d frontend | tee docker-up.log
+
+      # 추가 서비스 (backend, fileserver)에 대해서도 동일하게 처리
+      - name: SSH into server for main
+        if: github.ref == 'refs/heads/main' && contains(steps.changes.outputs.services_to_build, 'backend')
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: private_key
+          script: |
+            echo "SSH connection successful"
+            if [ ! -d /home/ubuntu/SEONSHINE ]; then
+              mkdir -p /home/ubuntu/SEONSHINE
+              git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
+            fi
+            cd /home/ubuntu/SEONSHINE
+            if [ -d .git ]; then
+              git reset --hard HEAD
+              git pull origin main
+            else
+              rm -rf /home/ubuntu/SEONSHINE/*
+              git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
+            fi
+            export COMPOSE_HTTP_TIMEOUT=240
+            docker-compose -f docker-compose.prod.yml pull | tee docker-pull.log
+            docker-compose -f docker-compose.prod.yml up -d backend | tee docker-up.log
+
+      - name: SSH into server for develop
+        if: github.ref == 'refs/heads/develop' && contains(steps.changes.outputs.services_to_build, 'backend')
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: private_key
+          script: |
+            echo "SSH connection successful"
+            if [ ! -d /home/ubuntu/SEONSHINE ]; then
+              mkdir -p /home/ubuntu/SEONSHINE
+              git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
+            fi
+            cd /home/ubuntu/SEONSHINE
+            if [ -d .git ]; then
+              git reset --hard HEAD
+              git pull origin develop
+            else
+              rm -rf /home/ubuntu/SEONSHINE/*
+              git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
+            fi
+            export COMPOSE_HTTP_TIMEOUT=240
+            docker-compose -f docker-compose.dev.yml pull | tee docker-pull.log
+            docker-compose -f docker-compose.dev.yml up -d backend | tee docker-up.log
+
+      - name: SSH into server for main
+        if: github.ref == 'refs/heads/main' && contains(steps.changes.outputs.services_to_build, 'fileserver')
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: private_key
+          script: |
+            echo "SSH connection successful"
+            if [ ! -d /home/ubuntu/SEONSHINE ]; then
+              mkdir -p /home/ubuntu/SEONSHINE
+              git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
+            fi
+            cd /home/ubuntu/SEONSHINE
+            if [ -d .git ]; then
+              git reset --hard HEAD
+              git pull origin main
+            else
+              rm -rf /home/ubuntu/SEONSHINE/*
+              git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
+            fi
+            export COMPOSE_HTTP_TIMEOUT=240
+            docker-compose -f docker-compose.prod.yml pull | tee docker-pull.log
+            docker-compose -f docker-compose.prod.yml up -d fileserver | tee docker-up.log
+
+      - name: SSH into server for develop
+        if: github.ref == 'refs/heads/develop' && contains(steps.changes.outputs.services_to_build, 'fileserver')
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: private_key
+          script: |
+            echo "SSH connection successful"
+            if [ ! -d /home/ubuntu/SEONSHINE ]; then
+              mkdir -p /home/ubuntu/SEONSHINE
+              git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
+            fi
+            cd /home/ubuntu/SEONSHINE
+            if [ -d .git ]; then
+              git reset --hard HEAD
+              git pull origin develop
+            else
+              rm -rf /home/ubuntu/SEONSHINE/*
+              git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
+            fi
+            export COMPOSE_HTTP_TIMEOUT=240
+            docker-compose -f docker-compose.dev.yml pull | tee docker-pull.log
+            docker-compose -f docker-compose.dev.yml up -d fileserver | tee docker-up.log
