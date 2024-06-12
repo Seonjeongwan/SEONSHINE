@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [frontend, backend, fileserver]
+        service: [frontend, backend, db, fileserver]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -46,27 +46,23 @@ jobs:
 
       - name: Build and push image for main
         if: github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@v5
-        with:
-          context: ./seonshine_${{ matrix.service }}
-          file: ./seonshine_${{ matrix.service }}/Dockerfile.prod
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:prod
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
+        run: |
+          docker buildx build \
+            --file ./seonshine_${{ matrix.service }}/Dockerfile.prod \
+            --platform linux/amd64,linux/arm64 \
+            --tag ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:prod \
+            --push \
+            ./seonshine_${{ matrix.service }} | tee build.log
 
       - name: Build and push image for develop
         if: github.ref == 'refs/heads/develop'
-        uses: docker/build-push-action@v5
-        with:
-          context: ./seonshine_${{ matrix.service }}
-          file: ./seonshine_${{ matrix.service }}/Dockerfile.dev
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:dev
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
+        run: |
+          docker buildx build \
+            --file ./seonshine_${{ matrix.service }}/Dockerfile.dev \
+            --platform linux/amd64,linux/arm64 \
+            --tag ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:dev \
+            --push \
+            ./seonshine_${{ matrix.service }} | tee build.log
 
   deploy:
     runs-on: ubuntu-latest
@@ -85,7 +81,7 @@ jobs:
 
       - name: SSH into server for main
         if: github.ref == 'refs/heads/main'
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -105,12 +101,12 @@ jobs:
               git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
             fi
             export COMPOSE_HTTP_TIMEOUT=240
-            docker-compose -f docker-compose.prod.yml pull
-            docker-compose -f docker-compose.prod.yml up -d ${{ matrix.service }}
+            docker-compose -f docker-compose.prod.yml pull | tee docker-pull.log
+            docker-compose -f docker-compose.prod.yml up -d ${{ matrix.service }} | tee docker-up.log
 
       - name: SSH into server for develop
         if: github.ref == 'refs/heads/develop'
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -130,5 +126,5 @@ jobs:
               git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
             fi
             export COMPOSE_HTTP_TIMEOUT=240
-            docker-compose -f docker-compose.dev.yml pull
-            docker-compose -f docker-compose.dev.yml up -d ${{ matrix.service }}
+            docker-compose -f docker-compose.dev.yml pull | tee docker-pull.log
+            docker-compose -f docker-compose.dev.yml up -d ${{ matrix.service }} | tee docker-up.log
