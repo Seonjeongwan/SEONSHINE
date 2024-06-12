@@ -48,7 +48,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           #context: ./seonshine_${{ matrix.service }}
-          dockerfile: ./seonshine_${{ matrix.service }}/Dockerfile.prod
+          dockerfile: ./seonshine_backend/Dockerfile.prod
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:prod
