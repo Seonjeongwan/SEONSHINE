@@ -1,8 +1,7 @@
-import * as Yup from 'yup';
 import * as zod from 'zod';
 
 import { errorMessages } from '@/constants/errorMessages';
-import { employeeIdRegex, otpRegex, passwordRegex } from '@/constants/regex';
+import { employeeIdRegex, otpRegex, passwordRegex, phoneNumberRegex } from '@/constants/regex';
 
 export const SignUpSchema = zod
   .object({
@@ -20,6 +19,15 @@ export const SignUpSchema = zod
         message: errorMessages.passwordInvalid,
       }),
     confirmPassword: zod.string(),
+    fullName: zod.string().min(1, { message: errorMessages.require }),
+    email: zod.string().email({ message: errorMessages.emailInvalid }),
+    phoneNumber: zod
+      .string()
+      .min(1, { message: errorMessages.require })
+      .refine((value) => phoneNumberRegex.test(value), {
+        message: errorMessages.phoneNumberInvalid,
+      }),
+    branchName: zod.string().min(1, { message: errorMessages.require }),
   })
   .refine(
     (values) => {

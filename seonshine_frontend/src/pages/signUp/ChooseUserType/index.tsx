@@ -4,9 +4,9 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import FoodBankIcon from '@mui/icons-material/FoodBank';
 import { Box, Button, Stack, Typography } from '@mui/material';
 
-import AccountVerificationLayout from '@/components/organims/accountVerification/accountVerificationLayout';
+import { EnterUserTypePropsType } from '../types';
 
-const ChooseUserType = () => {
+const ChooseUserType = ({ handleSubmitUserType }: EnterUserTypePropsType) => {
   return (
     <Stack
       alignItems="center"
@@ -38,12 +38,13 @@ const ChooseUserType = () => {
           justifyContent="space-between"
           gap={6}
           width="100%"
-          className="w-full p-24 md:w-max xl:w-240 max-w-screen"
+          className="w-full p-24 md:w-240 xl:w-240 max-w-screen"
         >
           <Button
             variant="contained"
             className="bg-blue-100 hover:bg-blue-300 shadow-blue-300 shadow-md"
             fullWidth
+            onClick={() => handleSubmitUserType('shinhan_user')}
           >
             <Box
               display="flex"
@@ -74,6 +75,7 @@ const ChooseUserType = () => {
             variant="contained"
             className="bg-yellow-100 hover:bg-yellow-300 shadow-yellow-300 shadow-md"
             fullWidth
+            onClick={() => handleSubmitUserType('restaurant')}
           >
             <Box
               display="flex"

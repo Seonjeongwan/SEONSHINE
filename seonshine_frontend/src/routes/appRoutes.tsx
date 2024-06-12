@@ -34,7 +34,7 @@ const AppRoutes = () => {
           />
           <Route
             path={paths.signUp}
-            element={authenticate ? <Navigate to={paths.main} /> : <ProfileRegistration />}
+            element={authenticate ? <Navigate to={paths.main} /> : <SignUpPage />}
           />
         </Route>
 

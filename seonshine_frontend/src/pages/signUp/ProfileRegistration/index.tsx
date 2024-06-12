@@ -8,19 +8,34 @@ import { Box, Button, IconButton, Stack, Typography } from '@mui/material';
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
 
-import { LoginSchema, LoginSchemaType } from '@/pages/login/schemas';
+import { EnterUserInformationPropsType } from '../types';
+import { SignUpSchema, SignUpSchemaType } from './schema';
 
-const ProfileRegistration = () => {
+const ProfileRegistration = ({
+  handleSubmitInformation,
+  userType,
+}: EnterUserInformationPropsType & { userType: string }) => {
   const {
+    handleSubmit,
     register,
     formState: { errors },
-  } = useForm<LoginSchemaType>({
-    resolver: zodResolver(LoginSchema),
+  } = useForm<SignUpSchemaType>({
+    resolver: zodResolver(SignUpSchema),
     defaultValues: {
       employeeId: '',
       password: '',
+      confirmPassword: '',
+      fullName: '',
+      email: '',
+      phoneNumber: '',
+      branchName: '',
     },
   });
+
+  const submitForm = (data: SignUpSchemaType) => {
+    handleSubmitInformation({ ...data, userType });
+  };
+
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const handleClickShowPassword = () => setShowPassword((prev) => !prev);
@@ -51,7 +66,7 @@ const ProfileRegistration = () => {
             className="h-full px-2"
           >
             <form
-              // onSubmit={handleSubmit(submitForm)}
+              onSubmit={handleSubmit(submitForm)}
               className="w-full"
               noValidate
             >
@@ -67,7 +82,6 @@ const ProfileRegistration = () => {
                     />
                     <FormInput
                       name="employeeId"
-                      autoFocus
                       register={register}
                       placeholder="Employee ID"
                       error={errors.employeeId}
@@ -101,7 +115,6 @@ const ProfileRegistration = () => {
                     />
                     <FormInput
                       name="confirmPassword"
-                      autoFocus
                       register={register}
                       placeholder="Confirm Password"
                       type={showConfirmPassword ? 'text' : 'password'}
@@ -113,7 +126,7 @@ const ProfileRegistration = () => {
                           {showConfirmPassword ? <Visibility /> : <VisibilityOff />}
                         </IconButton>
                       }
-                      error={errors.employeeId}
+                      error={errors.confirmPassword}
                     />
                   </Stack>
                   <Stack direction="column">
@@ -123,27 +136,22 @@ const ProfileRegistration = () => {
                     />
                     <FormInput
                       name="fullName"
-                      autoFocus
                       register={register}
                       placeholder="Full name"
-                      error={errors.employeeId}
+                      error={errors.fullName}
                     />
                   </Stack>
                   <Stack>
-                    <Stack
-                      className="mr-2"
-                      direction="column"
-                    >
+                    <Stack direction="column">
                       <FormLabel
                         title="Email"
                         required
                       />
                       <FormInput
                         name="email"
-                        autoFocus
                         register={register}
                         placeholder="Email"
-                        error={errors.employeeId}
+                        error={errors.email}
                       />
                     </Stack>
                     <Stack direction="column">
@@ -152,7 +160,7 @@ const ProfileRegistration = () => {
                         name="emailExtension"
                         register={register}
                         disabled
-                        placeholder="@seonshine.com"
+                        placeholder="@shinhan.com"
                       />
                     </Stack>
                   </Stack>
@@ -167,10 +175,9 @@ const ProfileRegistration = () => {
                       />
                       <FormInput
                         name="phoneNumber"
-                        autoFocus
                         register={register}
                         placeholder="Phone Number"
-                        error={errors.employeeId}
+                        error={errors.phoneNumber}
                       />
                     </Stack>
                     <Stack direction="column">
@@ -180,10 +187,9 @@ const ProfileRegistration = () => {
                       />
                       <FormInput
                         name="branchName"
-                        autoFocus
                         register={register}
                         placeholder="Branch name"
-                        error={errors.employeeId}
+                        error={errors.branchName}
                       />
                     </Stack>
                   </Stack>
@@ -194,7 +200,6 @@ const ProfileRegistration = () => {
                     fullWidth
                     className="text-lg"
                     type="submit"
-                    // disabled={isPending}
                   >
                     Next
                   </Button>

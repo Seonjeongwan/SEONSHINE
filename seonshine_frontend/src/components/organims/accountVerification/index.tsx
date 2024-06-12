@@ -12,6 +12,7 @@ import { OtpSchema, OtpSchemaType } from './schema';
 
 type AccountVerificationProps = {
   title?: string;
+  description?: string;
   secondsCountdown: number;
   handleSubmitOtp: (otp: string) => void;
   handleResendOtp: (resetTimer: () => void) => void;
@@ -19,6 +20,7 @@ type AccountVerificationProps = {
 
 const AccountVerification = ({
   title = 'Account Verification',
+  description = 'An OTP has been sent to your email. Please enter the OTP to verify your account.',
   handleSubmitOtp,
   secondsCountdown,
   handleResendOtp,
@@ -110,7 +112,7 @@ const AccountVerification = ({
   return (
     <AccountVerificationLayout
       title={title}
-      description="An OTP has been sent to your email. Please enter the OTP to verify your account."
+      description={description}
     >
       <Stack
         direction="column"
