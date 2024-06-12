@@ -5,11 +5,11 @@ on:
     branches:
       - main
       - develop
-    # paths:
-    #   - "seonshine_frontend/**"
-    #   - "seonshine_backend/**"
-    #   - "seonshine_db/**"
-    #   - "seonshine_fileserver/**"
+    paths:
+      - "seonshine_frontend/**"
+      - "seonshine_backend/**"
+      - "seonshine_db/**"
+      - "seonshine_fileserver/**"
 
 jobs:
   build-and-push:
@@ -48,6 +48,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./seonshine_${{ matrix.service }}
+          dockerfile: Dockerfile.${{ matrix.environment }}
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:${{ matrix.environment }}
@@ -71,7 +72,7 @@ jobs:
           chmod 600 private_key
 
       - name: SSH into server
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -91,7 +92,5 @@ jobs:
               git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
             fi
             export COMPOSE_HTTP_TIMEOUT=240
-            docker-compose -f docker-compose.${{ matrix.environment }}.yml pull
-            docker-compose -f docker-compose.${{ matrix.environment }}.yml up -d ${{ matrix.service }}
-
-      #dockercompose -f ./docker-compose.yml down 은 모두 제거후 사용
+            docker-compose -f docker-compose.prod.yml pull
+            docker-compose -f docker-compose.prod.yml up -d ${{ matrix.service }}

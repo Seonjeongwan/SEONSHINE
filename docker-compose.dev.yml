@@ -1,3 +1,4 @@
+#docker-compose.dev.yml
 version: "3.8"
 
 services:
@@ -8,19 +9,20 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./seonshine_frontend/src:/app/src
-      - /app/node_modules
-      - /app/build
+      - ./seonshine_frontend:/app
     environment:
       - NODE_ENV=development
-    depends_on:
-      - backend
     restart: always
 
   backend:
     build:
       context: ./seonshine_backend
       dockerfile: Dockerfile.dev
+    ports:
+      - "5050:5050"
+    volumes:
+      - ./seonshine_backend:/app
+      - /app/node_modules
     environment:
       - NODE_ENV=development
       - DB_HOST=db
@@ -30,26 +32,20 @@ services:
       - COMMON_DB_NAME=common_db
       - RESTAURANT_DB_NAME=restaurant_db
       - ORDER_DB_NAME=order_db
-    volumes:
-      - ./seonshine_backend:/app
-      - /app/node_modules
-    ports:
-      - "5050:5050"
+    command: ["npx", "nodemon", "server.js"]
     depends_on:
       db:
         condition: service_healthy
     restart: always
-    # env_file:
-    #   - ./seonshine_backend/.env
 
   db:
     image: mysql:8.0.36
     ports:
       - "3306:3306"
     environment:
-      MYSQL_USER: seonshine_mgr
-      MYSQL_PASSWORD: seonshine@2
-      MYSQL_ROOT_PASSWORD: seonshine@2
+      - MYSQL_USER=seonshine_mgr
+      - MYSQL_PASSWORD=seonshine@2
+      - MYSQL_ROOT_PASSWORD=seonshine@2
     volumes:
       - mysql-data:/var/lib/mysql
       - ./seonshine_db/schema:/docker-entrypoint-initdb.d
@@ -73,22 +69,5 @@ services:
       - NODE_ENV=development
     restart: always
 
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: portainer
-    command: -H unix:///var/run/docker.sock
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
-    ports:
-      - "9000:9000"
-    restart: always
-
-  redis:
-    image: redis:6.2
-    ports:
-      - "6379:6379"
-
 volumes:
   mysql-data:
-  portainer_data:
