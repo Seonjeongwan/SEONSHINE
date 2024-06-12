@@ -1,5 +1,5 @@
 import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
-import Branch from "../models/branch.js";
+import Branch from "../models/branchModel.js";
 import { getResponseErrors } from "../utils/responseParser.js";
 
 export const getAllBranch = async (req, res) => {

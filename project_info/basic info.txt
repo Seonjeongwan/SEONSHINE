@@ -1,24 +1,21 @@
-DB 사용자
-seonshine_mgr
-seonshine@2
+-DB User setting
+seonshine_mgr / seonshine@2
+root / admin -> setting needed 
 
-github
+-github root user
 sunnythek@naver.com
 
-docker
-seonshinevn
-seonshine
-seonshine@2
+-githublink
+https://github.com/Seonjeongwan/SEONSHINE.git
 
-admin 00000000 / admin
+-dockerhub info
+seonshinevn seonshine@2
+seonshine.vn@gmail.com seonshine@2
 
-root / admin
+-gmail info
+seonshine.vn@gmail.com / seonshinevn@2
 
-gmail
-seonshine.vn@gmail.com
-seonshinevn@2
-
-backup codes
+backup codes for gmail
 7637 0075
 9621 6985
 6154 8734
@@ -30,6 +27,6 @@ backup codes
 1303 9961
 5021 0901
 
-aws
+aws server ip
 54.254.0.100
 
