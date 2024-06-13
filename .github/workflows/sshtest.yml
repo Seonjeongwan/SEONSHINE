@@ -23,7 +23,7 @@ jobs:
 
       - name: SSH into server for main
         if: github.ref == 'refs/heads/main'
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.0.2
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -46,7 +46,7 @@ jobs:
 
       - name: SSH into server for develop
         if: github.ref == 'refs/heads/develop'
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.0.2
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
