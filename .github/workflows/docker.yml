@@ -71,9 +71,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push
-    strategy:
-      matrix:
-        service: [frontend, backend, db, fileserver]
+    # strategy:
+    #   matrix:
+    #     service: [frontend, backend, db, fileserver]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
