@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import { Logout, Notifications } from '@mui/icons-material';
 import { Avatar, Badge, Box, IconButton, Stack, Typography } from '@mui/material';
@@ -12,6 +12,8 @@ import { MenuItemType, SidebarPropsType } from './types';
 
 const Sidebar = ({ role }: SidebarPropsType) => {
   const { logout } = useAuth();
+  const location = useLocation();
+  const currentPath = location.pathname;
 
   const allowedMenuItems = menuItems.filter((item) => item.permission.includes(role));
 
@@ -80,12 +82,13 @@ const Sidebar = ({ role }: SidebarPropsType) => {
       <Stack direction="column">
         {allowedMenuItems.map((item: MenuItemType) => {
           if (item.path === paths.index) return null;
+          const isActive = currentPath === item.path;
           const Icon = iconMap[item.icon];
           return (
             <Link
               to={item.path}
               key={item.name}
-              className="flex p-4 gap-3 items-center hover:bg-black-100 rounded-sm border-b"
+              className={`flex p-4 gap-3 items-center rounded-md border-b  ${isActive ? 'bg-black-200' : 'hover:bg-black-100'}`}
             >
               <Icon sx={{ fontSize: 24 }} />
               <Typography variant="buttonM">{item.name}</Typography>

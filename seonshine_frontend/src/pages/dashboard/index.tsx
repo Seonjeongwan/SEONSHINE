@@ -3,8 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { paths } from '@/routes/paths';
 
-const TestPage = () => {
-  const navigate = useNavigate();
+const Dashboard = () => {
   return (
     <div>
       TestPage
@@ -13,4 +12,4 @@ const TestPage = () => {
   );
 };
 
-export default TestPage;
+export default Dashboard;
