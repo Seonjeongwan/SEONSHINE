@@ -249,7 +249,12 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
 
   deploy:
-    needs: check-changed-files
+    needs:
+      - check-changed-files
+      - build-and-push-frontend
+      - build-and-push-backend
+      - build-and-push-fileserver
+      - check-changed-files
     runs-on: ubuntu-latest
     if: needs.check-changed-files.outputs.any_changes == 'true'
     steps:
@@ -263,7 +268,7 @@ jobs:
 
       - name: SSH into server for main
         if: github.ref == 'refs/heads/main'
-        uses: appleboy/ssh-action@v1.1.0
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -293,7 +298,7 @@ jobs:
 
       - name: SSH into server for develop
         if: github.ref == 'refs/heads/develop'
-        uses: appleboy/ssh-action@v1.1.0
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
