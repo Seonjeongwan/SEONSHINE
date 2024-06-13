@@ -6,6 +6,7 @@ import LoginPage from '@/pages/login';
 import MainPage from '@/pages/main';
 import PageNotFound from '@/pages/pageNotFound';
 import SignUpPage from '@/pages/signUp';
+import ProfileRegistration from '@/pages/signUp/components/ProfileRegistration';
 
 import { RoleEnum } from '@/types/user';
 

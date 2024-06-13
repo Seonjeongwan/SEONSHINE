@@ -14,6 +14,7 @@ type TextFieldType = {
   error?: IPlainObject;
   valueAsNumber?: boolean;
   autoFocus?: boolean;
+  disabled?: boolean;
   variant?: TextFieldVariants;
   size?: OverridableStringUnion<'small' | 'medium', TextFieldPropsSizeOverrides>;
   className?: string;
@@ -29,6 +30,7 @@ const FormInput = ({
   register,
   valueAsNumber,
   autoFocus,
+  disabled,
   variant = 'filled',
   size = 'small',
   className = 'block',
@@ -42,6 +44,7 @@ const FormInput = ({
         {...register(name, { valueAsNumber })}
         variant={variant}
         autoFocus={autoFocus}
+        disabled={disabled}
         error={!!error}
         placeholder={placeholder}
         size={size}
