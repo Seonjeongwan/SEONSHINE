@@ -7,8 +7,8 @@ export const paths = {
   pageNotFound: '/404',
   admin: '/admin',
   dashboard: '/dashboard',
-  userManagement: '/user-management',
-  restaurantManagement: '/restaurant-management',
-  menuManagement: '/menu-management',
-  orderManagement: '/order-management',
+  user: { index: 'user', detail: ':id', register: 'register', edit: ':id/edit' },
+  restaurant: { index: 'restaurant' },
+  menu: { index: 'menu' },
+  order: { index: 'order' },
 };

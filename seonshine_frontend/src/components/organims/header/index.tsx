@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { NavigateNext } from '@mui/icons-material';
 import { Breadcrumbs, Stack, Typography } from '@mui/material';
 
-import { buildFullPath, getMenuItemNameByPath } from './helpers';
+import { buildFullPath, getNameByPath, getTitleByPath } from '@/utils/menu';
 
 const Header = () => {
   const location = useLocation();
@@ -18,7 +18,7 @@ const Header = () => {
         variant="heading2"
         component="h2"
       >
-        {getMenuItemNameByPath(location.pathname)}
+        {getTitleByPath(paths[0])}
       </Typography>
       <Breadcrumbs
         aria-label="breadcrumb"
@@ -28,23 +28,25 @@ const Header = () => {
         <Link to="/">Home</Link>
         {paths.map((path, index) => {
           const fullPath = buildFullPath(paths, index);
-          const isCurrentPage = location.pathname === fullPath;
-          return isCurrentPage ? (
-            <Typography
-              key={`${path}_${index}`}
-              color="primary"
-              variant="bodyS"
-            >
-              {getMenuItemNameByPath(fullPath)}
-            </Typography>
-          ) : (
-            <Link
-              key={`${path}_${index}`}
-              to={fullPath}
-            >
-              {getMenuItemNameByPath(fullPath)}
-            </Link>
-          );
+          const name = getNameByPath(fullPath);
+          return name ? (
+            index === paths.length - 1 ? (
+              <Typography
+                key={`${path}_${index}`}
+                color="primary"
+                variant="bodyS"
+              >
+                {name}
+              </Typography>
+            ) : (
+              <Link
+                key={`${path}_${index}`}
+                to={fullPath}
+              >
+                {name}
+              </Link>
+            )
+          ) : null;
         })}
       </Breadcrumbs>
     </Stack>

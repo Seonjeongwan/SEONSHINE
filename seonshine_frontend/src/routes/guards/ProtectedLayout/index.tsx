@@ -1,31 +1,21 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 
 import MainLayout from '@/components/templates/mainLayout';
 
-import { useAuth } from '@/hooks/useAuth';
 import { paths } from '@/routes/paths';
 import { RoleEnum } from '@/types/user';
-import { getUserFromCache } from '@/utils/persistCache/auth';
 
 import useAuthStore from '@/store/auth.store';
 
 type AllowedRole = RoleEnum;
 
 type ProtectedLayoutPropsType = {
-  children: React.ReactNode;
   allowedRoles: AllowedRole[];
 };
 
-const roleIdToRoleMap: { [key: string]: RoleEnum } = {
-  0: RoleEnum.ADMIN,
-  1: RoleEnum.USER,
-  2: RoleEnum.RESTAURANT,
-};
-
-const ProtectedLayout: React.FC<ProtectedLayoutPropsType> = ({ children, allowedRoles }) => {
+const ProtectedLayout: React.FC<ProtectedLayoutPropsType> = ({ allowedRoles }) => {
   const { currentUser, isAuthenticated } = useAuthStore();
-  const { logout } = useAuth();
 
   const authenticate = isAuthenticated();
 
@@ -38,14 +28,7 @@ const ProtectedLayout: React.FC<ProtectedLayoutPropsType> = ({ children, allowed
     );
   }
 
-  if (!currentUser?.role_id || !(currentUser?.role_id in roleIdToRoleMap)) {
-    logout();
-    return null;
-  }
-
-  const userRole = roleIdToRoleMap[currentUser.role_id];
-
-  if (!allowedRoles.includes(userRole)) {
+  if (currentUser && !allowedRoles.includes(currentUser.role_id)) {
     return (
       <Navigate
         to={paths.pageNotFound}
@@ -54,7 +37,13 @@ const ProtectedLayout: React.FC<ProtectedLayoutPropsType> = ({ children, allowed
     );
   }
 
-  return <MainLayout role={userRole}>{children}</MainLayout>;
+  return (
+    currentUser && (
+      <MainLayout role={currentUser.role_id}>
+        <Outlet />
+      </MainLayout>
+    )
+  );
 };
 
 export default ProtectedLayout;

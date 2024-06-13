@@ -68,31 +68,31 @@ const AppRoutes = () => {
 
         <Route
           path={paths.dashboard}
-          element={
-            <ProtectedLayout
-              allowedRoles={[RoleEnum.ADMIN, RoleEnum.USER, RoleEnum.RESTAURANT]}
-              children={<Dashboard />}
-            />
-          }
-        />
+          element={<ProtectedLayout allowedRoles={[RoleEnum.ADMIN, RoleEnum.USER, RoleEnum.RESTAURANT]} />}
+        >
+          <Route
+            index
+            element={<Dashboard />}
+          />
+        </Route>
         <Route
-          path={paths.userManagement}
-          element={
-            <ProtectedLayout
-              allowedRoles={[RoleEnum.ADMIN]}
-              children={<UserManagement />}
-            />
-          }
-        />
+          path={paths.user.index}
+          element={<ProtectedLayout allowedRoles={[RoleEnum.ADMIN]} />}
+        >
+          <Route
+            index
+            element={<UserManagement />}
+          />
+        </Route>
         <Route
-          path={paths.restaurantManagement}
-          element={
-            <ProtectedLayout
-              allowedRoles={[RoleEnum.ADMIN]}
-              children={<RestaurantManagement />}
-            />
-          }
-        />
+          path={paths.restaurant.index}
+          element={<ProtectedLayout allowedRoles={[RoleEnum.ADMIN]} />}
+        >
+          <Route
+            index
+            element={<RestaurantManagement />}
+          />
+        </Route>
       </Routes>
     </Router>
   );
