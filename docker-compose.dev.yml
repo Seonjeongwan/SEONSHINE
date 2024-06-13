@@ -32,7 +32,7 @@ services:
       - COMMON_DB_NAME=common_db
       - RESTAURANT_DB_NAME=restaurant_db
       - ORDER_DB_NAME=order_db
-    command: ["npx", "nodemon", "server.js"]
+    command: sh -c "npm run migrate:all && npm run seed:all && npm run dev"
     depends_on:
       db:
         condition: service_healthy
@@ -57,17 +57,21 @@ services:
       start_period: 5s
     restart: always
 
-  fileserver:
-    build:
-      context: ./seonshine_fileserver
-      dockerfile: Dockerfile.dev
+  # fileserver:
+  #   build:
+  #     context: ./seonshine_fileserver
+  #     dockerfile: Dockerfile.dev
+  #   ports:
+  #     - "4000:4000"
+  #   volumes:
+  #     - ./seonshine_fileserver/uploads:/app/uploads
+  #   environment:
+  #     - NODE_ENV=development
+  #   restart: always
+  redis:
+    image: redis:6.2
     ports:
-      - "4000:4000"
-    volumes:
-      - ./seonshine_fileserver/uploads:/app/uploads
-    environment:
-      - NODE_ENV=development
-    restart: always
+      - "6379:6379"
 
 volumes:
   mysql-data:
