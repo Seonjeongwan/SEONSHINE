@@ -2,19 +2,21 @@ version: "3.8"
 
 services:
   frontend:
-    image: seonshinevn/seonshine_frontend:latest
-    #build: ./seonshine_frontend
+    image: seonshinevn/seonshine_frontend:prod
     ports:
       - "3000:3000"
     volumes:
       - ./seonshine_frontend/src:/app/src
       - /app/node_modules
+      - /app/build # Cache build results
     depends_on:
       - backend
+    restart: always
+    environment:
+      - NODE_ENV=production
 
   backend:
-    image: seonshinevn/seonshine_backend:latest
-    #build: ./seonshine_backend
+    image: seonshinevn/seonshine_backend:prod
     environment:
       - NODE_ENV=production
       - DB_HOST=db
@@ -29,20 +31,16 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    # env_file:
-    #   - ./seonshine_backend/.env
-  # stdin_open: true
-  # tty: true
+    restart: always
 
   db:
     image: mysql:8.0.36
-    #build: ./seonshine_db
     ports:
       - "3306:3306"
     environment:
-      MYSQL_USER: seonshine_mgr
-      MYSQL_PASSWORD: seonshine@2
-      MYSQL_ROOT_PASSWORD: seonshine@2
+      - MYSQL_USER=seonshine_mgr
+      - MYSQL_PASSWORD=seonshine@2
+      - MYSQL_ROOT_PASSWORD=seonshine@2
     volumes:
       - mysql-data:/var/lib/mysql
       - ./seonshine_db/schema:/docker-entrypoint-initdb.d
@@ -52,14 +50,29 @@ services:
       timeout: 10s
       retries: 5
       start_period: 5s
+    restart: always
 
   fileserver:
-    image: seonshinevn/seonshine_fileserver:latest
-    #build: ./seonshine_fileserver
+    image: seonshinevn/seonshine_fileserver:prod
     ports:
       - "4000:4000"
     volumes:
       - ./seonshine_fileserver/uploads:/app/uploads
+    restart: always
+    environment:
+      - NODE_ENV=production
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    command: -H unix:///var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    ports:
+      - "9000:9000"
+    restart: always
 
 volumes:
   mysql-data:
+  portainer_data:

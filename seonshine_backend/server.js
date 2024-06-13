@@ -11,7 +11,7 @@ import express from "express";
 // const authRoutes = require("./routes/authRoutes");
 // const userRoutes = require("./routes/userRoutes");
 // import commonRouter from "./routes/commonRoutes";
-import commonRouter from './routes/commonRoutes.js';
+import commonRouter from "./routes/commonRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 //const orderRoutes = require("./routes/orderRoutes");
 
@@ -53,4 +53,4 @@ async function startServer() {
 // Start the server
 startServer();
 
-//test for docker test13
+//fianl link test 1

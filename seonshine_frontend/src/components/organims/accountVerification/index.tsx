@@ -63,8 +63,8 @@ const AccountVerification = ({
     onChange(newOtp.join(''));
     newOtp.forEach((value, index) => {
       if (inputRefs.current[index]) {
-        inputRefs.current[index].value = value;
-        value !== ' ' && inputRefs.current[index].focus();
+        inputRefs.current[index]!.value = value;
+        value !== ' ' && inputRefs.current[index]!.focus();
       }
     });
   };

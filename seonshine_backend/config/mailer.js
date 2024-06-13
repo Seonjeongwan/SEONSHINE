@@ -1,7 +1,7 @@
-const nodemailer = require("nodemailer");
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
 
-module.exports = {
+export default {
   service: "Gmail",
   auth: {
     user: process.env.EMAIL_USER,
