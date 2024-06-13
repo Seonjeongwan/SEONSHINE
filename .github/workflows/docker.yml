@@ -27,36 +27,43 @@ jobs:
       - name: Check for changed files
         id: check
         run: |
-          FRONTEND_CHANGED=$(git diff --name-only HEAD HEAD~1 | grep 'seonshine_frontend' || echo '')
-          BACKEND_CHANGED=$(git diff --name-only HEAD HEAD~1 | grep 'seonshine_backend' || echo '')
-          FILESERVER_CHANGED=$(git diff --name-only HEAD HEAD~1 | grep 'seonshine_fileserver' || echo '')
-
-          if [ "$FRONTEND_CHANGED" != '' ]; then
-            echo "::set-output name=frontend::true"
+          if [ "$(git rev-list --count HEAD)" -eq 1 ]; then
+            echo "frontend=true" >> $GITHUB_ENV
+            echo "backend=true" >> $GITHUB_ENV
+            echo "fileserver=true" >> $GITHUB_ENV
+            echo "any_changes=true" >> $GITHUB_ENV
           else
-            echo "::set-output name=frontend::false"
-          fi
+            FRONTEND_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep 'seonshine_frontend' || echo '')
+            BACKEND_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep 'seonshine_backend' || echo '')
+            FILESERVER_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep 'seonshine_fileserver' || echo '')
 
-          if [ "$BACKEND_CHANGED" != '' ]; then
-            echo "::set-output name=backend::true"
-          else
-            echo "::set-output name=backend::false"
-          fi
+            if [ "$FRONTEND_CHANGED" != '' ]; then
+              echo "frontend=true" >> $GITHUB_ENV
+            else
+              echo "frontend=false" >> $GITHUB_ENV
+            fi
 
-          if [ "$FILESERVER_CHANGED" != '' ]; then
-            echo "::set-output name=fileserver::true"
-          else
-            echo "::set-output name=fileserver::false"
-          fi
+            if [ "$BACKEND_CHANGED" != '' ]; then
+              echo "backend=true" >> $GITHUB_ENV
+            else
+              echo "backend=false" >> $GITHUB_ENV
+            fi
 
-          if [ "$FRONTEND_CHANGED" != '' ] || [ "$BACKEND_CHANGED" != '' ] || [ "$FILESERVER_CHANGED" != '' ]; then
-            echo "::set-output name=any_changes::true"
-          else
-            echo "::set-output name=any_changes::false"
+            if [ "$FILESERVER_CHANGED" != '' ]; then
+              echo "fileserver=true" >> $GITHUB_ENV
+            else
+              echo "fileserver=false" >> $GITHUB_ENV
+            fi
+
+            if [ "$FRONTEND_CHANGED" != '' ] || [ "$BACKEND_CHANGED" != '' ] || [ "$FILESERVER_CHANGED" != '' ]; then
+              echo "any_changes=true" >> $GITHUB_ENV
+            else
+              echo "any_changes=false" >> $GITHUB_ENV
+            fi
           fi
 
   build-and-push-frontend:
-    if: needs.check-changed-files.outputs.frontend == 'true'
+    if: env.frontend == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -87,7 +94,7 @@ jobs:
 
       - name: Build and push image for main
         if: github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v2
         with:
           context: ./seonshine_frontend
           file: ./seonshine_frontend/Dockerfile.prod
@@ -99,7 +106,7 @@ jobs:
 
       - name: Build and push image for develop
         if: github.ref == 'refs/heads/develop'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v2
         with:
           context: ./seonshine_frontend
           file: ./seonshine_frontend/Dockerfile.dev
@@ -110,7 +117,7 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
 
   build-and-push-backend:
-    if: needs.check-changed-files.outputs.backend == 'true'
+    if: env.backend == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -141,7 +148,7 @@ jobs:
 
       - name: Build and push image for main
         if: github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v2
         with:
           context: ./seonshine_backend
           file: ./seonshine_backend/Dockerfile.prod
@@ -153,7 +160,7 @@ jobs:
 
       - name: Build and push image for develop
         if: github.ref == 'refs/heads/develop'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v2
         with:
           context: ./seonshine_backend
           file: ./seonshine_backend/Dockerfile.dev
@@ -164,7 +171,7 @@ jobs:
           cache-to: type=local,dest=/tmp/.buildx-cache
 
   build-and-push-fileserver:
-    if: needs.check-changed-files.outputs.fileserver == 'true'
+    if: env.fileserver == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -195,7 +202,7 @@ jobs:
 
       - name: Build and push image for main
         if: github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v2
         with:
           context: ./seonshine_fileserver
           file: ./seonshine_fileserver/Dockerfile.prod
@@ -207,7 +214,7 @@ jobs:
 
       - name: Build and push image for develop
         if: github.ref == 'refs/heads/develop'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v2
         with:
           context: ./seonshine_fileserver
           file: ./seonshine_fileserver/Dockerfile.dev
