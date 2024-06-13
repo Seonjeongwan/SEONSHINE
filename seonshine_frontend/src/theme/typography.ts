@@ -4,7 +4,7 @@ import { TypographyVariantsOptions } from '@mui/material/styles';
 
 type PartialRecord<K extends string | number | symbol, T> = { [P in K]?: T };
 
-type headingTypo = 'heading1' | 'heading2' | 'heading4' | 'bodyS' | 'buttonM' | 'timer' | 'subtitleS';
+type headingTypo = 'heading1' | 'heading2' | 'heading3' | 'heading4' | 'bodyS' | 'buttonM' | 'timer' | 'subtitleS';
 
 declare module '@mui/material/styles' {
   interface TypographyVariantsOptions extends PartialRecord<headingTypo, CSSProperties> {}
@@ -28,8 +28,8 @@ const fontWeightValue = {
 export const customTypographyVariants: TypographyVariantsOptions = {
   heading1: {
     fontSize: '64px',
-    fontWeight: fontWeightValue.SupperBold,
-    lineHeight: '75px',
+    fontWeight: fontWeightValue.ExtraBold,
+    lineHeight: '26px',
     textShadow: '0 4px 4px rgba(0, 0, 0, 0.5)',
     textTransform: 'uppercase',
   },
@@ -37,6 +37,13 @@ export const customTypographyVariants: TypographyVariantsOptions = {
     fontSize: '42px',
     fontWeight: fontWeightValue.Bold,
     lineHeight: '46px',
+  },
+  heading3: {
+    fontSize: '24px',
+    fontWeight: fontWeightValue.SupperBold,
+    lineHeight: '75px',
+    textShadow: '0 2px 2px rgba(0, 0, 0, 0.5)',
+    textTransform: 'uppercase',
   },
   heading4: {
     fontSize: '24px',

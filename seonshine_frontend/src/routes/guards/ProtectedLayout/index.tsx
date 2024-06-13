@@ -29,10 +29,6 @@ const ProtectedLayout: React.FC<ProtectedLayoutPropsType> = ({ children, allowed
 
   const authenticate = isAuthenticated();
 
-  function getRoleByRoleId(roleId: string): RoleEnum {
-    return roleIdToRoleMap[roleId];
-  }
-
   if (!authenticate) {
     return (
       <Navigate
@@ -42,7 +38,7 @@ const ProtectedLayout: React.FC<ProtectedLayoutPropsType> = ({ children, allowed
     );
   }
 
-  if (!currentUser?.role_id) {
+  if (!currentUser?.role_id || !(currentUser?.role_id in roleIdToRoleMap)) {
     logout();
     return null;
   }
