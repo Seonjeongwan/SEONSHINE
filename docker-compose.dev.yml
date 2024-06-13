@@ -2,17 +2,17 @@
 version: "3.8"
 
 services:
-  # frontend:
-  #   build:
-  #     context: ./seonshine_frontend
-  #     dockerfile: Dockerfile.dev
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./seonshine_frontend:/app
-  #   environment:
-  #     - NODE_ENV=development
-  #   restart: always
+  frontend:
+    build:
+      context: ./seonshine_frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./seonshine_frontend:/app
+    environment:
+      - NODE_ENV=development
+    restart: always
 
   backend:
     build:
