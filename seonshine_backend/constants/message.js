@@ -9,4 +9,7 @@ export const statusWithMessageLogin = {
 
 export const messageErrors = {
   idOrEmailExist: "User ID or Email already exists",
+  verifyCodeIncorrect: "Incorrect verification code",
+  verifyCodeExpires:
+    "The verification code has expired. Please re-send the verification code to try again",
 };

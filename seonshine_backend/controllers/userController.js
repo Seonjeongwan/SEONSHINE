@@ -1,3 +1,4 @@
+// @ts-nocheck
 import bcrypt from "bcrypt";
 import { Op } from "sequelize";
 import { UserStatus } from "../constants/auth.js";
@@ -6,7 +7,7 @@ import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
 import { messageErrors, statusWithMessageLogin } from "../constants/message.js";
 import { verificationTypes } from "../constants/verification.js";
 import User from "../models/userModel.js";
-import Verification from "../models/verification.js";
+import Verification from "../models/verificationModel.js";
 import { sendVerificationCode } from "../utils/emailUtil.js";
 import { getResponseErrors } from "../utils/responseParser.js";
 import {
@@ -40,7 +41,9 @@ export const signUp = async (req, res) => {
 
     if (isSuccessSendingEmailCode) {
       await saveToTemporaryDb(`signup-user-${email}`, user, 86400);
-      return res.status(200).send("Sending email verification successful");
+      return res
+        .status(200)
+        .send({ message: "Sending email verification successful" });
     }
     return res
       .status(httpStatusCodes.internalServerError)
@@ -57,16 +60,21 @@ export const verifySignUp = async (req, res) => {
     const { code, email } = req.body;
     const verifyInfo = await Verification.findOne({
       where: {
-        code: code,
         email: email.trim(),
         type: verificationTypes.signUp,
       },
+      order: [["created_at", "DESC"]],
+      raw: true,
     });
-    if (verifyInfo) {
-      //TODO: Check code is in expire
+    if (verifyInfo && verifyInfo.code === code) {
+      const currentTime = Date.now();
+      if (currentTime > verifyInfo.expiration) {
+        return res
+          .status(httpStatusCodes.badRequest)
+          .json({ message: messageErrors.verifyCodeExpires });
+      }
       const userInfo = await getFromTemporaryDb(`signup-user-${email}`);
       if (userInfo) {
-        // @ts-ignore
         const hashedPassword = await bcrypt.hash(userInfo.password, 10);
         const user = {
           ...userInfo,
@@ -87,7 +95,7 @@ export const verifySignUp = async (req, res) => {
     } else {
       res
         .status(httpStatusCodes.badRequest)
-        .json({ message: "Incorrect verification code" });
+        .json({ message: messageErrors.verifyCodeIncorrect });
     }
   } catch (error) {
     console.log("error :>> ", error);
@@ -102,10 +110,8 @@ export const login = async (req, res) => {
     const { user_id, password } = req.body;
     const user = await User.findByPk(user_id, { raw: true });
     if (user) {
-      // @ts-ignore
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (isPasswordValid) {
-        // @ts-ignore
         const userStatus = user.user_status;
         const response = {};
         response.message = statusWithMessageLogin[userStatus];

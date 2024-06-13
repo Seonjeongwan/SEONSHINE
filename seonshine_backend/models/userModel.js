@@ -47,12 +47,6 @@ const User = sequelizeUserDb.define(
     },
     branch_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: "Branch name is required",
-        }
-      },
     },
     email: {
       type: DataTypes.STRING,
