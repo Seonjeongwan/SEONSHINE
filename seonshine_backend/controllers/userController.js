@@ -9,7 +9,11 @@ import User from "../models/userModel.js";
 import Verification from "../models/verification.js";
 import { sendVerificationCode } from "../utils/emailUtil.js";
 import { getResponseErrors } from "../utils/responseParser.js";
-import { getFromTemporaryDb, saveToTemporaryDb } from "../utils/storage.js";
+import {
+  deleteFromTemporaryDb,
+  getFromTemporaryDb,
+  saveToTemporaryDb,
+} from "../utils/storage.js";
 import { generateToken } from "../utils/token.js";
 // const { userDb } = require("../db/connection");
 
@@ -70,6 +74,7 @@ export const verifySignUp = async (req, res) => {
           user_status: UserStatus.waitingConfirm,
         };
         const userResponse = await User.create(user);
+        await deleteFromTemporaryDb(`signup-user-${email}`);
         //Delete all verification code sign up by email
         await Verification.destroy({
           where: {
