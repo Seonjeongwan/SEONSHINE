@@ -140,8 +140,8 @@ jobs:
 
       - name: Build and push image for develop
         id: build-frontend-develop
-        if: github.ref == 'refs/heads/develock-changed-files.outputs.frontend == 'true'
-        uses: docker/build-push-action@v3p' && needs.che
+        if: github.ref == 'refs/heads/develop' && needs.check-changed-files.outputs.frontend == 'true'
+        uses: docker/build-push-action@v3
         with:
           context: ./seonshine_frontend
           file: ./seonshine_frontend/Dockerfile.dev
