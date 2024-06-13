@@ -19,7 +19,7 @@ export default {
       md: '14px',
       base: '15px',
       lg: '16px',
-      xl: '18rem',
+      xl: '18px',
       '2xl': '1.5rem',
       '3xl': '1.8rem',
       '4xl': '2.25rem',
