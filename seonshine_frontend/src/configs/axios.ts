@@ -1,12 +1,12 @@
 import axios from 'axios';
 
+import { FORBIDDEN, UNAUTHORIZED } from '@/constants/http';
 import { useAuth } from '@/hooks/useAuth';
 import { paths } from '@/routes/paths';
 import { getAccessToken } from '@/utils/persistCache/token';
-import { FORBIDDEN, UNAUTHORIZED } from '@/constants/http';
 
 const axiosInstance = axios.create({
-  baseURL: 'https://dummyjson.com',
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
