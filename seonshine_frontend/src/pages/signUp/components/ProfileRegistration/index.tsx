@@ -8,8 +8,11 @@ import { Box, Button, FormControl, IconButton, InputLabel, MenuItem, Select, Sta
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
 
+import { labelIDByRole, RoleEnum } from '@/types/user';
+
 import { useSignUpApi } from '@/apis/hooks/signUpApi.hook';
 import { useGetBranches } from '@/apis/hooks/userApi.hook';
+import { BranchResponseType } from '@/apis/user';
 
 import { EnterUserInformationPropsType } from '../../types';
 import { SignUpSchema, SignUpSchemaType } from './schema';
@@ -50,6 +53,9 @@ const ProfileRegistration = ({
   const handleClickShowConfirmPassword = () => setShowConfirmPassword((prev) => !prev);
   const [selectedBranch, setSelectedBranch] = useState('');
 
+  useEffect(() => {
+    console.log(branchData);
+  }, []);
   return (
     <Stack
       alignItems="center"
@@ -86,13 +92,17 @@ const ProfileRegistration = ({
                 <Box className="grid gap-2 mt-4">
                   <Stack direction="column">
                     <FormLabel
-                      title={userType == '1' ? 'Employee Number' : 'ID'}
+                      title={
+                        userType == RoleEnum.USER ? labelIDByRole[RoleEnum.USER] : labelIDByRole[RoleEnum.RESTAURANT]
+                      }
                       required
                     />
                     <FormInput
                       name="employeeId"
                       register={register}
-                      placeholder={userType == '1' ? 'Employee Number' : 'ID'}
+                      placeholder={
+                        userType == RoleEnum.USER ? labelIDByRole[RoleEnum.USER] : labelIDByRole[RoleEnum.RESTAURANT]
+                      }
                       error={errors.employeeId}
                     />
                   </Stack>
@@ -150,7 +160,7 @@ const ProfileRegistration = ({
                       error={errors.fullName}
                     />
                   </Stack>
-                  <Stack direction={userType === '2' ? 'column' : 'row'}>
+                  <Stack direction={userType === RoleEnum.USER ? 'row' : 'column'}>
                     <Stack
                       direction="column"
                       className={'w-full'}
@@ -165,17 +175,17 @@ const ProfileRegistration = ({
                         placeholder="Email"
                         error={errors.email}
                         className="w-full"
-                        endAdornment={userType === '1' ? <Box>@shinhan.com</Box> : ''}
+                        endAdornment={userType == RoleEnum.USER ? <Box>@shinhan.com</Box> : ''}
                       />
                     </Stack>
                   </Stack>
                   <Stack
-                    direction={userType === '2' ? 'column' : 'row'}
+                    direction={userType == RoleEnum.USER ? 'row' : 'column'}
                     justifyContent="space-between"
                   >
                     <Stack
                       direction="column"
-                      className={userType === '2' ? 'w-full' : 'mr-2 w-1/2'}
+                      className={userType == RoleEnum.USER ? 'mr-2 w-1/2' : 'w-full'}
                     >
                       <FormLabel
                         title="Phone number"
@@ -186,10 +196,10 @@ const ProfileRegistration = ({
                         register={register}
                         placeholder="Phone Number"
                         error={errors.phoneNumber}
-                        className={userType === '2' ? 'w-full' : ''}
+                        className={userType == RoleEnum.USER ? '' : 'w-full'}
                       />
                     </Stack>
-                    {userType !== '2' && (
+                    {userType == RoleEnum.USER && (
                       <Stack
                         direction="column"
                         className="w-1/2"

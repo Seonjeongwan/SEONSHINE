@@ -1,6 +1,6 @@
 import { SignUpSchemaType } from '@/pages/signUp/components/ProfileRegistration/schema';
 
-import axiosInstance from '@/config/axios';
+import axiosInstance from '@/configs/axios';
 
 export type SignUpResponseType = {};
 

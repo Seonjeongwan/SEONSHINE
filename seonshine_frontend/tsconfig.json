@@ -27,7 +27,7 @@
       "@/apis/*": ["./src/apis/*"],
       "@/pages/*": ["./src/pages/*"],
       "@/assets/*": ["./src/assets/*"],
-      "@/config/*": ["./src/config/*"],
+      "@/config/*": ["src/configs/*"],
       "@/constants/*": ["./src/constants/*"],
       "@/hooks/*": ["./src/hooks/*"],
       "@/routes/*": ["./src/routes/*"],

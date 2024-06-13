@@ -5,6 +5,7 @@ import FoodBankIcon from '@mui/icons-material/FoodBank';
 import { Box, Button, Stack, Typography, useMediaQuery } from '@mui/material';
 
 import { useDeviceType } from '@/hooks/useDeviceType';
+import { RoleEnum } from '@/types/user';
 
 import { EnterUserTypePropsType } from '../../types';
 
@@ -47,7 +48,7 @@ const ChooseUserType = ({ handleSubmitUserType }: EnterUserTypePropsType) => {
             variant="contained"
             className="bg-blue-100 hover:bg-blue-300 shadow-blue-300 shadow-md"
             fullWidth
-            onClick={() => handleSubmitUserType('1')} //User
+            onClick={() => handleSubmitUserType(RoleEnum.USER)} //User
           >
             <Box
               display="flex"
@@ -78,7 +79,7 @@ const ChooseUserType = ({ handleSubmitUserType }: EnterUserTypePropsType) => {
             variant="contained"
             className="bg-yellow-100 hover:bg-yellow-300 shadow-yellow-300 shadow-md"
             fullWidth
-            onClick={() => handleSubmitUserType('2')} //
+            onClick={() => handleSubmitUserType(RoleEnum.RESTAURANT)} //
           >
             <Box
               display="flex"

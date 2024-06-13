@@ -12,8 +12,8 @@ RUN npm install
 # Copy application code
 COPY . .
 
-# Build application (adjust based on your build process)
-RUN npm run build
+# Remove the build step if no build script is defined
+# RUN npm run build
 
 # Production stage
 FROM node:22.2.0-alpine
@@ -30,4 +30,4 @@ RUN npm install --production --frozen-lockfile
 EXPOSE 5050
 
 # Run the application
-CMD ["node", "start"]
+CMD ["node", "server.js"]

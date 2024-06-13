@@ -1,4 +1,5 @@
 export const verificationTypes = {
   login: 'login',
-  forgotPassword: 'forgotPassword'
+  forgotPassword: 'forgotPassword',
+  signUp: 'signUp'
 }

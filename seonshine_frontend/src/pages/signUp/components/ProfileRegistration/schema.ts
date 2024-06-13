@@ -2,6 +2,7 @@ import * as zod from 'zod';
 
 import { errorMessages } from '@/constants/errorMessages';
 import { employeeIdRegex, otpRegex, passwordRegex, phoneNumberRegex } from '@/constants/regex';
+import { RoleEnum } from '@/types/user';
 
 export const SignUpSchema = zod
   .object({
@@ -30,7 +31,7 @@ export const SignUpSchema = zod
       }),
     branch_id: zod.number(),
   })
-  .refine((data) => data.userType !== '1' || (data.userType === '1' && data.branch_id), {
+  .refine((data) => data.userType !== RoleEnum.USER || (data.userType === RoleEnum.USER && data.branch_id), {
     message: 'Branch field is required',
     path: ['branch_id'],
   })

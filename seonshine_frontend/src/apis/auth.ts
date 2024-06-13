@@ -1,4 +1,4 @@
-import axiosInstance from '@/config/axios';
+import axiosInstance from '@/configs/axios';
 import { RoleEnum } from '@/types/user';
 
 export type LoginResponseType = {

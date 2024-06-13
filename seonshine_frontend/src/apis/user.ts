@@ -1,4 +1,4 @@
-import axiosInstance from '@/config/axios';
+import axiosInstance from '@/configs/axios';
 
 export type BranchResponseType = {
   branch_id: number;
