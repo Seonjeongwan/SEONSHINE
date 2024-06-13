@@ -84,226 +84,87 @@ jobs:
             echo "any_changes: $any_changes"
           fi
 
-  build-and-push-frontend:
+  build-and-push:
     runs-on: ubuntu-latest
     needs: check-changed-files
+    strategy:
+      matrix:
+        service: [frontend, backend, fileserver]
     outputs:
       frontend_built: ${{ steps.set-output-frontend.outputs.built }}
-    steps:
-      - name: Set default output
-        id: set-output-frontend
-        run: echo "built=false" >> $GITHUB_OUTPUT
-
-      - name: Checkout repository
-        if: needs.check-changed-files.outputs.frontend == 'true'
-        uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        if: needs.check-changed-files.outputs.frontend == 'true'
-        uses: docker/setup-buildx-action@v2
-
-      - name: Create Docker Buildx builder
-        if: needs.check-changed-files.outputs.frontend == 'true'
-        run: |
-          docker buildx create --name mybuilder --use
-          docker buildx inspect --bootstrap
-          echo "Docker Buildx builder created"
-
-      - name: Log in to Docker Hub
-        if: needs.check-changed-files.outputs.frontend == 'true'
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Cache Docker layers
-        if: needs.check-changed-files.outputs.frontend == 'true'
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-frontend-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-frontend-
-
-      - name: Build and push image for main
-        id: build-frontend-main
-        if: github.ref == 'refs/heads/main' && needs.check-changed-files.outputs.frontend == 'true'
-        uses: docker/build-push-action@v3
-        with:
-          context: ./seonshine_frontend
-          file: ./seonshine_frontend/Dockerfile.prod
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_frontend:prod
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-
-      - name: Build and push image for develop
-        id: build-frontend-develop
-        if: github.ref == 'refs/heads/develop' && needs.check-changed-files.outputs.frontend == 'true'
-        uses: docker/build-push-action@v3
-        with:
-          context: ./seonshine_frontend
-          file: ./seonshine_frontend/Dockerfile.dev
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_frontend:dev
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-
-      - name: Set output
-        if: needs.check-changed-files.outputs.frontend == 'true'
-        run: echo "built=true" >> $GITHUB_OUTPUT
-
-  build-and-push-backend:
-    runs-on: ubuntu-latest
-    needs: check-changed-files
-    outputs:
       backend_built: ${{ steps.set-output-backend.outputs.built }}
-    steps:
-      - name: Set default output
-        id: set-output-backend
-        run: echo "built=false" >> $GITHUB_OUTPUT
-
-      - name: Checkout repository
-        if: needs.check-changed-files.outputs.backend == 'true'
-        uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        if: needs.check-changed-files.outputs.backend == 'true'
-        uses: docker/setup-buildx-action@v2
-
-      - name: Create Docker Buildx builder
-        if: needs.check-changed-files.outputs.backend == 'true'
-        run: |
-          docker buildx create --name mybuilder --use
-          docker buildx inspect --bootstrap
-          echo "Docker Buildx builder created"
-
-      - name: Log in to Docker Hub
-        if: needs.check-changed-files.outputs.backend == 'true'
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Cache Docker layers
-        if: needs.check-changed-files.outputs.backend == 'true'
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-backend-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-backend-
-
-      - name: Build and push image for main
-        id: build-backend-main
-        if: github.ref == 'refs/heads/main' && needs.check-changed-files.outputs.backend == 'true'
-        uses: docker/build-push-action@v3
-        with:
-          context: ./seonshine_backend
-          file: ./seonshine_backend/Dockerfile.prod
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_backend:prod
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-
-      - name: Build and push image for develop
-        id: build-backend-develop
-        if: github.ref == 'refs/heads/develop' && needs.check-changed-files.outputs.backend == 'true'
-        uses: docker/build-push-action@v3
-        with:
-          context: ./seonshine_backend
-          file: ./seonshine_backend/Dockerfile.dev
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_backend:dev
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
-
-      - name: Set output
-        if: needs.check-changed-files.outputs.backend == 'true'
-        run: echo "built=true" >> $GITHUB_OUTPUT
-
-  build-and-push-fileserver:
-    runs-on: ubuntu-latest
-    needs: check-changed-files
-    outputs:
       fileserver_built: ${{ steps.set-output-fileserver.outputs.built }}
     steps:
-      - name: Set default output
-        id: set-output-fileserver
+      - name: Set default output for all
+        id: set-output-${{ matrix.service }}
         run: echo "built=false" >> $GITHUB_OUTPUT
 
       - name: Checkout repository
-        if: needs.check-changed-files.outputs.fileserver == 'true'
+        if: needs.check-changed-files.outputs.${{ matrix.service }} == 'true'
         uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
-        if: needs.check-changed-files.outputs.fileserver == 'true'
+        if: needs.check-changed-files.outputs.${{ matrix.service }} == 'true'
         uses: docker/setup-buildx-action@v2
 
       - name: Create Docker Buildx builder
-        if: needs.check-changed-files.outputs.fileserver == 'true'
+        if: needs.check-changed-files.outputs.${{ matrix.service }} == 'true'
         run: |
           docker buildx create --name mybuilder --use
           docker buildx inspect --bootstrap
           echo "Docker Buildx builder created"
 
       - name: Log in to Docker Hub
-        if: needs.check-changed-files.outputs.fileserver == 'true'
+        if: needs.check-changed-files.outputs.${{ matrix.service }} == 'true'
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Cache Docker layers
-        if: needs.check-changed-files.outputs.fileserver == 'true'
+        if: needs.check-changed-files.outputs.${{ matrix.service }} == 'true'
         uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-fileserver-${{ github.sha }}
+          key: ${{ runner.os }}-buildx-${{ matrix.service }}-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-buildx-fileserver-
+            ${{ runner.os }}-buildx-${{ matrix.service }}-
 
       - name: Build and push image for main
-        id: build-fileserver-main
-        if: github.ref == 'refs/heads/main' && needs.check-changed-files.outputs.fileserver == 'true'
+        id: build-${{ matrix.service }}-main
+        if: github.ref == 'refs/heads/main' && needs.check-changed-files.outputs.${{ matrix.service }} == 'true'
         uses: docker/build-push-action@v3
         with:
-          context: ./seonshine_fileserver
-          file: ./seonshine_fileserver/Dockerfile.prod
+          context: ./seonshine_${{ matrix.service }}
+          file: ./seonshine_${{ matrix.service }}/Dockerfile.prod
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_fileserver:prod
+          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:prod
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 
       - name: Build and push image for develop
-        id: build-fileserver-develop
-        if: github.ref == 'refs/heads/develop' && needs.check-changed-files.outputs.fileserver == 'true'
+        id: build-${{ matrix.service }}-develop
+        if: github.ref == 'refs/heads/develop' && needs.check-changed-files.outputs.${{ matrix.service }} == 'true'
         uses: docker/build-push-action@v3
         with:
-          context: ./seonshine_fileserver
-          file: ./seonshine_fileserver/Dockerfile.dev
+          context: ./seonshine_${{ matrix.service }}
+          file: ./seonshine_${{ matrix.service }}/Dockerfile.dev
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_fileserver:dev
+          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:dev
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 
       - name: Set output
-        if: needs.check-changed-files.outputs.fileserver == 'true'
+        if: needs.check-changed-files.outputs.${{ matrix.service }} == 'true'
         run: echo "built=true" >> $GITHUB_OUTPUT
 
   deploy:
+    runs-on: ubuntu-latest
     needs:
       - check-changed-files
-      - build-and-push-frontend
-      - build-and-push-backend
-      - build-and-push-fileserver
-    runs-on: ubuntu-latest
+      - build-and-push
     if: needs.check-changed-files.outputs.any_changes == 'true'
     steps:
       - name: Checkout repository
