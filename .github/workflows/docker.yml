@@ -22,23 +22,32 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
       - name: Check for changed files
         id: check
         run: |
-          FRONTEND_CHANGED=$(git diff --name-only HEAD HEAD~1 | grep 'seonshine_frontend' || echo '')
-          BACKEND_CHANGED=$(git diff --name-only HEAD HEAD~1 | grep 'seonshine_backend' || echo '')
-          FILESERVER_CHANGED=$(git diff --name-only HEAD HEAD~1 | grep 'seonshine_fileserver' || echo '')
-
-          if [ "$FRONTEND_CHANGED" != '' ] || [ "$BACKEND_CHANGED" != '' ] || [ "$FILESERVER_CHANGED" != '' ]; then
-            ANY_CHANGES=true
+          if [ "$(git rev-list --count HEAD)" -eq 1 ]; then
+            echo "::set-output name=frontend::true"
+            echo "::set-output name=backend::true"
+            echo "::set-output name=fileserver::true"
+            echo "::set-output name=any_changes::true"
           else
-            ANY_CHANGES=false
-          fi
+            FRONTEND_CHANGED=$(git diff --name-only HEAD HEAD~1 | grep 'seonshine_frontend' || echo '')
+            BACKEND_CHANGED=$(git diff --name-only HEAD HEAD~1 | grep 'seonshine_backend' || echo '')
+            FILESERVER_CHANGED=$(git diff --name-only HEAD HEAD~1 | grep 'seonshine_fileserver' || echo '')
 
-          echo "::set-output name=frontend::$FRONTEND_CHANGED"
-          echo "::set-output name=backend::$BACKEND_CHANGED"
-          echo "::set-output name=fileserver::$FILESERVER_CHANGED"
-          echo "::set-output name=any_changes::$ANY_CHANGES"
+            if [ "$FRONTEND_CHANGED" != '' ] || [ "$BACKEND_CHANGED" != '' ] || [ "$FILESERVER_CHANGED" != '' ]; then
+              ANY_CHANGES=true
+            else
+              ANY_CHANGES=false
+            fi
+
+            echo "::set-output name=frontend::$FRONTEND_CHANGED"
+            echo "::set-output name=backend::$BACKEND_CHANGED"
+            echo "::set-output name=fileserver::$FILESERVER_CHANGED"
+            echo "::set-output name=any_changes::$ANY_CHANGES"
+          fi
 
   build-and-push:
     needs: check-changed-files
@@ -75,7 +84,7 @@ jobs:
 
       - name: Build and push image for main
         if: github.ref == 'refs/heads/main' && needs.check-changed-files.outputs.${{ matrix.service }} != ''
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v5
         with:
           context: ./seonshine_${{ matrix.service }}
           file: ./seonshine_${{ matrix.service }}/Dockerfile.prod
@@ -87,7 +96,7 @@ jobs:
 
       - name: Build and push image for develop
         if: github.ref == 'refs/heads/develop' && needs.check-changed-files.outputs.${{ matrix.service }} != ''
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v5
         with:
           context: ./seonshine_${{ matrix.service }}
           file: ./seonshine_${{ matrix.service }}/Dockerfile.dev
