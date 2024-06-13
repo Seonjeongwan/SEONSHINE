@@ -1,11 +1,11 @@
-// @ts-nocheck
 import bcrypt from "bcrypt";
-import { Op } from "sequelize";
+import { Op, QueryTypes } from "sequelize";
 import { UserStatus } from "../constants/auth.js";
 import { errorCodes } from "../constants/errorCode.js";
 import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
 import { messageErrors, statusWithMessageLogin } from "../constants/message.js";
 import { verificationTypes } from "../constants/verification.js";
+import { sequelizeUserDb } from "../db/dbConfig.js";
 import User from "../models/userModel.js";
 import Verification from "../models/verificationModel.js";
 import { sendVerificationCode } from "../utils/emailUtil.js";
@@ -18,9 +18,22 @@ import {
 import { generateToken } from "../utils/token.js";
 // const { userDb } = require("../db/connection");
 
-export const getAllUsers = async (req, res) => {
-  const users = await User.findAll();
-  res.status(httpStatusCodes.success).send(users);
+export const getUserList = async (req, res) => {
+  const {
+    page_size = 25,
+    page_number = 1,
+    user_id = "",
+    username = "",
+  } = req.query;
+  const query = `SELECT u.*, b.branch_name FROM user_db.users u LEFT JOIN common_db.branch_info b ON u.branch_id = b.branch_id`;
+  const users = await sequelizeUserDb.query(query, {
+    type: QueryTypes.SELECT,
+  });
+  const usersWithoutPassword = users.map((user) => {
+    delete user.password_hash;
+    return user;
+  });
+  res.status(httpStatusCodes.success).send(usersWithoutPassword);
 };
 
 export const signUp = async (req, res) => {
