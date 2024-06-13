@@ -11,7 +11,7 @@ import { FormLabel } from '@/components/molecules/formEntity/label';
 import { useSignUpApi } from '@/apis/hooks/signUpApi.hook';
 import { useGetBranches } from '@/apis/hooks/userApi.hook';
 
-import { EnterUserInformationPropsType } from '../types';
+import { EnterUserInformationPropsType } from '../../types';
 import { SignUpSchema, SignUpSchemaType } from './schema';
 
 const ProfileRegistration = ({
@@ -36,7 +36,7 @@ const ProfileRegistration = ({
       branch_id: 0,
     },
   });
-  const { data: branchData } = useGetBranches({ enabled: true });
+  const { data: branchData = [] } = useGetBranches({ enabled: true });
 
   const submitForm = (data: SignUpSchemaType) => {
     handleSubmitInformation({ ...data, userType, branch_id: selectedBranch });

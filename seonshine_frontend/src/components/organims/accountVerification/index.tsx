@@ -16,7 +16,7 @@ type AccountVerificationProps = {
   secondsCountdown: number;
   handleSubmitOtp: (otp: string) => void;
   handleResendOtp: (resetTimer: () => void) => void;
-  clazzName?: string;
+  className?: string;
 };
 
 const AccountVerification = ({
@@ -25,7 +25,7 @@ const AccountVerification = ({
   handleSubmitOtp,
   secondsCountdown,
   handleResendOtp,
-  clazzName,
+  className,
 }: AccountVerificationProps) => {
   const {
     handleSubmit,
@@ -113,7 +113,7 @@ const AccountVerification = ({
 
   return (
     <AccountVerificationLayout
-      clazzName={clazzName}
+      className={className}
       title={title}
       description={description}
     >

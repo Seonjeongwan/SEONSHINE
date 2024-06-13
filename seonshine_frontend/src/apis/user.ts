@@ -7,7 +7,7 @@ export type BranchResponseType = {
   updated_at: string;
 };
 
-export const callBranches = async (): Promise<BranchResponseType> => {
-  const response = await axiosInstance.get<BranchResponseType>('/common/branches');
+export const callBranches = async (): Promise<BranchResponseType[]> => {
+  const response = await axiosInstance.get<BranchResponseType[]>('/common/branches');
   return response.data;
 };

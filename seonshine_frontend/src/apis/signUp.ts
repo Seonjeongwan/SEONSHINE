@@ -1,4 +1,4 @@
-import { SignUpSchemaType } from '@/pages/signUp/ProfileRegistration/schema';
+import { SignUpSchemaType } from '@/pages/signUp/components/ProfileRegistration/schema';
 
 import axiosInstance from '@/config/axios';
 

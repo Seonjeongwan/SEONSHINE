@@ -6,7 +6,7 @@ interface UseGetBranchProps {
   enabled?: boolean;
 }
 
-export const useGetBranches = ({ enabled = true }: UseGetBranchProps): UseQueryResult<BranchResponseType> => {
+export const useGetBranches = ({ enabled = true }: UseGetBranchProps): UseQueryResult<BranchResponseType[]> => {
   return useQuery({
     queryKey: ['branchList'],
     queryFn: async () => {

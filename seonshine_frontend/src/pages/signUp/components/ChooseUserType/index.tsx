@@ -4,10 +4,12 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import FoodBankIcon from '@mui/icons-material/FoodBank';
 import { Box, Button, Stack, Typography, useMediaQuery } from '@mui/material';
 
-import { EnterUserTypePropsType } from '../types';
+import { useDeviceType } from '@/hooks/useDeviceType';
+
+import { EnterUserTypePropsType } from '../../types';
 
 const ChooseUserType = ({ handleSubmitUserType }: EnterUserTypePropsType) => {
-  const isMobile = useMediaQuery('(max-width:600px)');
+  const { isMobile } = useDeviceType();
   return (
     <Stack
       alignItems="center"

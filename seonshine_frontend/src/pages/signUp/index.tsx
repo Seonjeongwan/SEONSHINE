@@ -4,9 +4,9 @@ import { Box, Button, Step, StepLabel, Stepper } from '@mui/material';
 
 import AccountVerification from '@/components/organims/accountVerification';
 
-import ChooseUserType from './ChooseUserType';
-import PendingApprovalPage from './PendingApproval';
-import ProfileRegistration from './ProfileRegistration';
+import ChooseUserType from './components/ChooseUserType';
+import PendingApprovalPage from './components/PendingApproval';
+import ProfileRegistration from './components/ProfileRegistration';
 import { SignUpStepsType } from './types';
 
 const steps = ['Select User Type', 'Enter User Information', 'Verify OTP', 'Pending Approval'];
@@ -81,7 +81,7 @@ const SignUpPage = () => {
             handleSubmitOtp={handleSubmitOtp}
             secondsCountdown={timeCountdown}
             handleResendOtp={handleResendOtp}
-            clazzName="min-h-[80vh]"
+            className="min-h-[80vh]"
           />
         )}
         {step === 'pending_approval' && <PendingApprovalPage />}
