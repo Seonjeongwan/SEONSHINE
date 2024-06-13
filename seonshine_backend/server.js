@@ -46,11 +46,11 @@ async function startServer() {
     });
   } catch (error) {
     console.error("Error initializing databases:", error);
-    setTimeout(startServer, 5000); // Retry after 5 seconds if initialization fails
+    setTimeout(startServer, 6000); // Retry after 5 seconds if initialization fails
   }
 }
 
 // Start the server
 startServer();
 
-//final link test 15
+//final link test 16
