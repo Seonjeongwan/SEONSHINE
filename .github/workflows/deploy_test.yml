@@ -1,0 +1,59 @@
+name: Deploy Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up SSH key
+        run: |
+          echo "${{ secrets.SSH_KEY }}" | tr -d '\r' > private_key
+          chmod 600 private_key
+
+      - name: SSH into server for main
+        if: github.ref == 'refs/heads/main'
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: private_key
+          script: |
+            echo "SSH connection successful"
+            if [ ! -d /home/ubuntu/SEONSHINE ]; then
+              mkdir -p /home/ubuntu/SEONSHINE
+              git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
+            fi
+            cd /home/ubuntu/SEONSHINE
+            git reset --hard HEAD
+            git pull origin main
+            export COMPOSE_HTTP_TIMEOUT=240
+            docker-compose -f docker-compose.prod.yml down
+            docker-compose -f docker-compose.prod.yml pull
+            docker-compose -f docker-compose.dev.yml up -d
+
+      - name: SSH into server for develop
+        if: github.ref == 'refs/heads/develop'
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: private_key
+          script: |
+            echo "SSH connection successful"
+            if [ ! -d /home/ubuntu/SEONSHINE ]; then
+              mkdir -p /home/ubuntu/SEONSHINE
+              git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
+            fi
+            cd /home/ubuntu/SEONSHINE
+            git reset --hard HEAD
+            git pull origin develop
+            export COMPOSE_HTTP_TIMEOUT=240
+            docker-compose -f docker-compose.dev.yml down
+            docker-compose -f docker-compose.dev.yml pull
+            docker-compose -f docker-compose.dev.yml up -d
