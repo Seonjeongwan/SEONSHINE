@@ -31,10 +31,10 @@ const AppRoutes = () => {
             path={paths.forgotPassword}
             element={authenticate ? <Navigate to={paths.main} /> : <ForgotPasswordPage />}
           />
-          {/* <Route
+          <Route
             path={paths.signUp}
             element={authenticate ? <Navigate to={paths.main} /> : <SignUpPage />}
-          /> */}
+          />
         </Route>
 
         <Route
