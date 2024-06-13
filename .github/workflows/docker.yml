@@ -32,28 +32,24 @@ jobs:
           FILESERVER_CHANGED=$(git diff --name-only HEAD HEAD~1 | grep 'seonshine_fileserver' || echo '')
 
           if [ "$FRONTEND_CHANGED" != '' ]; then
-            echo "frontend=true" >> $GITHUB_ENV
             echo "::set-output name=frontend::true"
           else
             echo "::set-output name=frontend::false"
           fi
 
           if [ "$BACKEND_CHANGED" != '' ]; then
-            echo "backend=true" >> $GITHUB_ENV
             echo "::set-output name=backend::true"
           else
             echo "::set-output name=backend::false"
           fi
 
           if [ "$FILESERVER_CHANGED" != '' ]; then
-            echo "fileserver=true" >> $GITHUB_ENV
             echo "::set-output name=fileserver::true"
           else
             echo "::set-output name=fileserver::false"
           fi
 
           if [ "$FRONTEND_CHANGED" != '' ] || [ "$BACKEND_CHANGED" != '' ] || [ "$FILESERVER_CHANGED" != '' ]; then
-            echo "any_changes=true" >> $GITHUB_ENV
             echo "::set-output name=any_changes::true"
           else
             echo "::set-output name=any_changes::false"
@@ -258,13 +254,13 @@ jobs:
             docker-compose -f docker-compose.prod.yml down
             docker-compose -f docker-compose.prod.yml pull
 
-            if [ "${{ needs.check-changed-files.outputs.frontend }}" != '' ]; then
+            if [ "${{ needs.check-changed-files.outputs.frontend }}" == 'true' ]; then
               docker-compose -f docker-compose.prod.yml up -d frontend
             fi
-            if [ "${{ needs.check-changed-files.outputs.backend }}" != '' ]; then
+            if [ "${{ needs.check-changed-files.outputs.backend }}" == 'true' ]; then
               docker-compose -f docker-compose.prod.yml up -d backend
             fi
-            if [ "${{ needs.check-changed-files.outputs.fileserver }}" != '' ]; then
+            if [ "${{ needs.check-changed-files.outputs.fileserver }}" == 'true' ]; then
               docker-compose -f docker-compose.prod.yml up -d fileserver
             fi
 
@@ -288,12 +284,12 @@ jobs:
             docker-compose -f docker-compose.dev.yml down
             docker-compose -f docker-compose.dev.yml pull
 
-            if [ "${{ needs.check-changed-files.outputs.frontend }}" != '' ]; then
+            if [ "${{ needs.check-changed-files.outputs.frontend }}" == 'true' ]; then
               docker-compose -f docker-compose.dev.yml up -d frontend
             fi
-            if [ "${{ needs.check-changed-files.outputs.backend }}" != '' ]; then
+            if [ "${{ needs.check-changed-files.outputs.backend }}" == 'true' ]; then
               docker-compose -f docker-compose.dev.yml up -d backend
             fi
-            if [ "${{ needs.check-changed-files.outputs.fileserver }}" != '' ]; then
+            if [ "${{ needs.check-changed-files.outputs.fileserver }}" == 'true' ]; then
               docker-compose -f docker-compose.dev.yml up -d fileserver
             fi
