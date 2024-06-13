@@ -27,7 +27,6 @@ jobs:
       - name: Check for changed files
         id: check
         run: |
-          ANY_CHANGES=false
           if [ "$(git rev-list --count HEAD)" -eq 1 ]; then
             echo "frontend=true" >> $GITHUB_ENV
             echo "backend=true" >> $GITHUB_ENV
@@ -42,10 +41,13 @@ jobs:
             BACKEND_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep 'seonshine_backend' || echo '')
             FILESERVER_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep 'seonshine_fileserver' || echo '')
 
+            echo "FRONTEND_CHANGED=$FRONTEND_CHANGED" >> $GITHUB_ENV
+            echo "BACKEND_CHANGED=$BACKEND_CHANGED" >> $GITHUB_ENV
+            echo "FILESERVER_CHANGED=$FILESERVER_CHANGED" >> $GITHUB_ENV
+
             if [ "$FRONTEND_CHANGED" != '' ]; then
               echo "frontend=true" >> $GITHUB_ENV
               echo "::set-output name=frontend::true"
-              ANY_CHANGES=true
             else
               echo "frontend=false" >> $GITHUB_ENV
               echo "::set-output name=frontend::false"
@@ -54,7 +56,6 @@ jobs:
             if [ "$BACKEND_CHANGED" != '' ]; then
               echo "backend=true" >> $GITHUB_ENV
               echo "::set-output name=backend::true"
-              ANY_CHANGES=true
             else
               echo "backend=false" >> $GITHUB_ENV
               echo "::set-output name=backend::false"
@@ -63,13 +64,12 @@ jobs:
             if [ "$FILESERVER_CHANGED" != '' ]; then
               echo "fileserver=true" >> $GITHUB_ENV
               echo "::set-output name=fileserver::true"
-              ANY_CHANGES=true
             else
               echo "fileserver=false" >> $GITHUB_ENV
               echo "::set-output name=fileserver::false"
             fi
 
-            if [ "$ANY_CHANGES" == "true" ]; then
+            if [ "$FRONTEND_CHANGED" != '' ] || [ "$BACKEND_CHANGED" != '' ] || [ "$FILESERVER_CHANGED" != '' ]; then
               echo "any_changes=true" >> $GITHUB_ENV
               echo "::set-output name=any_changes::true"
             else
@@ -81,7 +81,7 @@ jobs:
             echo "Frontend: $FRONTEND_CHANGED"
             echo "Backend: $BACKEND_CHANGED"
             echo "Fileserver: $FILESERVER_CHANGED"
-            echo "any_changes: $ANY_CHANGES"
+            echo "any_changes: $any_changes"
           fi
 
   build-and-push-frontend:
@@ -256,7 +256,7 @@ jobs:
       - build-and-push-backend
       - build-and-push-fileserver
     runs-on: ubuntu-latest
-
+    if: needs.check-changed-files.outputs.any_changes == 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -275,7 +275,7 @@ jobs:
           key: private_key
           script: |
             echo "SSH connection successful"
-            if [ ! -d /home/ubuntu/SEONSHINE ]; then
+            if [ ! -d /home/ubuntu/sSEONSHINE ]; then
               mkdir -p /home/ubuntu/SEONSHINE
               git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
             fi
