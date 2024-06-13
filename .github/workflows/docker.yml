@@ -256,7 +256,7 @@ jobs:
       - build-and-push-backend
       - build-and-push-fileserver
     runs-on: ubuntu-latest
-    if: needs.check-changed-files.outputs.any_changes == 'true'
+    # if: needs.check-changed-files.outputs.any_changes == 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
