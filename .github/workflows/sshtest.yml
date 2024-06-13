@@ -23,11 +23,11 @@ jobs:
 
       - name: SSH into server for main
         if: github.ref == 'refs/heads/main'
-        uses: appleboy/ssh-action@v1.0.2
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
-          key: private_key
+          key: ${{ secrets.SSH_KEY }}
           script: |
             echo "SSH connection to main branch successful"
             if [ ! -d /home/ubuntu/SEONSHINE ]; then
@@ -46,11 +46,11 @@ jobs:
 
       - name: SSH into server for develop
         if: github.ref == 'refs/heads/develop'
-        uses: appleboy/ssh-action@v1.0.2
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
-          key: private_key
+          key: ${{ secrets.SSH_KEY }}
           script: |
             echo "SSH connection to develop branch successful"
             if [ ! -d /home/ubuntu/SEONSHINE ]; then
