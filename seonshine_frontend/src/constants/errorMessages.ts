@@ -4,4 +4,6 @@ export const errorMessages = {
   passwordInvalid: 'Invalid password',
   passwordNotMatch: "Passwords don't match",
   otpInvalid: 'OTP must have 6 digits',
+  emailInvalid: 'Invalid email',
+  phoneNumberInvalid: 'Invalid phone number',
 };

@@ -12,11 +12,82 @@ on:
       - "seonshine_fileserver/**"
 
 jobs:
-  build-and-push:
+  check-changed-files:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        service: [frontend, backend, fileserver]
+    outputs:
+      frontend: ${{ steps.check.outputs.frontend }}
+      backend: ${{ steps.check.outputs.backend }}
+      fileserver: ${{ steps.check.outputs.fileserver }}
+      any_changes: ${{ steps.check.outputs.any_changes }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: Check for changed files
+        id: check
+        run: |
+          ANY_CHANGES=false
+          if [ "$(git rev-list --count HEAD)" -eq 1 ]; then
+            echo "frontend=true" >> $GITHUB_ENV
+            echo "backend=true" >> $GITHUB_ENV
+            echo "fileserver=true" >> $GITHUB_ENV
+            echo "any_changes=true" >> $GITHUB_ENV
+            echo "::set-output name=frontend::true"
+            echo "::set-output name=backend::true"
+            echo "::set-output name=fileserver::true"
+            echo "::set-output name=any_changes::true"
+          else
+            FRONTEND_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep 'seonshine_frontend' || echo '')
+            BACKEND_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep 'seonshine_backend' || echo '')
+            FILESERVER_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep 'seonshine_fileserver' || echo '')
+
+            if [ "$FRONTEND_CHANGED" != '' ]; then
+              echo "frontend=true" >> $GITHUB_ENV
+              echo "::set-output name=frontend::true"
+              ANY_CHANGES=true
+            else
+              echo "frontend=false" >> $GITHUB_ENV
+              echo "::set-output name=frontend::false"
+            fi
+
+            if [ "$BACKEND_CHANGED" != '' ]; then
+              echo "backend=true" >> $GITHUB_ENV
+              echo "::set-output name=backend::true"
+              ANY_CHANGES=true
+            else
+              echo "backend=false" >> $GITHUB_ENV
+              echo "::set-output name=backend::false"
+            fi
+
+            if [ "$FILESERVER_CHANGED" != '' ]; then
+              echo "fileserver=true" >> $GITHUB_ENV
+              echo "::set-output name=fileserver::true"
+              ANY_CHANGES=true
+            else
+              echo "fileserver=false" >> $GITHUB_ENV
+              echo "::set-output name=fileserver::false"
+            fi
+
+            if [ "$ANY_CHANGES" == "true" ]; then
+              echo "any_changes=true" >> $GITHUB_ENV
+              echo "::set-output name=any_changes::true"
+            else
+              echo "any_changes=false" >> $GITHUB_ENV
+              echo "::set-output name=any_changes::false"
+            fi
+
+            echo "Changed files:"
+            echo "Frontend: $FRONTEND_CHANGED"
+            echo "Backend: $BACKEND_CHANGED"
+            echo "Fileserver: $FILESERVER_CHANGED"
+            echo "any_changes: $ANY_CHANGES"
+          fi
+
+  build-and-push-frontend:
+    if: needs.check-changed-files.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    needs: check-changed-files
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -40,40 +111,152 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ matrix.service }}-${{ github.sha }}
+          key: ${{ runner.os }}-buildx-frontend-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-buildx-${{ matrix.service }}-
+            ${{ runner.os }}-buildx-frontend-
 
       - name: Build and push image for main
         if: github.ref == 'refs/heads/main'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v2
         with:
-          context: ./seonshine_${{ matrix.service }}
-          file: ./seonshine_${{ matrix.service }}/Dockerfile.prod
+          context: ./seonshine_frontend
+          file: ./seonshine_frontend/Dockerfile.prod
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:prod
+          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_frontend:prod
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 
       - name: Build and push image for develop
         if: github.ref == 'refs/heads/develop'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v2
         with:
-          context: ./seonshine_${{ matrix.service }}
-          file: ./seonshine_${{ matrix.service }}/Dockerfile.dev
+          context: ./seonshine_frontend
+          file: ./seonshine_frontend/Dockerfile.dev
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_${{ matrix.service }}:dev
+          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_frontend:dev
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+  build-and-push-backend:
+    if: needs.check-changed-files.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    needs: check-changed-files
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Create Docker Buildx builder
+        run: |
+          docker buildx create --name mybuilder --use
+          docker buildx inspect --bootstrap
+          echo "Docker Buildx builder created"
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-backend-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-backend-
+
+      - name: Build and push image for main
+        if: github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v2
+        with:
+          context: ./seonshine_backend
+          file: ./seonshine_backend/Dockerfile.prod
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_backend:prod
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: Build and push image for develop
+        if: github.ref == 'refs/heads/develop'
+        uses: docker/build-push-action@v2
+        with:
+          context: ./seonshine_backend
+          file: ./seonshine_backend/Dockerfile.dev
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_backend:dev
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+  build-and-push-fileserver:
+    if: needs.check-changed-files.outputs.fileserver == 'true'
+    runs-on: ubuntu-latest
+    needs: check-changed-files
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Create Docker Buildx builder
+        run: |
+          docker buildx create --name mybuilder --use
+          docker buildx inspect --bootstrap
+          echo "Docker Buildx builder created"
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-fileserver-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-fileserver-
+
+      - name: Build and push image for main
+        if: github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v2
+        with:
+          context: ./seonshine_fileserver
+          file: ./seonshine_fileserver/Dockerfile.prod
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_fileserver:prod
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: Build and push image for develop
+        if: github.ref == 'refs/heads/develop'
+        uses: docker/build-push-action@v2
+        with:
+          context: ./seonshine_fileserver
+          file: ./seonshine_fileserver/Dockerfile.dev
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ secrets.DOCKER_USERNAME }}/seonshine_fileserver:dev
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 
   deploy:
+    needs:
+      - check-changed-files
+      - build-and-push-frontend
+      - build-and-push-backend
+      - build-and-push-fileserver
     runs-on: ubuntu-latest
-    needs: build-and-push
-    strategy:
-      matrix:
-        service: [frontend, backend, db, fileserver]
+    if: needs.check-changed-files.outputs.any_changes == 'true'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -89,7 +272,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
+          key: private_key
           script: |
             echo "SSH connection successful"
             if [ ! -d /home/ubuntu/SEONSHINE ]; then
@@ -97,16 +280,21 @@ jobs:
               git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
             fi
             cd /home/ubuntu/SEONSHINE
-            if [ -d .git ]; then
-              git reset --hard HEAD
-              git pull origin main
-            else
-              rm -rf /home/ubuntu/SEONSHINE/*
-              git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
-            fi
+            git reset --hard HEAD
+            git pull origin main
             export COMPOSE_HTTP_TIMEOUT=240
+            docker-compose -f docker-compose.prod.yml down
             docker-compose -f docker-compose.prod.yml pull
-            docker-compose -f docker-compose.prod.yml up -d
+
+            if [ "${{ needs.check-changed-files.outputs.frontend }}" == 'true' ]; then
+              docker-compose -f docker-compose.prod.yml up -d frontend
+            fi
+            if [ "${{ needs.check-changed-files.outputs.backend }}" == 'true' ]; then
+              docker-compose -f docker-compose.prod.yml up -d backend
+            fi
+            if [ "${{ needs.check-changed-files.outputs.fileserver }}" == 'true' ]; then
+              docker-compose -f docker-compose.prod.yml up -d fileserver
+            fi
 
       - name: SSH into server for develop
         if: github.ref == 'refs/heads/develop'
@@ -114,7 +302,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
+          key: private_key
           script: |
             echo "SSH connection successful"
             if [ ! -d /home/ubuntu/SEONSHINE ]; then
@@ -122,13 +310,18 @@ jobs:
               git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
             fi
             cd /home/ubuntu/SEONSHINE
-            if [ -d .git ]; then
-              git reset --hard HEAD
-              git pull origin develop
-            else
-              rm -rf /home/ubuntu/SEONSHINE/*
-              git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
-            fi
+            git reset --hard HEAD
+            git pull origin develop
             export COMPOSE_HTTP_TIMEOUT=240
+            docker-compose -f docker-compose.dev.yml down
             docker-compose -f docker-compose.dev.yml pull
-            docker-compose -f docker-compose.dev.yml up -d
+
+            if [ "${{ needs.check-changed-files.outputs.frontend }}" == 'true' ]; then
+              docker-compose -f docker-compose.dev.yml up -d frontend
+            fi
+            if [ "${{ needs.check-changed-files.outputs.backend }}" == 'true' ]; then
+              docker-compose -f docker-compose.dev.yml up -d backend
+            fi
+            if [ "${{ needs.check-changed-files.outputs.fileserver }}" == 'true' ]; then
+              docker-compose -f docker-compose.dev.yml up -d fileserver
+            fi

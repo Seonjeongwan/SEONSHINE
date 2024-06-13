@@ -4,10 +4,12 @@ import { UserStatus } from "../constants/auth.js";
 import { errorCodes } from "../constants/errorCode.js";
 import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
 import { messageErrors, statusWithMessageLogin } from "../constants/message.js";
+import { verificationTypes } from "../constants/verification.js";
 import User from "../models/userModel.js";
+import Verification from "../models/verification.js";
 import { sendVerificationCode } from "../utils/emailUtil.js";
 import { getResponseErrors } from "../utils/responseParser.js";
-import { saveToTemporaryDb } from "../utils/storage.js";
+import { getFromTemporaryDb, saveToTemporaryDb } from "../utils/storage.js";
 import { generateToken } from "../utils/token.js";
 // const { userDb } = require("../db/connection");
 
@@ -27,9 +29,11 @@ export const signUp = async (req, res) => {
         errorCode: errorCodes.idOrEmailExist,
       });
     }
+
     const isSuccessSendingEmailCode = await sendAndSaveEmailVerificationCode(
       email
     );
+
     if (isSuccessSendingEmailCode) {
       await saveToTemporaryDb(`signup-user-${email}`, user, 86400);
       return res.status(200).send("Sending email verification successful");
@@ -37,15 +41,54 @@ export const signUp = async (req, res) => {
     return res
       .status(httpStatusCodes.internalServerError)
       .json({ error: httpStatusErrors.internalServerError });
-    // const hashedPassword = await bcrypt.hash(user.password, 10);
-    // user.user_status = UserStatus.waitingConfirm;
-    // user.password = hashedPassword;
-    // const userResponse = await User.create(user);
-    // res.status(httpStatusCodes.created).json(userResponse);
   } catch (error) {
-    console.log('error :>> ', error);
+    console.log("error :>> ", error);
     const response = getResponseErrors(error);
     res.status(response.status).json({ errors: response.errors });
+  }
+};
+
+export const verifySignUp = async (req, res) => {
+  try {
+    const { code, email } = req.body;
+    const verifyInfo = await Verification.findOne({
+      where: {
+        code: code,
+        email: email.trim(),
+        type: verificationTypes.signUp,
+      },
+    });
+    if (verifyInfo) {
+      //TODO: Check code is in expire
+      const userInfo = await getFromTemporaryDb(`signup-user-${email}`);
+      if (userInfo) {
+        // @ts-ignore
+        const hashedPassword = await bcrypt.hash(userInfo.password, 10);
+        const user = {
+          ...userInfo,
+          password: hashedPassword,
+          user_status: UserStatus.waitingConfirm,
+        };
+        const userResponse = await User.create(user);
+        //Delete all verification code sign up by email
+        await Verification.destroy({
+          where: {
+            email: email,
+            type: verificationTypes.signUp,
+          },
+        });
+        res.status(httpStatusCodes.created).json(userResponse);
+      }
+    } else {
+      res
+        .status(httpStatusCodes.badRequest)
+        .json({ message: "Incorrect verification code" });
+    }
+  } catch (error) {
+    console.log("error :>> ", error);
+    res
+      .status(httpStatusCodes.internalServerError)
+      .json({ error: httpStatusErrors.internalServerError });
   }
 };
 
@@ -93,21 +136,6 @@ export const checkIdEmailExist = async (userId, email) => {
 
   const isExist = !!user;
   return isExist;
-  // const duplicateQuery =
-  //   "SELECT * FROM user_db.users WHERE user_id = ? OR email = ?";
-  // userDb.query(duplicateQuery, [user_id, email], (err, results) => {
-  //   if (err) {
-  //     return res.status(500).send({ message: "Database error", error: err });
-  //   }
-  //   if (results.length > 0) {
-  //     return res
-  //       .status(409)
-  //       .send({ message: "User ID or Email already exists", status: 409 });
-  //   }
-  //   res
-  //     .status(200)
-  //     .send({ message: "User ID and Email are available", status: 200 });
-  // });
 };
 
 // export const confirmSignin = (req, res) => {
@@ -134,9 +162,22 @@ export const checkIdEmailExist = async (userId, email) => {
 
 const sendAndSaveEmailVerificationCode = async (email) => {
   const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6자리 숫자 생성
-  const isSuccess = await sendVerificationCode(email, code);
-  if (isSuccess) {
-    await saveToTemporaryDb(`signup-verification-${email}`, code, 3000); // 5 minutes
+  const expiration = Date.now() + 5 * 60 * 1000; // 5 minutes
+  const verification = {
+    email,
+    code,
+    type: verificationTypes.signUp,
+    expiration,
+  };
+  let isSuccess = false;
+
+  const userResponse = await Verification.create(verification);
+
+  if (userResponse) {
+    isSuccess = await sendVerificationCode(email, code);
   }
+  // if (isSuccess) {
+  //   await saveToTemporaryDb(`signup-verification-${email}`, code, 3000); // 5 minutes
+  // }
   return isSuccess;
 };

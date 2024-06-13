@@ -1,8 +1,14 @@
 export enum RoleEnum {
-  ADMIN = 'admin',
-  USER = 'user',
-  RESTAURANT = 'restaurant',
+  ADMIN = '0',
+  USER = '1',
+  RESTAURANT = '2',
 }
+
+export const labelIDByRole: { [key in RoleEnum]: string } = {
+  [RoleEnum.ADMIN]: 'ID',
+  [RoleEnum.USER]: 'Employee Number',
+  [RoleEnum.RESTAURANT]: 'ID',
+};
 
 export type CurrentUserType = {
   user_id: string;

@@ -7,6 +7,7 @@ type AccountVerificationLayoutProps = {
   description: string;
   children: ReactNode;
   size?: 'small' | 'normal';
+  className?: string;
 };
 
 const AccountVerificationLayout = ({
@@ -14,6 +15,7 @@ const AccountVerificationLayout = ({
   description,
   children,
   size = 'normal',
+  className,
 }: AccountVerificationLayoutProps) => {
   const renderDescription = description.split('. ').map((text, index, array) => (
     <React.Fragment key={index}>
@@ -26,7 +28,7 @@ const AccountVerificationLayout = ({
     <Stack
       alignItems="center"
       justifyContent="center"
-      className="min-h-screen"
+      className={`${className} + min-h-screen`}
     >
       <Stack
         direction="column"

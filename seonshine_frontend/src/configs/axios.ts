@@ -6,7 +6,7 @@ import { paths } from '@/routes/paths';
 import { getAccessToken } from '@/utils/persistCache/token';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:5050/',
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
