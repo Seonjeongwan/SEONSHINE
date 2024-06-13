@@ -1,6 +1,6 @@
 import { RoleEnum } from './user';
 
-export type SubMenuItemType = {
+export type SubPathType = {
   name: string;
   path: string;
 };
@@ -10,5 +10,5 @@ export type MenuItemType = {
   icon: string;
   path: string;
   permission: RoleEnum[];
-  subItems?: SubMenuItemType[];
+  subPaths?: SubPathType[];
 };

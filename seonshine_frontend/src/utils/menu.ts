@@ -10,8 +10,8 @@ export const getNameByPath = (path: string): string | null => {
     if (matchPath(path, item.path)) {
       return item.name;
     }
-    if (item.subItems) {
-      for (const subItem of item.subItems) {
+    if (item.subPaths) {
+      for (const subItem of item.subPaths) {
         if (matchPath(path, subItem.path)) {
           return subItem.name;
         }

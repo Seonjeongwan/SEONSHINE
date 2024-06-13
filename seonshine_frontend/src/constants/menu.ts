@@ -13,7 +13,7 @@ export const menuItems: MenuItemType[] = [
     icon: 'userIcon',
     path: '/user',
     permission: [RoleEnum.ADMIN],
-    subItems: [
+    subPaths: [
       { name: 'Register', path: '/user/register' },
       { name: 'Edit User', path: '/user/:id/edit' },
     ],
