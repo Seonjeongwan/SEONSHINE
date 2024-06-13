@@ -50,7 +50,7 @@ const LoginPage = () => {
       onSuccess: (data) => {
         setLoading(false);
         handleLoginSuccess(data.user, data.token, !!rememberCheckboxRef.current?.checked);
-        navigate('/');
+        navigate(paths.index);
       },
       onError: () => {
         toast.error('Login failed!');
