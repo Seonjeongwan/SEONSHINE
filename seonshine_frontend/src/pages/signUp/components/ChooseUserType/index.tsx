@@ -15,7 +15,7 @@ const ChooseUserType = ({ handleSubmitUserType }: EnterUserTypePropsType) => {
     <Stack
       alignItems="center"
       justifyContent="center"
-      className="min-h-[80vh]"
+      // className="min-h-[80vh]"
     >
       <Stack
         direction="column"

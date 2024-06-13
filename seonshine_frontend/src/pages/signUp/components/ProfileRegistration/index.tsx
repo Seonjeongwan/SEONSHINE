@@ -16,6 +16,7 @@ import { BranchResponseType } from '@/apis/user';
 
 import { EnterUserInformationPropsType } from '../../types';
 import { SignUpSchema, SignUpSchemaType } from './schema';
+import { SignUpRequestType } from '@/apis/signUp';
 
 const ProfileRegistration = ({
   handleSubmitInformation,
@@ -42,7 +43,7 @@ const ProfileRegistration = ({
   const { data: branchData = [] } = useGetBranches({ enabled: true });
 
   const submitForm = (data: SignUpSchemaType) => {
-    handleSubmitInformation({ ...data, userType, branch_id: selectedBranch });
+    handleSubmitInformation({ ...data, userType, branch_id: parseInt(selectedBranch) });
   };
   // will use custom hook useSignUp after having the API
   // const { mutate: signUpUser } = useSignUpApi();
@@ -60,7 +61,7 @@ const ProfileRegistration = ({
     <Stack
       alignItems="center"
       justifyContent="center"
-      className="min-h-[80vh]"
+      // className="min-h-[80vh]"
     >
       <Stack
         direction="column"

@@ -4,9 +4,13 @@ import { Box, Button, Step, StepLabel, Stepper } from '@mui/material';
 
 import AccountVerification from '@/components/organims/accountVerification';
 
+import { useSignUpApi } from '@/apis/hooks/signUpApi.hook';
+
 import ChooseUserType from './components/ChooseUserType';
 import PendingApprovalPage from './components/PendingApproval';
 import ProfileRegistration from './components/ProfileRegistration';
+import { SignUpSchemaType } from './components/ProfileRegistration/schema';
+import VerificationAccount from './components/VerificationAccount';
 import { SignUpStepsType } from './types';
 
 const steps = ['Select User Type', 'Enter User Information', 'Verify OTP', 'Pending Approval'];
@@ -14,7 +18,7 @@ const steps = ['Select User Type', 'Enter User Information', 'Verify OTP', 'Pend
 const SignUpPage = () => {
   const [step, setStep] = useState<SignUpStepsType>('select_user_type');
   const [userType, setUserType] = useState<string>('');
-  const timeCountdown = 120;
+  const { mutate: signUpUser } = useSignUpApi();
 
   const stepIndexMap: Record<SignUpStepsType, number> = {
     select_user_type: 0,
@@ -39,8 +43,9 @@ const SignUpPage = () => {
     nextStep();
   };
 
-  const handleSubmitInformation = (user_information: object) => {
+  const handleSubmitInformation = (user_information: SignUpSchemaType) => {
     nextStep();
+    // signUpUser(user_information);
     console.log(user_information);
   };
 
@@ -54,18 +59,20 @@ const SignUpPage = () => {
 
   return (
     <Box sx={{ width: '100%', overflowY: 'hidden' }}>
-      <Stepper
-        className="pt-20 w-1/2 flex justify-center mx-auto min-h-[20vh]"
-        activeStep={stepIndexMap[step]}
-        alternativeLabel
-      >
-        {steps.map((label) => (
-          <Step key={label}>
-            <StepLabel>{label}</StepLabel>
-          </Step>
-        ))}
-      </Stepper>
-      <Box>
+      <Box className="h-20vh min-h-[20vh]">
+        <Stepper
+          className="pt-20 w-1/2 flex justify-center mx-auto"
+          activeStep={stepIndexMap[step]}
+          alternativeLabel
+        >
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+      </Box>
+      <Box className="h-80vh min-h-[0vh]">
         {step === 'select_user_type' && <ChooseUserType handleSubmitUserType={handleSubmitUserType} />}
         {step === 'enter_user_information' && (
           <ProfileRegistration
@@ -74,14 +81,12 @@ const SignUpPage = () => {
           />
         )}
         {step === 'verify_otp' && (
-          <AccountVerification
+          <VerificationAccount
             title="Account Verification"
-            description="An OTP has been sent to your email. 
-            Please enter the OTP to verify you account"
-            handleSubmitOtp={handleSubmitOtp}
-            secondsCountdown={timeCountdown}
+            description="Your account is under approval process now.
+Please wait for administrator’s confirmation before using the application"
             handleResendOtp={handleResendOtp}
-            className="min-h-[80vh]"
+            handleSubmitOtp={handleSubmitOtp}
           />
         )}
         {step === 'pending_approval' && <PendingApprovalPage />}
