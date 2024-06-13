@@ -8,7 +8,7 @@ const theme = createTheme({
   palette: paletteConfig,
   spacing: 4,
   typography: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Roboto',
     fontWeightLight: 300,
     fontWeightRegular: 400,
     fontWeightMedium: 500,

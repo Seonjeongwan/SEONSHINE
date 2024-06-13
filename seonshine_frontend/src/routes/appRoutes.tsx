@@ -1,17 +1,17 @@
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
-import AdminPage from '@/pages/admin';
+import Dashboard from '@/pages/dashboard';
 import ForgotPasswordPage from '@/pages/forgotPassword';
 import LoginPage from '@/pages/login';
-import MainPage from '@/pages/main';
 import PageNotFound from '@/pages/pageNotFound';
 import SignUpPage from '@/pages/signUp';
-import ProfileRegistration from '@/pages/signUp/components/ProfileRegistration';
+import UserManagement from '@/pages/userManagement';
 
 import { RoleEnum } from '@/types/user';
 
 import useAuthStore from '@/store/auth.store';
 
+import RestaurantManagement from './../pages/restaurantManagement/index';
 import AuthenticateLayout from './guards/AuthenticateLayout';
 import ProtectedLayout from './guards/ProtectedLayout';
 import { paths } from './paths';
@@ -26,42 +26,26 @@ const AppRoutes = () => {
         <Route element={<AuthenticateLayout />}>
           <Route
             path={paths.login}
-            element={authenticate ? <Navigate to={paths.main} /> : <LoginPage />}
+            element={<LoginPage />}
           />
           <Route
             path={paths.forgotPassword}
-            element={authenticate ? <Navigate to={paths.main} /> : <ForgotPasswordPage />}
+            element={<ForgotPasswordPage />}
           />
           <Route
             path={paths.signUp}
-            element={authenticate ? <Navigate to={paths.main} /> : <SignUpPage />}
+            element={<SignUpPage />}
           />
         </Route>
 
         <Route
-          path={paths.main}
-          element={authenticate ? <MainPage /> : <Navigate to={paths.login} />}
-        />
-        <Route
-          path={paths.pageNotFound}
-          element={<PageNotFound />}
+          index
+          element={<Navigate to={paths.dashboard} />}
         />
 
         <Route
-          index
-          element={
-            authenticate ? (
-              <Navigate
-                to={paths.main}
-                replace
-              />
-            ) : (
-              <Navigate
-                to={paths.login}
-                replace
-              />
-            )
-          }
+          path={paths.pageNotFound}
+          element={<PageNotFound />}
         />
 
         <Route
@@ -81,15 +65,34 @@ const AppRoutes = () => {
           }
         />
         {/* Access Control List  routing example*/}
+
         <Route
-          path={paths.admin}
-          element={
-            <ProtectedLayout
-              allowedRoles={[RoleEnum.ADMIN]}
-              children={<AdminPage />}
-            />
-          }
-        />
+          path={paths.dashboard}
+          element={<ProtectedLayout allowedRoles={[RoleEnum.ADMIN, RoleEnum.USER, RoleEnum.RESTAURANT]} />}
+        >
+          <Route
+            index
+            element={<Dashboard />}
+          />
+        </Route>
+        <Route
+          path={paths.user.index}
+          element={<ProtectedLayout allowedRoles={[RoleEnum.ADMIN]} />}
+        >
+          <Route
+            index
+            element={<UserManagement />}
+          />
+        </Route>
+        <Route
+          path={paths.restaurant.index}
+          element={<ProtectedLayout allowedRoles={[RoleEnum.ADMIN]} />}
+        >
+          <Route
+            index
+            element={<RestaurantManagement />}
+          />
+        </Route>
       </Routes>
     </Router>
   );
