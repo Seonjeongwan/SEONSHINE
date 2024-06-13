@@ -272,7 +272,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
-          key: private_key
+          key: ${{ secrets.SSH_KEY }}
           script: |
             echo "SSH connection successful"
             if [ ! -d /home/ubuntu/SEONSHINE ]; then
@@ -302,7 +302,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
-          key: private_key
+          key: ${{ secrets.SSH_KEY }}
           script: |
             echo "SSH connection successful"
             if [ ! -d /home/ubuntu/SEONSHINE ]; then
