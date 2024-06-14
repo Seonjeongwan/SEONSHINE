@@ -11,6 +11,7 @@ import express from "express";
 // const authRoutes = require("./routes/authRoutes");
 // const userRoutes = require("./routes/userRoutes");
 // import commonRouter from "./routes/commonRoutes";
+// import "./db/sync.js";
 import commonRouter from "./routes/commonRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 //const orderRoutes = require("./routes/orderRoutes");
@@ -30,8 +31,8 @@ app.use(bodyParser.json());
 
 // Define route handlers
 // app.use("/auth", authRoutes);
-app.use("/user", userRouter);
-app.use("/common", commonRouter);
+app.use("/api/user", userRouter);
+app.use("/api/common", commonRouter);
 // app.use("/order", orderRoutes);
 
 // Initialize the database
@@ -53,4 +54,4 @@ async function startServer() {
 // Start the server
 startServer();
 
-//test deploy2
+//test deploy3
