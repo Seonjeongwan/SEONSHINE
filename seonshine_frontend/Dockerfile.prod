@@ -19,28 +19,39 @@ RUN yarn install
 # 애플리케이션 코드 복사
 COPY . ./
 
-# Vite를 전역 설치
-RUN yarn global add vite
-
 # 애플리케이션 빌드
 RUN yarn build
 
-# Production stage
-FROM node:22.2.0-alpine
+# CMD ["yarn", "preview"]
 
-WORKDIR /app
+FROM nginx:1.25.3 
 
-# Yarn 설치
-RUN apk add --no-cache yarn
+COPY --from=builder /app/build /usr/share/nginx/html
 
-# 빌드된 파일 복사
-COPY --from=builder /app/build /app/build
-COPY --from=builder /app/package.json /app/yarn.lock ./
+# COPY /build /usr/share/nginx/html
 
-# 프로덕션 의존성 설치
-RUN yarn install --production --frozen-lockfile
+COPY nginx.conf /etc/nginx/nginx.conf
 
-EXPOSE 3000
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+
+# # Production stage
+# FROM node:22.2.0-alpine
+
+# WORKDIR /app
+
+# # Yarn 설치
+# RUN apk add --no-cache yarn
+
+# # 빌드된 파일 복사
+# COPY --from=builder /app/build /app/build
+# COPY --from=builder /app/package.json /app/yarn.lock ./
+
+# # 프로덕션 의존성 설치
+# RUN yarn install --production --frozen-lockfile
+
+# EXPOSE 3000
 
 # 빌드된 애플리케이션 실행
-CMD ["yarn", "preview"]
+# CMD ["yarn", "preview"]
