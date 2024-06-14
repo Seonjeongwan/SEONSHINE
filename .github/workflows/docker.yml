@@ -330,7 +330,7 @@ jobs:
             cd /home/ubuntu/SEONSHINE
             git reset --hard HEAD
             git pull origin main
-            export COMPOSE_HTTP_TIMEOUT=240
+            export COMPOSE_HTTP_TIMEOUT=600
             docker-compose -f docker-compose.prod.yml down
             docker-compose -f docker-compose.prod.yml pull
 
