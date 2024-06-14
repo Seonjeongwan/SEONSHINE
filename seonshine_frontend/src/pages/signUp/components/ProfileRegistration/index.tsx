@@ -3,16 +3,14 @@ import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { Box, Button, FormControl, IconButton, InputLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Box, Button, FormControl, IconButton, MenuItem, Select, Stack, Typography } from '@mui/material';
 
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
 
 import { labelIDByRole, RoleEnum } from '@/types/user';
 
-import { useSignUpApi } from '@/apis/hooks/signUpApi.hook';
 import { useGetBranches } from '@/apis/hooks/userApi.hook';
-import { BranchResponseType } from '@/apis/user';
 
 import { EnterUserInformationPropsType } from '../../types';
 import { SignUpSchema, SignUpSchemaType } from './schema';
@@ -20,7 +18,7 @@ import { SignUpSchema, SignUpSchemaType } from './schema';
 const ProfileRegistration = ({
   handleSubmitInformation,
   userType,
-}: EnterUserInformationPropsType & { userType: string }) => {
+}: EnterUserInformationPropsType) => {
   const {
     handleSubmit,
     register,
@@ -51,16 +49,12 @@ const ProfileRegistration = ({
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const handleClickShowPassword = () => setShowPassword((prev) => !prev);
   const handleClickShowConfirmPassword = () => setShowConfirmPassword((prev) => !prev);
-  const [selectedBranch, setSelectedBranch] = useState('');
+  const [selectedBranch, setSelectedBranch] = useState<number | string>(0);
 
-  useEffect(() => {
-    console.log(branchData);
-  }, []);
   return (
     <Stack
       alignItems="center"
       justifyContent="center"
-      className="min-h-[80vh]"
     >
       <Stack
         direction="column"
@@ -217,7 +211,7 @@ const ProfileRegistration = ({
                             value={selectedBranch}
                             onChange={(e) => {
                               setSelectedBranch(e.target.value);
-                              setValue('branch_id', parseInt(e.target.value));
+                              setValue('branch_id', e.target.value);
                             }}
                             size="small"
                             variant="filled"

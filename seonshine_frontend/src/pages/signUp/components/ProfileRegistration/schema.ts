@@ -29,7 +29,7 @@ export const SignUpSchema = zod
       .refine((value) => phoneNumberRegex.test(value), {
         message: errorMessages.phoneNumberInvalid,
       }),
-    branch_id: zod.number(),
+    branch_id: zod.union([zod.string(), zod.number()]),
   })
   .refine((data) => data.userType !== RoleEnum.USER || (data.userType === RoleEnum.USER && data.branch_id), {
     message: 'Branch field is required',
@@ -46,7 +46,10 @@ export const SignUpSchema = zod
   );
 
 export type SignUpSchemaType = zod.infer<typeof SignUpSchema>;
-
+export type SignUpVerifySchemaType = {
+  code: string;
+  email: string;
+};
 export const OtpSchema = zod.object({
   otp: zod.string().trim().regex(otpRegex, 'OTP must have 6 digits'),
 });

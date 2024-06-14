@@ -15,7 +15,7 @@ export type CurrentUserType = {
   role_id: RoleEnum;
   username: string;
   phone_number: string;
-  branch_id: number;
+  branch_id: string;
   email: string;
   password_hash: string;
   confirm_yn: string;
