@@ -1,17 +1,9 @@
-import { SignUpSchemaType } from '@/pages/signUp/components/ProfileRegistration/schema';
+import { SignUpSchemaType, SignUpVerifySchemaType } from '@/pages/signUp/components/ProfileRegistration/schema';
 
 import axiosInstance from '@/configs/axios';
 
 export type SignUpResponseType = { message: string; errorCode: string };
-export type SignUpRequestType = {
-  user_id: string;
-  role_id: string;
-  username: string;
-  phone_number: string;
-  branch_id: string;
-  email: string;
-  password: string;
-};
+export type SignUpVerifyResponseType = { message: string; errorCode: string };
 
 export const signUp = async (formData: SignUpSchemaType): Promise<SignUpResponseType> => {
   const response = await axiosInstance.post<SignUpResponseType>('/user/sign-up', {
@@ -22,6 +14,14 @@ export const signUp = async (formData: SignUpSchemaType): Promise<SignUpResponse
     branch_id: formData.branch_id.toString(),
     email: formData.email,
     password: formData.password,
+  });
+  return response.data;
+};
+
+export const signUpVerify = async (formData: SignUpVerifySchemaType): Promise<SignUpVerifyResponseType> => {
+  const response = await axiosInstance.post<SignUpVerifyResponseType>('/user/sign-up', {
+    otp: formData.otp,
+    email: formData.email,
   });
   return response.data;
 };

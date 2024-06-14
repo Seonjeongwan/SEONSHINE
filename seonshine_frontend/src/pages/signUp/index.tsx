@@ -1,16 +1,19 @@
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 import { Box, Button, Step, StepLabel, Stepper } from '@mui/material';
+import { time } from 'console';
 
 import AccountVerification from '@/components/organims/accountVerification';
 
-import { useSignUpApi } from '@/apis/hooks/signUpApi.hook';
+import { useSignUpApi, useSignUpVerifyApi } from '@/apis/hooks/signUpApi.hook';
+import { signUpVerify } from '@/apis/signUp';
 
 import ChooseUserType from './components/ChooseUserType';
 import PendingApprovalPage from './components/PendingApproval';
 import ProfileRegistration from './components/ProfileRegistration';
-import { SignUpSchemaType } from './components/ProfileRegistration/schema';
-import VerificationAccount from './components/VerificationAccount';
+import { SignUpSchemaType, SignUpVerifySchemaType } from './components/ProfileRegistration/schema';
+import AccountVerificationPage from './components/VerificationAccount';
 import { SignUpStepsType } from './types';
 
 const steps = ['Select User Type', 'Enter User Information', 'Verify OTP', 'Pending Approval'];
@@ -18,7 +21,10 @@ const steps = ['Select User Type', 'Enter User Information', 'Verify OTP', 'Pend
 const SignUpPage = () => {
   const [step, setStep] = useState<SignUpStepsType>('select_user_type');
   const [userType, setUserType] = useState<string>('');
+  const [userEmail, setUserEmail] = useState<string>('');
   const { mutate: signUpUser } = useSignUpApi();
+  const { mutate: verifyOtp } = useSignUpVerifyApi();
+  const secondsCountdown = 120;
 
   const stepIndexMap: Record<SignUpStepsType, number> = {
     select_user_type: 0,
@@ -44,13 +50,29 @@ const SignUpPage = () => {
   };
 
   const handleSubmitInformation = (user_information: SignUpSchemaType) => {
-    nextStep();
-    // signUpUser(user_information);
+    setUserEmail(user_information.email);
+    signUpUser(user_information, {
+      onSuccess: () => {
+        nextStep();
+      },
+      onError: (err) => {
+        console.error(err);
+        toast.error('Sign up failed!');
+      },
+    });
     console.log(user_information);
   };
 
-  const handleSubmitOtp = (otp: string) => {
-    nextStep();
+  const handleSubmitOtp = (verify_information: SignUpVerifySchemaType) => {
+    verifyOtp(verify_information, {
+      onSuccess: () => {
+        nextStep();
+      },
+      onError: (err) => {
+        console.error(err);
+        toast.error('Sign up failed!');
+      },
+    });
   };
 
   const handleResendOtp = (resetTimer: () => void) => {
@@ -81,12 +103,14 @@ const SignUpPage = () => {
           />
         )}
         {step === 'verify_otp' && (
-          <VerificationAccount
+          <AccountVerificationPage
             title="Account Verification"
             description="Your account is under approval process now.
 Please wait for administrator’s confirmation before using the application"
             handleResendOtp={handleResendOtp}
             handleSubmitOtp={handleSubmitOtp}
+            secondsCountdown={secondsCountdown}
+            userEmail={userEmail}
           />
         )}
         {step === 'pending_approval' && <PendingApprovalPage />}
