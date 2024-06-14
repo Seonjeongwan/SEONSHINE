@@ -18,7 +18,6 @@ const AccountVerificationPage = ({
   secondsCountdown,
   handleResendOtp,
   className,
-  size = 'normal',
 }: AccountVerificationPageProps) => {
   const {
     register,

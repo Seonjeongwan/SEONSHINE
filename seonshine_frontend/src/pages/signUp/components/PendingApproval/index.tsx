@@ -5,10 +5,9 @@ import { Box, Button, Stack, Typography } from '@mui/material';
 
 import { paths } from '@/routes/paths';
 
+const title = 'Account Verification';
+const description = 'An OTP has been sent to your email. Please enter the OTP to verify your account.';
 const PendingApprovalPage = () => {
-  const title = 'Account Verification';
-  const description = 'An OTP has been sent to your email. Please enter the OTP to verify your account.';
-  const size = 'normal';
   const navigate = useNavigate();
 
   const renderDescription = description?.split('. ').map((text, index, array) => (

@@ -15,13 +15,13 @@ import { SignUpStepsType } from './types';
 
 const steps = ['Select User Type', 'Enter User Information', 'Verify OTP', 'Pending Approval'];
 
+const secondsCountdown = 120;
 const SignUpPage = () => {
   const [step, setStep] = useState<SignUpStepsType>('select_user_type');
   const [userType, setUserType] = useState<string>('');
   const [userEmail, setUserEmail] = useState<string>('');
   const { mutate: signUpUser, isPending: isSignUpPending } = useSignUpApi();
   const { mutate: verifyOtp, isPending: isVerifyPending } = useSignUpVerifyApi();
-  const secondsCountdown = 120;
 
   const setLoading = useLoadingStore((state) => state.setLoading);
 
