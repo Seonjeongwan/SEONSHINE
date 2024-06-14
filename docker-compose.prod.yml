@@ -5,15 +5,12 @@ services:
     image: seonshinevn/seonshine_frontend:prod
     ports:
       - "80:80"
-    volumes:
-      - ./seonshine_frontend/src:/app/src
-      - /app/node_modules
-      - /app/build # Cache build results
     depends_on:
       - backend
     restart: always
     environment:
       - NODE_ENV=production
+      - VITE_API_URL=http://backend:5050
 
   backend:
     image: seonshinevn/seonshine_backend:prod
