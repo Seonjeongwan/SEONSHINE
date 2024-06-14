@@ -4,7 +4,7 @@ services:
   frontend:
     image: seonshinevn/seonshine_frontend:prod
     ports:
-      - "3000:3000"
+      - "80:80"
     volumes:
       - ./seonshine_frontend/src:/app/src
       - /app/node_modules
