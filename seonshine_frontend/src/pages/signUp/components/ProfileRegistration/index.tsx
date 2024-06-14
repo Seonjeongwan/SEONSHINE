@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { Box, Button, FormControl, IconButton, InputLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Box, Button, FormControl, IconButton, MenuItem, Select, Stack, Typography } from '@mui/material';
 
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
@@ -42,6 +42,8 @@ const ProfileRegistration = ({
   const submitForm = (data: SignUpSchemaType) => {
     handleSubmitInformation({ ...data, userType, branch_id: selectedBranch });
   };
+  // will use custom hook useSignUp after having the API
+  // const { mutate: signUpUser } = useSignUpApi();
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);

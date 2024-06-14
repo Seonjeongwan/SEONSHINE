@@ -19,6 +19,9 @@ RUN yarn install
 # 애플리케이션 코드 복사
 COPY . ./
 
+# Vite를 전역 설치
+RUN yarn global add vite
+
 # 애플리케이션 빌드
 RUN yarn build
 

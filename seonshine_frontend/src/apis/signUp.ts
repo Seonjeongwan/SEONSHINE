@@ -11,7 +11,7 @@ export const signUp = async (formData: SignUpSchemaType): Promise<SignUpResponse
     role_id: formData.userType,
     username: formData.fullName,
     phone_number: formData.phoneNumber,
-    branch_id: formData.branch_id.toString(),
+    branch_id: formData.branch_id || undefined,
     email: formData.email,
     password: formData.password,
   });

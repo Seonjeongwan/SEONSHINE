@@ -1,21 +1,39 @@
 import bcrypt from "bcrypt";
-import { Op } from "sequelize";
+import { Op, QueryTypes } from "sequelize";
 import { UserStatus } from "../constants/auth.js";
 import { errorCodes } from "../constants/errorCode.js";
 import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
 import { messageErrors, statusWithMessageLogin } from "../constants/message.js";
 import { verificationTypes } from "../constants/verification.js";
+import { sequelizeUserDb } from "../db/dbConfig.js";
 import User from "../models/userModel.js";
-import Verification from "../models/verification.js";
+import Verification from "../models/verificationModel.js";
 import { sendVerificationCode } from "../utils/emailUtil.js";
 import { getResponseErrors } from "../utils/responseParser.js";
-import { getFromTemporaryDb, saveToTemporaryDb } from "../utils/storage.js";
+import {
+  deleteFromTemporaryDb,
+  getFromTemporaryDb,
+  saveToTemporaryDb,
+} from "../utils/storage.js";
 import { generateToken } from "../utils/token.js";
 // const { userDb } = require("../db/connection");
 
-export const getAllUsers = async (req, res) => {
-  const users = await User.findAll();
-  res.status(httpStatusCodes.success).send(users);
+export const getUserList = async (req, res) => {
+  const {
+    page_size = 25,
+    page_number = 1,
+    user_id = "",
+    username = "",
+  } = req.query;
+  const query = `SELECT u.*, b.branch_name FROM user_db.users u LEFT JOIN common_db.branch_info b ON u.branch_id = b.branch_id`;
+  const users = await sequelizeUserDb.query(query, {
+    type: QueryTypes.SELECT,
+  });
+  const usersWithoutPassword = users.map((user) => {
+    delete user.password_hash;
+    return user;
+  });
+  res.status(httpStatusCodes.success).send(usersWithoutPassword);
 };
 
 export const signUp = async (req, res) => {
@@ -36,7 +54,9 @@ export const signUp = async (req, res) => {
 
     if (isSuccessSendingEmailCode) {
       await saveToTemporaryDb(`signup-user-${email}`, user, 86400);
-      return res.status(200).send("Sending email verification successful");
+      return res
+        .status(200)
+        .send({ message: "Sending email verification successful" });
     }
     return res
       .status(httpStatusCodes.internalServerError)
@@ -53,16 +73,21 @@ export const verifySignUp = async (req, res) => {
     const { code, email } = req.body;
     const verifyInfo = await Verification.findOne({
       where: {
-        code: code,
         email: email.trim(),
         type: verificationTypes.signUp,
       },
+      order: [["created_at", "DESC"]],
+      raw: true,
     });
-    if (verifyInfo) {
-      //TODO: Check code is in expire
+    if (verifyInfo && verifyInfo.code === code) {
+      const currentTime = Date.now();
+      if (currentTime > verifyInfo.expiration) {
+        return res
+          .status(httpStatusCodes.badRequest)
+          .json({ message: messageErrors.verifyCodeExpires });
+      }
       const userInfo = await getFromTemporaryDb(`signup-user-${email}`);
       if (userInfo) {
-        // @ts-ignore
         const hashedPassword = await bcrypt.hash(userInfo.password, 10);
         const user = {
           ...userInfo,
@@ -70,6 +95,7 @@ export const verifySignUp = async (req, res) => {
           user_status: UserStatus.waitingConfirm,
         };
         const userResponse = await User.create(user);
+        await deleteFromTemporaryDb(`signup-user-${email}`);
         //Delete all verification code sign up by email
         await Verification.destroy({
           where: {
@@ -82,13 +108,13 @@ export const verifySignUp = async (req, res) => {
     } else {
       res
         .status(httpStatusCodes.badRequest)
-        .json({ message: "Incorrect verification code" });
+        .json({ message: messageErrors.verifyCodeIncorrect });
     }
   } catch (error) {
     console.log("error :>> ", error);
     res
       .status(httpStatusCodes.internalServerError)
-      .json({ error: httpStatusErrors.internalServerError });
+      .json({ error: JSON.stringify(error) });
   }
 };
 
@@ -97,10 +123,8 @@ export const login = async (req, res) => {
     const { user_id, password } = req.body;
     const user = await User.findByPk(user_id, { raw: true });
     if (user) {
-      // @ts-ignore
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (isPasswordValid) {
-        // @ts-ignore
         const userStatus = user.user_status;
         const response = {};
         response.message = statusWithMessageLogin[userStatus];

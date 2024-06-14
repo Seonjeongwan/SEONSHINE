@@ -1,13 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
-import { Box, Button, Step, StepLabel, Stepper } from '@mui/material';
-import { time } from 'console';
-
-import AccountVerification from '@/components/organims/accountVerification';
+import { Box, Step, StepLabel, Stepper } from '@mui/material';
 
 import { useSignUpApi, useSignUpVerifyApi } from '@/apis/hooks/signUpApi.hook';
-import { signUpVerify } from '@/apis/signUp';
+import { useLoadingStore } from '@/store/loading.store';
 
 import ChooseUserType from './components/ChooseUserType';
 import PendingApprovalPage from './components/PendingApproval';
@@ -22,9 +19,11 @@ const SignUpPage = () => {
   const [step, setStep] = useState<SignUpStepsType>('select_user_type');
   const [userType, setUserType] = useState<string>('');
   const [userEmail, setUserEmail] = useState<string>('');
-  const { mutate: signUpUser } = useSignUpApi();
-  const { mutate: verifyOtp } = useSignUpVerifyApi();
+  const { mutate: signUpUser, isPending: isSignUpPending } = useSignUpApi();
+  const { mutate: verifyOtp, isPending: isVerifyPending } = useSignUpVerifyApi();
   const secondsCountdown = 120;
+
+  const setLoading = useLoadingStore((state) => state.setLoading);
 
   const stepIndexMap: Record<SignUpStepsType, number> = {
     select_user_type: 0,
@@ -46,6 +45,7 @@ const SignUpPage = () => {
 
   const handleSubmitUserType = (user_type: string) => {
     setUserType(user_type);
+    setLoading(false);
     nextStep();
   };
 
@@ -53,6 +53,7 @@ const SignUpPage = () => {
     setUserEmail(user_information.email);
     signUpUser(user_information, {
       onSuccess: () => {
+        setLoading(false);
         nextStep();
       },
       onError: (err) => {
@@ -65,6 +66,7 @@ const SignUpPage = () => {
   const handleSubmitOtp = (verify_information: SignUpVerifySchemaType) => {
     verifyOtp(verify_information, {
       onSuccess: () => {
+        setLoading(false);
         nextStep();
       },
       onError: (err) => {
@@ -78,6 +80,13 @@ const SignUpPage = () => {
     resetTimer();
   };
 
+  useEffect(() => {
+    setLoading(isSignUpPending);
+  }, [isSignUpPending]);
+
+  useEffect(() => {
+    setLoading(isVerifyPending);
+  }, [isVerifyPending]);
   return (
     <Box sx={{ width: '100%', overflowY: 'hidden' }}>
       <Box className="h-20vh min-h-[20vh]">

@@ -23,7 +23,6 @@ const PendingApprovalPage = () => {
   };
   return (
     <Stack
-      // alignItems="center"
       justifyContent="center"
       className="min-h-screen"
     >
@@ -32,9 +31,7 @@ const PendingApprovalPage = () => {
         justifyContent="center"
         gap={6}
         alignItems="center"
-        className={`w-full h-screen p-24 bg-white rounded-lg shadow-md max-w-screen relative ${
-          size === 'normal' ? 'md:h-171 md:w-240' : 'md:h-131 md:w-194'
-        }`}
+        className="w-full h-screen p-24 bg-white rounded-lg shadow-md max-w-screen relative md:h-171 md:w-240 sm:h-131 sm:w-200"
       >
         <Typography
           variant="heading2"

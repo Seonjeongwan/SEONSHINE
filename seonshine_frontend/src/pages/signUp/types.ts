@@ -1,4 +1,3 @@
-import { UseFormRegister } from 'react-hook-form';
 import { SignUpSchemaType, SignUpVerifySchemaType } from './components/ProfileRegistration/schema';
 
 export type SignUpStepsType = 'select_user_type' | 'enter_user_information' | 'verify_otp' | 'pending_approval';

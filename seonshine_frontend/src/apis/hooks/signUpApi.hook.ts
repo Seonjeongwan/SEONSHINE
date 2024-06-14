@@ -1,6 +1,6 @@
 import { useMutation, UseMutationResult } from '@tanstack/react-query';
 
-import { OtpSchemaType, SignUpSchemaType, SignUpVerifySchemaType } from '@/pages/signUp/components/ProfileRegistration/schema';
+import { SignUpSchemaType, SignUpVerifySchemaType } from '@/pages/signUp/components/ProfileRegistration/schema';
 
 import { signUp, SignUpResponseType, signUpVerify, SignUpVerifyResponseType } from '../signUp';
 

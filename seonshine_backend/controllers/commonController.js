@@ -3,7 +3,9 @@ import Branch from "../models/branchModel.js";
 import { getResponseErrors } from "../utils/responseParser.js";
 
 export const getAllBranch = async (req, res) => {
-  const branches = await Branch.findAll();
+  const branches = await Branch.findAll({
+    attributes: { exclude: ["created_at", "updated_at"] },
+  });
   res.status(httpStatusCodes.success).send(branches);
 };
 

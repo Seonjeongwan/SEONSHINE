@@ -116,117 +116,107 @@ const AccountVerificationPage = ({
 
   return (
     <Stack
-      // alignItems="center"
       justifyContent="center"
       className={`${className} + min-h-screen`}
     >
       <form
         onSubmit={handleSubmit(submitForm)}
         noValidate
+        className="w-full h-screen p-24 bg-white rounded-lg shadow-md max-w-screen relative md:h-171 md:w-240 sm:h-131 sm:w-200 flex flex-col justify-center items-center gap-6"
       >
+        <Typography
+          variant="heading2"
+          component="h2"
+          className="text-center"
+        >
+          {title}
+        </Typography>
+        <Typography
+          variant="bodyS"
+          className="text-center min-w-max"
+        >
+          {renderDescription}
+        </Typography>
         <Stack
           direction="column"
-          justifyContent="center"
-          gap={6}
+          gap="8px"
           alignItems="center"
-          className={`w-full h-screen p-24 bg-white rounded-lg shadow-md max-w-screen relative ${
-            size === 'normal' ? 'md:h-171 md:w-240' : 'md:h-131 md:w-194'
-          }`}
+          className="w-screen md:w-auto"
         >
-          <Typography
-            variant="heading2"
-            component="h2"
-            className="text-center"
-          >
-            {title}
-          </Typography>
-          <Typography
-            variant="bodyS"
-            className="text-center min-w-max"
-          >
-            {renderDescription}
-          </Typography>
-          <Stack
-            direction="column"
-            gap="8px"
-            alignItems="center"
-            className="w-screen md:w-auto"
-          >
-            <Controller
-              name="code"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Stack
-                  justifyContent="space-around"
-                  className="gap-4 md:gap-6 w-11/12 md:w-150"
-                  onPaste={(e: ClipboardEvent<HTMLInputElement>) => handlePaste(e, onChange)}
-                >
-                  {Array.from({ length: 6 }).map((_, index) => (
-                    <TextField
-                      key={index}
-                      inputRef={(el) => (inputRefs.current[index] = el)}
-                      type="tel"
-                      inputProps={{ maxLength: 1 }}
-                      variant="standard"
-                      autoComplete="off"
-                      value={getValues('code')[index] !== ' ' ? getValues('code')[index] : ''}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => handleOtpChange(e, index, onChange)}
-                      onFocus={(e) => e.target.select()}
-                      onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => handleKeyDown(e, index)}
-                      sx={{ input: { fontWeight: '500', fontSize: { xs: '40px', md: '64px' }, textAlign: 'center' } }}
-                    />
-                  ))}
-                </Stack>
-              )}
-            />
-            <FormHelperText
-              error={!!errors.code}
-              sx={{ marginTop: 1 }}
-            >
-              {errors?.code?.message}
-            </FormHelperText>
-            {!isActive && seconds === 0 && (
-              <Typography
-                component="span"
-                variant="subtitleS"
-                className="text-red-500 text-center"
+          <Controller
+            name="code"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <Stack
+                justifyContent="space-around"
+                className="gap-4 md:gap-6 w-11/12 md:w-150"
+                onPaste={(e: ClipboardEvent<HTMLInputElement>) => handlePaste(e, onChange)}
               >
-                Your OTP has expired. Please click resend OTP and try again
-              </Typography>
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <TextField
+                    key={index}
+                    inputRef={(el) => (inputRefs.current[index] = el)}
+                    type="tel"
+                    inputProps={{ maxLength: 1 }}
+                    variant="standard"
+                    autoComplete="off"
+                    value={getValues('code')[index] !== ' ' ? getValues('code')[index] : ''}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => handleOtpChange(e, index, onChange)}
+                    onFocus={(e) => e.target.select()}
+                    onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => handleKeyDown(e, index)}
+                    sx={{ input: { fontWeight: '500', fontSize: { xs: '40px', md: '64px' }, textAlign: 'center' } }}
+                  />
+                ))}
+              </Stack>
             )}
-          </Stack>
-          <Box>
+          />
+          <FormHelperText
+            error={!!errors.code}
+            sx={{ marginTop: 1 }}
+          >
+            {errors?.code?.message}
+          </FormHelperText>
+          {!isActive && seconds === 0 && (
             <Typography
               component="span"
-              variant="timer"
+              variant="subtitleS"
+              className="text-red-500 text-center"
             >
-              {`${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`}
+              Your OTP has expired. Please click resend OTP and try again
             </Typography>
-          </Box>
-          <Stack
-            gap="8px"
-            alignItems="center"
-            flexDirection="column"
+          )}
+        </Stack>
+        <Box>
+          <Typography
+            component="span"
+            variant="timer"
           >
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
-              type="submit"
-              disabled={!isActive}
-              className="w-80 md:w-120 h-12"
-            >
-              <Typography variant="buttonM">Verify</Typography>
-            </Button>
-            <Button
-              variant="text"
-              className="text-center w-max font-bold text-md text-black-500"
-              disabled={isActive}
-              onClick={hanldeClickResendOtp}
-            >
-              Resend OTP
-            </Button>
-          </Stack>
+            {`${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`}
+          </Typography>
+        </Box>
+        <Stack
+          gap="8px"
+          alignItems="center"
+          flexDirection="column"
+        >
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            type="submit"
+            disabled={!isActive}
+            className="w-80 md:w-120 h-12"
+          >
+            <Typography variant="buttonM">Verify</Typography>
+          </Button>
+          <Button
+            variant="text"
+            className="text-center w-max font-bold text-md text-black-500"
+            disabled={isActive}
+            onClick={hanldeClickResendOtp}
+          >
+            Resend OTP
+          </Button>
         </Stack>
       </form>
     </Stack>
