@@ -19,6 +19,7 @@ type AccountVerificationProps = {
   className?: string;
 };
 
+
 const AccountVerification = ({
   title = 'Account Verification',
   description = 'An OTP has been sent to your email. Please enter the OTP to verify your account.',

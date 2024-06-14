@@ -1,15 +1,6 @@
-name: Build and Deploy
+name: Force Build Push Deploy
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-    paths:
-      - "seonshine_frontend/**"
-      - "seonshine_backend/**"
-      - "seonshine_db/**"
-      - "seonshine_fileserver/**"
   workflow_dispatch:
 
 jobs:

@@ -29,7 +29,6 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.log('error', error);
     if (error.response && (error.response.status === UNAUTHORIZED || error.response.status === FORBIDDEN)) {
       const { logout } = useAuth();
 
