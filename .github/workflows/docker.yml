@@ -37,9 +37,9 @@ jobs:
             echo "fileserver=true" >> $GITHUB_OUTPUT
             echo "any_changes=true" >> $GITHUB_OUTPUT
           else
-            FRONTEND_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep 'seonshine_frontend' || echo '')
-            BACKEND_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep 'seonshine_backend' || echo '')
-            FILESERVER_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep 'seonshine_fileserver' || echo '')
+            FRONTEND_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep 'seonshine_frontend' | tr '\n' ' ' || echo '')
+            BACKEND_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep 'seonshine_backend' | tr '\n' ' ' || echo '')
+            FILESERVER_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep 'seonshine_fileserver' | tr '\n' ' ' || echo '')
 
             echo "FRONTEND_CHANGED=$FRONTEND_CHANGED" >> $GITHUB_ENV
             echo "BACKEND_CHANGED=$BACKEND_CHANGED" >> $GITHUB_ENV
