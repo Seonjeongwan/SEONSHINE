@@ -4,42 +4,32 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Button, FormHelperText, Stack, TextField, Typography } from '@mui/material';
 
-import AccountVerificationLayout from '@/components/organims/accountVerification/accountVerificationLayout';
-
 import { digitRegex } from '@/constants/regex';
 
+import { AccountVerificationPageProps } from '../../types';
 import { SignUpVerifySchemaType } from '../ProfileRegistration/schema';
-import { OtpSchema, OtpSchemaType } from './schema';
-
-type AccountVerificationPageProps = {
-  userEmail: string;
-  title?: string;
-  description?: string;
-  secondsCountdown: number;
-  handleSubmitOtp: (verify_information: SignUpVerifySchemaType) => void;
-  handleResendOtp: (resetTimer: () => void) => void;
-  className?: string;
-  size?: 'small' | 'normal';
-};
+import { VerifyOtpSchema, VerifyOtpSchemaType } from './schema';
 
 const AccountVerificationPage = ({
+  handleSubmitOtp,
   userEmail,
   title = 'Account Verification',
   description = 'An OTP has been sent to your email. Please enter the OTP to verify your account.',
-  handleSubmitOtp,
   secondsCountdown,
   handleResendOtp,
   className,
   size = 'normal',
 }: AccountVerificationPageProps) => {
   const {
+    register,
     handleSubmit,
     control,
     getValues,
+    setValue,
     formState: { errors },
-  } = useForm<OtpSchemaType>({
-    resolver: zodResolver(OtpSchema),
-    defaultValues: { otp: ' '.repeat(6) },
+  } = useForm<VerifyOtpSchemaType>({
+    resolver: zodResolver(VerifyOtpSchema),
+    defaultValues: { code: ' '.repeat(6), email: userEmail },
   });
   const renderDescription = description.split('. ').map((text, index, array) => (
     <React.Fragment key={index}>
@@ -58,7 +48,7 @@ const AccountVerificationPage = ({
     const value = e.target.value;
     if (!digitRegex.test(value) && value !== '') return;
 
-    const currentOtp = getValues('otp').split('');
+    const currentOtp = getValues('code').split('');
     currentOtp[index] = value || ' ';
     onChange(currentOtp.join(''));
 
@@ -103,8 +93,8 @@ const AccountVerificationPage = ({
     setIsActive(true);
   };
 
-  const onSubmit = (data: SignUpVerifySchemaType) => {
-    handleSubmitOtp({ ...data, email:userEmail });
+  const submitForm = (data: SignUpVerifySchemaType) => {
+    handleSubmitOtp({ ...data, email: userEmail });
   };
 
   useEffect(() => {
@@ -126,113 +116,119 @@ const AccountVerificationPage = ({
 
   return (
     <Stack
+      // alignItems="center"
       justifyContent="center"
       className={`${className} + min-h-screen`}
     >
-      <Stack
-        direction="column"
-        justifyContent="center"
-        gap={6}
-        alignItems="center"
-        className={`w-full h-screen p-24 bg-white rounded-lg shadow-md max-w-screen relative ${
-          size === 'normal' ? 'md:h-171 md:w-240' : 'md:h-131 md:w-194'
-        }`}
+      <form
+        onSubmit={handleSubmit(submitForm)}
+        noValidate
       >
-        <Typography
-          variant="heading2"
-          component="h2"
-          className="text-center"
-        >
-          {title}
-        </Typography>
-        <Typography
-          variant="bodyS"
-          className="text-center min-w-max"
-        >
-          {renderDescription}
-        </Typography>
-        direction="column"
         <Stack
           direction="column"
-          gap="8px"
+          justifyContent="center"
+          gap={6}
           alignItems="center"
-          className="w-screen md:w-auto"
+          className={`w-full h-screen p-24 bg-white rounded-lg shadow-md max-w-screen relative ${
+            size === 'normal' ? 'md:h-171 md:w-240' : 'md:h-131 md:w-194'
+          }`}
         >
-          <Controller
-            name="otp"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <Stack
-                justifyContent="space-around"
-                className="gap-4 md:gap-6 w-11/12 md:w-150"
-                onPaste={(e: ClipboardEvent<HTMLInputElement>) => handlePaste(e, onChange)}
-              >
-                {Array.from({ length: 6 }).map((_, index) => (
-                  <TextField
-                    key={index}
-                    inputRef={(el) => (inputRefs.current[index] = el)}
-                    type="tel"
-                    inputProps={{ maxLength: 1 }}
-                    variant="standard"
-                    autoComplete="off"
-                    value={value[index] !== ' ' ? value[index] : ''}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => handleOtpChange(e, index, onChange)}
-                    onFocus={(e) => e.target.select()}
-                    onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => handleKeyDown(e, index)}
-                    sx={{ input: { fontWeight: '500', fontSize: { xs: '40px', md: '64px' }, textAlign: 'center' } }}
-                  />
-                ))}
-              </Stack>
-            )}
-          />
-          <FormHelperText
-            error={!!errors.otp}
-            sx={{ marginTop: 1 }}
+          <Typography
+            variant="heading2"
+            component="h2"
+            className="text-center"
           >
-            {errors?.otp?.message}
-          </FormHelperText>
-          {!isActive && seconds === 0 && (
+            {title}
+          </Typography>
+          <Typography
+            variant="bodyS"
+            className="text-center min-w-max"
+          >
+            {renderDescription}
+          </Typography>
+          <Stack
+            direction="column"
+            gap="8px"
+            alignItems="center"
+            className="w-screen md:w-auto"
+          >
+            <Controller
+              name="code"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <Stack
+                  justifyContent="space-around"
+                  className="gap-4 md:gap-6 w-11/12 md:w-150"
+                  onPaste={(e: ClipboardEvent<HTMLInputElement>) => handlePaste(e, onChange)}
+                >
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <TextField
+                      key={index}
+                      inputRef={(el) => (inputRefs.current[index] = el)}
+                      type="tel"
+                      inputProps={{ maxLength: 1 }}
+                      variant="standard"
+                      autoComplete="off"
+                      value={getValues('code')[index] !== ' ' ? getValues('code')[index] : ''}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) => handleOtpChange(e, index, onChange)}
+                      onFocus={(e) => e.target.select()}
+                      onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => handleKeyDown(e, index)}
+                      sx={{ input: { fontWeight: '500', fontSize: { xs: '40px', md: '64px' }, textAlign: 'center' } }}
+                    />
+                  ))}
+                </Stack>
+              )}
+            />
+            <FormHelperText
+              error={!!errors.code}
+              sx={{ marginTop: 1 }}
+            >
+              {errors?.code?.message}
+            </FormHelperText>
+            {!isActive && seconds === 0 && (
+              <Typography
+                component="span"
+                variant="subtitleS"
+                className="text-red-500 text-center"
+              >
+                Your OTP has expired. Please click resend OTP and try again
+              </Typography>
+            )}
+          </Stack>
+          <Box>
             <Typography
               component="span"
-              variant="subtitleS"
-              className="text-red-500 text-center"
+              variant="timer"
             >
-              Your OTP has expired. Please click resend OTP and try again
+              {`${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`}
             </Typography>
-          )}
+          </Box>
+          <Stack
+            gap="8px"
+            alignItems="center"
+            flexDirection="column"
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              type="submit"
+              disabled={!isActive}
+              className="w-80 md:w-120 h-12"
+            >
+              <Typography variant="buttonM">Verify</Typography>
+            </Button>
+            <Button
+              variant="text"
+              className="text-center w-max font-bold text-md text-black-500"
+              disabled={isActive}
+              onClick={hanldeClickResendOtp}
+            >
+              Resend OTP
+            </Button>
+          </Stack>
         </Stack>
-        <Box>
-          <Typography
-            component="span"
-            variant="timer"
-          >
-            {`${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`}
-          </Typography>
-        </Box>
-        <Stack
-          gap="8px"
-          alignItems="center"
-        >
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            onClick={handleSubmit(onSubmit)}
-            disabled={!isActive}
-            className="w-80 md:w-120 h-12"
-          >
-            <Typography variant="buttonM">Verify</Typography>
-          </Button>
-          <Button
-            variant="text"
-            className="text-center w-max font-bold text-md text-black-500"
-            disabled={isActive}
-            onClick={hanldeClickResendOtp}
-          >
-            Resend OTP
-          </Button>
-        </Stack>
-      </Stack>
+      </form>
     </Stack>
   );
 };

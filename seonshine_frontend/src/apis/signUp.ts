@@ -19,8 +19,8 @@ export const signUp = async (formData: SignUpSchemaType): Promise<SignUpResponse
 };
 
 export const signUpVerify = async (formData: SignUpVerifySchemaType): Promise<SignUpVerifyResponseType> => {
-  const response = await axiosInstance.post<SignUpVerifyResponseType>('/user/sign-up', {
-    otp: formData.otp,
+  const response = await axiosInstance.post<SignUpVerifyResponseType>('/user/verify-sign-up', {
+    code: formData.code,
     email: formData.email,
   });
   return response.data;

@@ -18,7 +18,7 @@ import { SignUpSchema, SignUpSchemaType } from './schema';
 const ProfileRegistration = ({
   handleSubmitInformation,
   userType,
-}: EnterUserInformationPropsType & { userType: string }) => {
+}: EnterUserInformationPropsType) => {
   const {
     handleSubmit,
     register,
@@ -49,14 +49,10 @@ const ProfileRegistration = ({
   const handleClickShowConfirmPassword = () => setShowConfirmPassword((prev) => !prev);
   const [selectedBranch, setSelectedBranch] = useState<number | string>(0);
 
-  useEffect(() => {
-    console.log(branchData);
-  }, []);
   return (
     <Stack
       alignItems="center"
       justifyContent="center"
-      // className="min-h-[80vh]"
     >
       <Stack
         direction="column"
@@ -213,7 +209,7 @@ const ProfileRegistration = ({
                             value={selectedBranch}
                             onChange={(e) => {
                               setSelectedBranch(e.target.value);
-                              setValue('branch_id',e.target.value);
+                              setValue('branch_id', e.target.value);
                             }}
                             size="small"
                             variant="filled"

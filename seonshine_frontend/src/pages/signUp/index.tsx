@@ -60,7 +60,6 @@ const SignUpPage = () => {
         toast.error('Sign up failed!');
       },
     });
-    console.log(user_information);
   };
 
   const handleSubmitOtp = (verify_information: SignUpVerifySchemaType) => {
@@ -70,7 +69,7 @@ const SignUpPage = () => {
       },
       onError: (err) => {
         console.error(err);
-        toast.error('Sign up failed!');
+        toast.error('Verify failed!');
       },
     });
   };

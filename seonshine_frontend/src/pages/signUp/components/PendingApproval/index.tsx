@@ -23,6 +23,7 @@ const PendingApprovalPage = () => {
   };
   return (
     <Stack
+      // alignItems="center"
       justifyContent="center"
       className="min-h-screen"
     >

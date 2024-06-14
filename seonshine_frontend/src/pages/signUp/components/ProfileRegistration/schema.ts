@@ -47,7 +47,7 @@ export const SignUpSchema = zod
 
 export type SignUpSchemaType = zod.infer<typeof SignUpSchema>;
 export type SignUpVerifySchemaType = {
-  otp: string;
+  code: string;
   email: string;
 };
 export const OtpSchema = zod.object({

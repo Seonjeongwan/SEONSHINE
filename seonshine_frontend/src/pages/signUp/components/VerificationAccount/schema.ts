@@ -3,8 +3,9 @@ import * as zod from 'zod';
 import { errorMessages } from '@/constants/errorMessages';
 import { otpRegex } from '@/constants/regex';
 
-export const OtpSchema = zod.object({
-  otp: zod.string().trim().regex(otpRegex, errorMessages.otpInvalid),
+export const VerifyOtpSchema = zod.object({
+  code: zod.string().trim().regex(otpRegex, errorMessages.otpInvalid),
+  email: zod.string().email(errorMessages.emailInvalid),
 });
 
-export type OtpSchemaType = zod.infer<typeof OtpSchema>;
+export type VerifyOtpSchemaType = zod.infer<typeof VerifyOtpSchema>;
