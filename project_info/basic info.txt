@@ -30,3 +30,20 @@ backup codes for gmail
 aws server ip
 54.254.0.100
 
+명령어
+docker build -f Dockerfile.prod -t seonshinevn/seonshine_frontend:prod .
+docker push seonshinevn/seonshine_frontend:prod
+
+docker build -f Dockerfile.prod -t seonshinevn/seonshine_fileserver:prod .
+docker push seonshinevn/seonshine_fileserver:prod
+
+docker build -f Dockerfile.prod -t seonshinevn/seonshine_backend:prod .
+docker push seonshinevn/seonshine_backend:prod
+
+docker-compose -f docker-compose.prod.yml down
+docker-compose -f docker-compose.prod.yml pull
+docker-compose -f docker-compose.prod.yml up -d
+
+seonshine_frontend
+seonshine_fileserver
+seonshine_backend
