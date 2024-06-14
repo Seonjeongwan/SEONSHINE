@@ -114,7 +114,7 @@ export const verifySignUp = async (req, res) => {
     console.log("error :>> ", error);
     res
       .status(httpStatusCodes.internalServerError)
-      .json({ error: httpStatusErrors.internalServerError });
+      .json({ error: JSON.stringify(error) });
   }
 };
 
