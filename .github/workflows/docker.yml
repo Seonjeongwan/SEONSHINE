@@ -347,6 +347,9 @@ jobs:
             fi
             docker-compose -f docker-compose.prod.yml up -d "${services_to_restart[@]}"
 
+            # Remove unused images
+            docker image prune -f
+
       - name: SSH into server for develop
         if: github.ref == 'refs/heads/develop'
         uses: appleboy/ssh-action@v1.0.3
@@ -378,3 +381,6 @@ jobs:
               services_to_restart+=('fileserver')
             fi
             docker-compose -f docker-compose.dev.yml up -d "${services_to_restart[@]}"
+
+            # Remove unused images
+            docker image prune -f

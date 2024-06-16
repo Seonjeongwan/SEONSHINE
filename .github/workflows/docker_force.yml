@@ -1,15 +1,6 @@
-name: Build and Deploy
+name: Force Build Push Deploy
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-    paths:
-      - "seonshine_frontend/**"
-      - "seonshine_backend/**"
-      - "seonshine_db/**"
-      - "seonshine_fileserver/**"
   workflow_dispatch:
 
 jobs:
@@ -241,6 +232,9 @@ jobs:
             docker-compose -f docker-compose.prod.yml pull
             docker-compose -f docker-compose.prod.yml up -d
 
+            # Remove unused images
+            docker image prune -f
+
       - name: SSH into server for develop
         if: github.ref == 'refs/heads/develop'
         uses: appleboy/ssh-action@v1.0.3
@@ -261,3 +255,6 @@ jobs:
             docker-compose -f docker-compose.dev.yml down
             docker-compose -f docker-compose.dev.yml pull
             docker-compose -f docker-compose.dev.yml up -d
+
+            # Remove unused images
+            docker image prune -f
