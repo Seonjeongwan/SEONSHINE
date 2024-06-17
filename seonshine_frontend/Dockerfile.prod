@@ -3,6 +3,8 @@ FROM node:22.2.0-alpine AS builder
 
 WORKDIR /app
 
+ENV VITE_API_URL=/api
+
 # Yarn 설치
 RUN apk add --no-cache yarn
 

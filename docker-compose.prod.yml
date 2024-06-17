@@ -3,6 +3,7 @@ version: "3.8"
 services:
   frontend:
     image: seonshinevn/seonshine_frontend:prod
+    pull_policy: always
     ports:
       - "80:80"
     depends_on:
@@ -10,10 +11,10 @@ services:
     restart: always
     environment:
       - NODE_ENV=production
-      - VITE_API_URL=http://backend:5050/api
 
   backend:
     image: seonshinevn/seonshine_backend:prod
+    pull_policy: always
     environment:
       - NODE_ENV=production
       - DB_HOST=db
@@ -25,7 +26,10 @@ services:
       - ORDER_DB_NAME=order_db
     ports:
       - "5050:5050"
+    # command: sh -c "npm run migrate:all && npm run seed:all && npm run start"
     depends_on:
+      redis:
+        condition: service_started
       db:
         condition: service_healthy
     restart: always
