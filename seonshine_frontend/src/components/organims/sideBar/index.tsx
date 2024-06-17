@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 
 import { Logout, Notifications } from '@mui/icons-material';
@@ -8,13 +9,46 @@ import { menuItems } from '@/constants/menu';
 import { useAuth } from '@/hooks/useAuth';
 import { paths } from '@/routes/paths';
 
+import UserProfileModal from '../userProfileModal';
 import { iconMap } from './constants';
 import { MenuItemType, SidebarPropsType } from './types';
 
+export type userType = {
+  user_id: string;
+  role_id: string;
+  username: string;
+  email: string;
+  branch_id: string;
+  birth_date: string;
+  address: string;
+  phone_number: string;
+  status: string;
+  profilePicture: string;
+};
+
 const Sidebar = ({ role }: SidebarPropsType) => {
   const { logout } = useAuth();
+  const [user, setUser] = useState<userType>({
+    user_id: 'shinhanuser',
+    role_id: '1',
+    username: 'Shinhan User',
+    email: 'shinhanuser@mail.com',
+    branch_id: 'Centec',
+    birth_date: '10.10.20001',
+    address: 'Thu Duc, HCMC',
+    phone_number: '0123456789',
+    status: 'Active',
+    profilePicture: '',
+  });
 
   const allowedMenuItems = menuItems.filter((item) => item.permission.includes(role));
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
+  const handleSaveUser = (editedUser: userType) => {
+    setUser(editedUser);
+  };
 
   return (
     <Stack
@@ -55,7 +89,16 @@ const Sidebar = ({ role }: SidebarPropsType) => {
           aria-label="notifications"
           className="w-12 h-12"
         >
-          <Avatar className="bg-gray-200" />
+          <Avatar
+            className="bg-gray-200"
+            onClick={handleOpenModal}
+          />
+          <UserProfileModal
+            onSave={handleSaveUser}
+            user={user}
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
+          />
         </IconButton>
 
         <IconButton
