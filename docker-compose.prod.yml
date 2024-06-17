@@ -26,6 +26,7 @@ services:
       - ORDER_DB_NAME=order_db
     ports:
       - "5050:5050"
+    command: sh -c "npm run migrate:all && npm run seed:all && npm run start"
     depends_on:
       redis:
         condition: service_started
