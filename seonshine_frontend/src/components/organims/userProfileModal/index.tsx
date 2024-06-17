@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import EditIcon from '@mui/icons-material/Edit';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import { Avatar, Box, Button, Modal } from '@mui/material';
+import { Avatar, Box, Button, IconButton, Modal } from '@mui/material';
 
 import { userType } from '../sideBar';
+import { UserInfoSchema, userInfoSchema } from './schema';
+import DatePicker from './DatePicker';
 
 interface UserProfileModalProps {
   user: userType;
@@ -15,37 +18,49 @@ interface UserProfileModalProps {
 
 const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, isOpen, onClose, onSave }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState<userType>({ ...user });
+
+  const { control, handleSubmit, reset } = useForm({
+    defaultValues: {
+      full_name: user.full_name,
+      birth_date: user.birth_date,
+      address: user.address,
+      phone_number: user.phone_number,
+    },
+    resolver: zodResolver(userInfoSchema),
+  });
 
   const handleEditToggle = () => setIsEditing(!isEditing);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setEditedUser((prevUser) => ({
-      ...prevUser,
-      [name]: value,
-    }));
-  };
-
-  const handleSave = () => {
-    onSave(editedUser);
+  const handleSave = (data: any) => {
+    onSave({ ...user, ...data });
     setIsEditing(false);
   };
 
   const handleCancel = () => {
     setIsEditing(false);
-    setEditedUser({ ...user });
+    reset({
+      full_name: user.full_name,
+      birth_date: user.birth_date,
+      address: user.address,
+      phone_number: user.phone_number,
+    });
   };
 
   const handleClose = () => {
     onClose();
     setIsEditing(false);
+    reset({
+      full_name: user.full_name,
+      birth_date: user.birth_date,
+      address: user.address,
+      phone_number: user.phone_number,
+    });
   };
 
   const fields = [
     { name: 'user_id', label: 'ID', disabled: true },
     { name: 'role_id', label: 'Type of User', disabled: true },
-    { name: 'username', label: 'Full name', disabled: false },
+    { name: 'full_name', label: 'Full name', disabled: false },
     { name: 'email', label: 'Email', disabled: true },
     { name: 'branch_id', label: 'Branch', disabled: true },
     { name: 'birth_date', label: 'Birth Date', disabled: false },
@@ -65,7 +80,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, isOpen, onClo
         <Box className="flex">
           <Box className="w-1/4 bg-gray-100 flex flex-col items-center rounded-lg">
             <Avatar
-              alt={user.username}
+              alt={user.full_name}
               src={user.profilePicture}
               className="w-24 h-24 mt-12"
             />
@@ -75,76 +90,84 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, isOpen, onClo
           </Box>
           <Box className="w-3/4 p-16 relative">
             {!isEditing ? (
-              <>
-                <div className="absolute top-6 right-6">
-                  <EditOutlinedIcon
-                    onClick={handleEditToggle}
-                    className="cursor-pointer"
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="absolute top-6 right-6">
-                  <EditIcon
-                    onClick={handleEditToggle}
-                    className="cursor-pointer"
-                  />
-                </div>
-              </>
-            )}
-            {fields.map((field) => (
-              <Box
-                key={field.name}
-                className="flex items-center mb-4"
+              <IconButton
+                className="absolute top-6 right-6"
+                onClick={handleEditToggle}
               >
-                <div className="w-1/2 font-bold">{field.label}</div>
-                <div className="w-1/2">
-                  {isEditing ? (
-                    <form action="">
-                      <input
-                        type="text"
-                        disabled={field.disabled}
+                <EditOutlinedIcon />
+              </IconButton>
+            ) : (
+              <IconButton
+                className="absolute top-6 right-6"
+                onClick={handleEditToggle}
+              >
+                <EditIcon />
+              </IconButton>
+            )}
+            <form onSubmit={handleSubmit(handleSave)}>
+              {fields.map((field) => (
+                <Box
+                  key={field.name}
+                  className="flex items-center mb-4"
+                >
+                  <div className="w-1/2 font-bold">{field.label}</div>
+                  <div className="w-1/2">
+                    {isEditing && field.name === 'birth_date' ? ( // Check for birth_date field
+                      <DatePicker
                         name={field.name}
-                        value={editedUser[field.name as keyof userType]}
-                        onChange={handleChange}
-                        className={`bg-white w-full outline-none ${field.disabled ? '' : 'border-b-2 border-black-500'}`}
+                        control={control}
+                        disabled={field.disabled}
                       />
-                    </form>
-                  ) : (
-                    <span
-                      className="cursor-pointer"
-                      onClick={handleEditToggle}
+                    ) : (
+                      isEditing && !field.disabled ? (
+                        <Controller
+                          name={field.name as keyof UserInfoSchema}
+                          control={control}
+                          render={({ field, fieldState: { error } }) => (
+                            <>
+                              <input
+                                {...field}
+                                type="text"
+                                disabled={field.disabled}
+                                className={`bg-white w-full outline-none border-b-2 border-black-500 ${
+                                  error ? 'border-red-500' : 'border-black-500'
+                                }`}
+                              />
+                              {error && <p className="text-red-500 text-xs">{error.message}</p>}
+                            </>
+                          )}
+                        />
+                      ) : (
+                        <span>{user[field.name as keyof userType]}</span>
+                      )
+                    )}
+                  </div>
+                </Box>
+              ))}
+              <Box className="flex justify-end">
+                {isEditing ? (
+                  <>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      color="primary"
                     >
-                      {editedUser[field.name as keyof userType]}
-                    </span>
-                  )}
-                </div>
+                      Save
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={handleCancel}
+                      className="ml-2"
+                    >
+                      Cancel
+                    </Button>
+                  </>
+                ) : (
+                  <Button onClick={handleClose}>OK</Button>
+                )}
               </Box>
-            ))}
-            <Box className="flex justify-end">
-              {isEditing ? (
-                <>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSave}
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={handleCancel}
-                    className="ml-2"
-                  >
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                <Button onClick={handleClose}>OK</Button>
-              )}
-            </Box>
+            </form>
           </Box>
         </Box>
       </Box>

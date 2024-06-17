@@ -16,7 +16,7 @@ import { MenuItemType, SidebarPropsType } from './types';
 export type userType = {
   user_id: string;
   role_id: string;
-  username: string;
+  full_name: string;
   email: string;
   branch_id: string;
   birth_date: string;
@@ -31,10 +31,10 @@ const Sidebar = ({ role }: SidebarPropsType) => {
   const [user, setUser] = useState<userType>({
     user_id: 'shinhanuser',
     role_id: '1',
-    username: 'Shinhan User',
+    full_name: 'Shinhan User',
     email: 'shinhanuser@mail.com',
     branch_id: 'Centec',
-    birth_date: '10.10.20001',
+    birth_date: '2001-10-10', // Adjusted to ISO date format
     address: 'Thu Duc, HCMC',
     phone_number: '0123456789',
     status: 'Active',
@@ -93,12 +93,14 @@ const Sidebar = ({ role }: SidebarPropsType) => {
             className="bg-gray-200"
             onClick={handleOpenModal}
           />
-          <UserProfileModal
-            onSave={handleSaveUser}
-            user={user}
-            isOpen={isModalOpen}
-            onClose={handleCloseModal}
-          />
+          {isModalOpen && (
+            <UserProfileModal
+              onSave={handleSaveUser}
+              user={user}
+              isOpen={isModalOpen}
+              onClose={handleCloseModal}
+            />
+          )}
         </IconButton>
 
         <IconButton
