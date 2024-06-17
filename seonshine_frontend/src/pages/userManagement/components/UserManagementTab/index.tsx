@@ -3,34 +3,30 @@ import { useEffect, useState } from 'react';
 import { Stack, Typography } from '@mui/material';
 import { SortingState } from '@tanstack/react-table';
 
-import UserTable from '../UserTable';
-import { DummyData, fetchUserData } from './constants';
-import { Columns, UserType } from './TableHeader';
+import { UserType } from '@/types/user';
 
-const ITEMS_PER_PAGE = 10;
+import { useGetUserListApi } from '@/apis/hooks/userApi.hook';
+
+import UserTable from '../UserTable';
+import { Columns } from './TableHeader';
+
+const ITEMS_PER_PAGE = 5;
 
 const UserManagementTab = () => {
-  const [items, setItems] = useState<UserType[]>([]);
-  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPageCount, setTotalPageCount] = useState(1);
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchUserData(currentPage, ITEMS_PER_PAGE, sorting);
-        setItems(data.items);
-        setTotalPageCount(Math.ceil(data.total / ITEMS_PER_PAGE));
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [currentPage, sorting]);
+  console.log({ currentPage });
+
+  const sortKey = sorting.length > 0 ? sorting[0].id : 'user_id';
+  const sortType = sorting.length > 0 && sorting[0].desc ? 'desc' : 'asc';
+
+  const { data, isFetching } = useGetUserListApi({
+    page_size: ITEMS_PER_PAGE,
+    page_number: currentPage,
+    sort_key: sortKey,
+    sort_type: sortType,
+  });
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -50,12 +46,12 @@ const UserManagementTab = () => {
         User List
       </Typography>
       <UserTable<UserType>
-        data={items}
+        data={data?.data || []}
         columns={Columns}
         searchLabel="Search by Name or job title"
         EmptyText="No staff found!"
-        isFetching={loading}
-        pageCount={totalPageCount}
+        isFetching={isFetching}
+        pageCount={data ? Math.ceil(data.total / ITEMS_PER_PAGE) : 0}
         page={handlePageChange}
         onSortingChange={handleSortingChange}
       />

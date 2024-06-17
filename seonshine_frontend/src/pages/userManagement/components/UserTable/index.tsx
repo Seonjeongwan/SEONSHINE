@@ -152,7 +152,7 @@ const UserTable = <T extends object>({
           count={pageCount}
           page={paginationPage}
           onChange={handlePageChange}
-          className="flex justify-center"
+          className="flex justify-center mt-4"
         />
       )}
     </TableContainer>

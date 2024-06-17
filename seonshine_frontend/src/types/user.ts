@@ -23,3 +23,27 @@ export type CurrentUserType = {
   updated_at: string;
   token: string;
 };
+
+export type GetUserListApiPropsType = {
+  page_size: number;
+  page_number: number;
+  sort_key?: string;
+  sort_type?: 'asc' | 'desc';
+  branch_name?: string;
+};
+
+export type GetUserListResponseType = {
+  data: UserType[];
+  page_number: string;
+  page_size: string;
+  sort_key: string;
+  sort_type: string;
+  total: number;
+};
+
+export type UserType = {
+  user_id: string;
+  username: string;
+  user_status: string;
+  branch_name: string;
+};

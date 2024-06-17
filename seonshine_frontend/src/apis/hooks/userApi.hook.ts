@@ -1,6 +1,8 @@
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
-import { BranchResponseType, callBranches } from '../user';
+import { GetUserListApiPropsType, GetUserListResponseType } from '@/types/user';
+
+import { BranchResponseType, callBranches, getUserList } from '../user';
 
 interface UseGetBranchProps {
   enabled?: boolean;
@@ -13,5 +15,14 @@ export const useGetBranches = ({ enabled = true }: UseGetBranchProps): UseQueryR
       return callBranches();
     },
     enabled,
+  });
+};
+
+export const useGetUserListApi = (params: GetUserListApiPropsType): UseQueryResult<GetUserListResponseType> => {
+  return useQuery({
+    queryKey: ['getUserList', params],
+    queryFn: async () => {
+      return getUserList(params);
+    },
   });
 };
