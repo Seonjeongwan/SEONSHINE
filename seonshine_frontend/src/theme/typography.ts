@@ -49,7 +49,6 @@ export const customTypographyVariants: TypographyVariantsOptions = {
     fontSize: '24px',
     fontWeight: fontWeightValue.Bold,
     lineHeight: '26px',
-    textTransform: 'uppercase',
   },
   bodyS: {
     fontSize: '14px',

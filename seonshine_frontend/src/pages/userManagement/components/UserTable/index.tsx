@@ -1,27 +1,29 @@
-import React, { ChangeEvent, memo, useMemo, useState } from 'react';
+import { ChangeEvent, memo, useMemo, useState } from 'react';
 
+import { ArrowDownward, ArrowUpward } from '@mui/icons-material';
 import {
   Box,
   Table as MuiTable,
   Pagination,
-  Paper,
   Skeleton,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
 } from '@mui/material';
-import { Cell, ColumnDef, flexRender, getCoreRowModel, Row, useReactTable } from '@tanstack/react-table';
+import { Cell, flexRender, getCoreRowModel, Row, SortingState, Updater, useReactTable } from '@tanstack/react-table';
+
+import { CustomColumnDef } from '@/types/table';
+
+const genericMemo: <T>(component: T) => T = memo;
 
 type UserTableProps<T> = {
   data: T[];
-  columns: ColumnDef<T, any>[];
+  columns: CustomColumnDef<T>[];
   isFetching?: boolean;
   skeletonCount?: number;
   skeletonHeight?: number;
-  headerComponent?: JSX.Element;
   pageCount?: number;
   page?: (page: number) => void;
   search?: (search: string) => void;
@@ -29,15 +31,15 @@ type UserTableProps<T> = {
   searchLabel?: string;
   EmptyText?: string;
   handleRow?: () => void;
+  onSortingChange?: (sorting: SortingState) => void;
 };
 
 const UserTable = <T extends object>({
   data,
   columns,
-  isFetching,
+  isFetching = false,
   skeletonCount = 10,
   skeletonHeight = 28,
-  headerComponent,
   pageCount,
   search,
   onClickRow,
@@ -45,94 +47,101 @@ const UserTable = <T extends object>({
   searchLabel = 'Search',
   EmptyText = 'No Data is found',
   handleRow,
+  onSortingChange,
 }: UserTableProps<T>) => {
   const [paginationPage, setPaginationPage] = useState(1);
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   const memoizedData = useMemo(() => data, [data]);
   const memoizedColumns = useMemo(() => columns, [columns]);
-  const memoisedHeaderComponent = useMemo(() => headerComponent, [headerComponent]);
 
   const { getHeaderGroups, getRowModel, getAllColumns } = useReactTable<T>({
     data: memoizedData,
     columns: memoizedColumns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
+    manualSorting: true,
     pageCount,
+    state: { sorting },
+    onSortingChange: (updater: Updater<SortingState>) => {
+      const newSorting = updater instanceof Function ? updater(sorting) : updater;
+      setSorting(newSorting);
+      onSortingChange?.(newSorting);
+    },
   });
 
-  const skeletons = Array.from({ length: skeletonCount }, (x, i) => i);
   const columnCount = getAllColumns().length;
   const noDataFound = !isFetching && (!memoizedData || memoizedData.length === 0);
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    search && search(e.target.value);
+    search?.(e.target.value);
   };
 
   const handlePageChange = (event: ChangeEvent<unknown>, currentPage: number) => {
-    setPaginationPage(currentPage === 0 ? 1 : currentPage);
-    page?.(currentPage === 0 ? 1 : currentPage);
+    const newPage = currentPage === 0 ? 1 : currentPage;
+    setPaginationPage(newPage);
+    page?.(newPage);
   };
 
   return (
-    <TableContainer style={{ padding: '0 0 1rem 0' }}>
-      <Box style={{ overflowX: 'auto' }}>
-        <MuiTable>
-          {!isFetching && (
-            <TableHead>
-              {getHeaderGroups().map((headerGroup) => (
-                <TableRow
-                  key={headerGroup.id}
-                  className="bg-black-300"
-                >
-                  {headerGroup.headers.map((header) => (
-                    <TableCell
-                      key={header.id}
-                      className="text-white text-sm font-cambon"
-                    >
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHead>
-          )}
-          <TableBody>
-            {!isFetching ? (
-              getRowModel()?.rows.map((row) => (
+    <TableContainer className="overflow-y-auto bg-white px-4 pb-4">
+      <MuiTable>
+        {!isFetching && (
+          <TableHead>
+            {getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableCell
+                    key={header.id}
+                    className="font-bold text-md border-black-300 px-2 py-5"
+                    sx={{ textAlign: (header.column.columnDef as CustomColumnDef<T>).align || 'left' }}
+                    onClick={() => header.column.getCanSort() && header.column.toggleSorting()}
+                  >
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    {{
+                      asc: <ArrowDownward className="h-4 w-4" />,
+                      desc: <ArrowUpward className="h-4 w-4" />,
+                    }[header.column.getIsSorted() as string] ?? null}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableHead>
+        )}
+        <TableBody>
+          {!isFetching
+            ? getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
                   onClick={handleRow}
+                  className="hover:bg-black-100"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
-                      onClick={() => onClickRow?.(cell, row)}
                       key={cell.id}
-                      className="text-[#2E353A] text-base font-graphik"
+                      onClick={() => onClickRow?.(cell, row)}
+                      className="text-black-500 text-md border-0 p-2"
+                      sx={{ textAlign: (cell.column.columnDef as CustomColumnDef<T>).align || 'left' }}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
-            ) : (
-              <>
-                {skeletons.map((skeleton) => (
-                  <TableRow key={skeleton}>
-                    {Array.from({ length: columnCount }, (x, i) => i).map((elm) => (
-                      <TableCell key={elm}>
-                        <Skeleton height={skeletonHeight} />
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </>
-            )}
-          </TableBody>
-        </MuiTable>
-      </Box>
+            : Array.from({ length: skeletonCount }, (_, i) => (
+                <TableRow key={i}>
+                  {Array.from({ length: columnCount }, (_, j) => (
+                    <TableCell key={j}>
+                      <Skeleton height={skeletonHeight} />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+        </TableBody>
+      </MuiTable>
       {noDataFound && (
         <Box
-          my={2}
+          my={4}
           textAlign="center"
         >
           {EmptyText}
@@ -143,10 +152,11 @@ const UserTable = <T extends object>({
           count={pageCount}
           page={paginationPage}
           onChange={handlePageChange}
+          className="flex justify-center"
         />
       )}
     </TableContainer>
   );
 };
 
-export default UserTable;
+export default genericMemo(UserTable);

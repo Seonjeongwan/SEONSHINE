@@ -1,5 +1,6 @@
 import { Button } from '@mui/material';
-import { ColumnDef } from '@tanstack/react-table';
+
+import { CustomColumnDef } from '@/types/table';
 
 export type UserType = {
   _id: string;
@@ -10,26 +11,34 @@ export type UserType = {
   status: string;
 };
 
-export const Columns: ColumnDef<UserType, unknown>[] = [
+export const Columns: CustomColumnDef<UserType>[] = [
+  {
+    accessorKey: 'no',
+    header: 'No',
+    cell: (user) => {
+      return user.row.index + 1;
+    },
+    enableSorting: false,
+  },
   {
     accessorKey: '_id',
     header: 'ID',
     cell: (user) => {
-      return <span>{user.row.original._id || '---'}</span>;
+      return user.row.original._id || '...';
     },
   },
   {
     accessorKey: 'name',
     header: 'Full name',
     cell: (user) => {
-      return <span>{user.row.original.name || '---'}</span>;
+      return user.row.original.name || '...';
     },
   },
   {
     accessorKey: 'country',
     header: 'Branch',
     cell: (user) => {
-      return <span>{user.row.original.country || '---'}</span>;
+      return user.row.original.country || '...';
     },
   },
   {
@@ -40,18 +49,21 @@ export const Columns: ColumnDef<UserType, unknown>[] = [
         <Button
           variant="text"
           color="primary"
+          className="hover:bg-transparent underline"
         >
           View
         </Button>
       );
     },
+    align: 'center',
   },
   {
     accessorKey: 'status',
     header: 'Status of user',
     cell: (user) => {
-      return <span>{user.row.original.status || '---'}</span>;
+      return user.row.original.status || '...';
     },
+    align: 'center',
   },
   {
     accessorKey: 'action',
@@ -60,11 +72,25 @@ export const Columns: ColumnDef<UserType, unknown>[] = [
       return (
         <Button
           variant="contained"
-          color={user.row.original.status === 'Active' ? 'error' : 'primary'}
+          sx={({ palette }) => ({
+            backgroundColor: user.row.original.status === 'Active' ? palette.red[200] : palette.blue[400],
+            fontSize: '13px',
+            fontWeight: 400,
+            width: {
+              xs: '50%',
+              xl: '40%',
+            },
+            borderRadius: '30px',
+            boxShadow: 'none',
+            ':hover': {
+              backgroundColor: user.row.original.status === 'Active' ? palette.red[200] : palette.blue[400],
+            },
+          })}
         >
           {user.row.original.status === 'Active' ? 'Deactivate' : 'Activate'}
         </Button>
       );
     },
+    align: 'center',
   },
 ];

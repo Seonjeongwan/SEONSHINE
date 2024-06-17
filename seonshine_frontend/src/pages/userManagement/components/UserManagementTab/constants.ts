@@ -1,74 +1,23 @@
-export const DummyData = [
-  {
-    _id: '23063240',
-    name: 'Mai Thai Hoang',
-    age: 30,
-    job: 'Frontend Engineer',
-    country: 'Centec',
-    status: 'Active',
-  },
-  {
-    _id: '23063272',
-    name: 'Nguyen Van A',
-    age: 60,
-    job: 'Technical writer',
-    country: 'The Mett',
-    status: 'Deactivated',
-  },
-  {
-    _id: '23044043',
-    name: 'Tran Thi B',
-    age: 20,
-    job: 'Technical writer',
-    country: '',
-    status: 'Active',
-  },
-  {
-    _id: '22063145',
-    name: '',
-    age: 40,
-    job: 'Technical writer',
-    country: '',
-    status: 'Active',
-  },
-  {
-    _id: '',
-    name: '',
-    age: 90,
-    job: 'Technical writer',
-    country: '',
-    status: 'Active',
-  },
-  {
-    _id: '23063272',
-    name: 'Nguyen Van A',
-    age: 60,
-    job: 'Technical writer',
-    country: 'The Mett',
-    status: 'Deactivated',
-  },
-  {
-    _id: '23044043',
-    name: 'Tran Thi B',
-    age: 20,
-    job: 'Technical writer',
-    country: '',
-    status: 'Active',
-  },
-  {
-    _id: '23063272',
-    name: 'Nguyen Van A',
-    age: 60,
-    job: 'Technical writer',
-    country: 'The Mett',
-    status: 'Deactivated',
-  },
-  {
-    _id: '23044043',
-    name: 'Tran Thi B',
-    age: 20,
-    job: 'Technical writer',
-    country: '',
-    status: 'Active',
-  },
-];
+import { SortingState } from '@tanstack/react-table';
+
+export const DummyData = Array.from({ length: 28 }, (v, k) => ({
+  _id: (23063240 + k).toString(),
+  name: `User ${k + 1}`,
+  age: 20 + (k % 10),
+  job: `Job ${k + 1}`,
+  country: `Country ${k + 1}`,
+  status: k % 2 === 0 ? 'Active' : 'Inactive',
+}));
+
+export const fetchUserData = async (page: number, limit: number, sorting: SortingState) => {
+  console.log({ sorting });
+  const start = (page - 1) * limit;
+  const end = start + limit;
+  const items = DummyData.slice(start, end);
+  const total = DummyData.length;
+
+  return {
+    items,
+    total,
+  };
+};

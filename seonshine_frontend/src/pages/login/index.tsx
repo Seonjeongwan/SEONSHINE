@@ -49,7 +49,7 @@ const LoginPage = () => {
     exeLogin(data, {
       onSuccess: (data) => {
         setLoading(false);
-        handleLoginSuccess(data.user, data.token, !!rememberCheckboxRef.current?.checked);
+        handleLoginSuccess(data.user, data.user.token, !!rememberCheckboxRef.current?.checked);
         navigate(paths.index);
       },
       onError: () => {
