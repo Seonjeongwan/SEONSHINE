@@ -30,4 +30,4 @@ COPY . .
 EXPOSE 5050
 
 # Run the application
-CMD ["node", "server.js"]
+CMD ["npm", "run", "sync-start"]
