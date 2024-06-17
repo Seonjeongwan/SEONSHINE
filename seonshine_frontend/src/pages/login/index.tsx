@@ -70,7 +70,7 @@ const LoginPage = () => {
     <Stack
       justifyContent="center"
       alignItems="center"
-      className="w-screen h-screen"
+      className="w-full h-screen"
     >
       <Stack className="w-full h-full bg-white shadow-md md:rounded-md shadow-black-100 md:w-280 md:h-200">
         <Box className="grid w-full h-full grid-cols-1 md:grid-cols-2">
