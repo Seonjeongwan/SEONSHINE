@@ -39,7 +39,7 @@ const MainLayout = ({ children, role }: MainLayoutPropsType) => {
       <Stack
         direction="column"
         gap={4}
-        className="flex-1 bg-gray-100 p-8"
+        className="flex-1 bg-black-100 p-8"
       >
         <IconButton
           className="md:hidden absolute top-1/2 -left-2 -translate-y-1/2 bg-gray-200 rounded-md w-8 h-12 opacity-50 hover:opacity-100"

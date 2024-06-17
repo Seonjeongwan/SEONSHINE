@@ -2,7 +2,6 @@ import axiosInstance from '@/configs/axios';
 import { CurrentUserType } from '@/types/user';
 
 export type LoginResponseType = {
-  token: string;
   message: string;
   user: CurrentUserType;
   user_status: string;

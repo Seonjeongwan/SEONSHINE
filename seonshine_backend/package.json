@@ -14,7 +14,8 @@
     "seed:all": "npm run seed:branches && npm run seed:users",
     "seed:undo:branches": "npx sequelize db:seed:undo:all --config config/common-db.mjs --seeders-path seeders/common-db",
     "seed:undo:users": "npx sequelize db:seed:undo:all --config config/user-db.mjs --seeders-path seeders/user-db",
-    "seed:undo:all": "npm run seed:undo:branches && npm run seed:undo:users"
+    "seed:undo:all": "npm run seed:undo:branches && npm run seed:undo:users",
+    "sync-start": "npm run migrate:all && npm run seed:all && npm run start"
   },
   "keywords": [],
   "author": "",

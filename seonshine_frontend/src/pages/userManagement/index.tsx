@@ -1,17 +1,18 @@
 import { useState } from 'react';
 
-import { Box, Tab, Tabs, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 
 import UserManagementTab from './components/UserManagementTab';
+import { StyledTab, StyledTabs } from './styled';
 
-interface TabPanelProps {
+type TabPanelPropsType = {
   children?: React.ReactNode;
   dir?: string;
   index: number;
   value: number;
-}
+};
 
-function TabPanel(props: TabPanelProps) {
+function TabPanel(props: TabPanelPropsType) {
   const { children, value, index, ...other } = props;
 
   return (
@@ -34,17 +35,17 @@ const UserManagement = () => {
     setValue(newValue);
   };
   return (
-    <Box sx={{ width: '100%' }}>
-      <Tabs
+    <Box className="w-full">
+      <StyledTabs
         value={value}
         onChange={handleChange}
         aria-label="management tabs"
         TabIndicatorProps={{ style: { display: 'none' } }}
       >
-        <Tab label="User Management" />
-        <Tab label="Restaurant Management" />
-        <Tab label="Approval" />
-      </Tabs>
+        <StyledTab label="User Management" />
+        <StyledTab label="Restaurant Management" />
+        <StyledTab label="Approval" />
+      </StyledTabs>
       <TabPanel
         value={value}
         index={0}
