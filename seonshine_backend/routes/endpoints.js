@@ -10,5 +10,7 @@ export const endpoints = {
   },
   users: {
     list: '/list',
+    detail: '/:id',
+    confirm: '/confirm-signup'
   }
 };
