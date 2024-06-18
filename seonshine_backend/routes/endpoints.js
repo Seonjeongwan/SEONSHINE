@@ -12,6 +12,6 @@ export const endpoints = {
     list: '/list',
     restaurantList: '/restaurant-list',
     detail: '/:id',
-    confirm: '/confirm-signup'
+    changeStatus: '/change-status'
   }
 };
