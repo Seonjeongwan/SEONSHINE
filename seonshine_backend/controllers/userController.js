@@ -6,7 +6,8 @@ import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
 import { messageErrors, statusWithMessageLogin } from "../constants/message.js";
 import { verificationTypes } from "../constants/verification.js";
 import { sequelizeUserDb } from "../db/dbConfig.js";
-import User from "../models/userModel.js";
+import Branch from "../models/branchModel.js";
+import { User, UserProfile } from "../models/index.js";
 import Verification from "../models/verificationModel.js";
 import { sendVerificationCode } from "../utils/emailUtil.js";
 import { getResponseErrors } from "../utils/responseParser.js";
@@ -261,7 +262,7 @@ export const login = async (req, res) => {
 
 export const changeUserStatus = async (req, res) => {
   try {
-    const {user_id, status} = req.body;
+    const { user_id, status } = req.body;
     const user = await User.findByPk(user_id);
 
     if (!user) {
@@ -285,6 +286,59 @@ export const changeUserStatus = async (req, res) => {
   }
 };
 
+export const getUserDetail = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const user = await User.findOne({
+      where: { user_id: id },
+      attributes: [
+        "user_id",
+        "role_id",
+        "username",
+        "email",
+        "branch_id",
+        "phone_number",
+        "user_status",
+      ],
+      include: {
+        model: UserProfile,
+        as: "profile",
+        attributes: ["birth_date", "address", "profile_picture_url"],
+      },
+      raw: true,
+      nest: true,
+    });
+
+    if (!user) {
+      return res
+        .status(httpStatusCodes.badRequest)
+        .json({ message: "User not found" });
+    }
+
+    const userData = {
+      ...user,
+      ...user.profile,
+    };
+    delete userData.profile;
+
+    const branchId = user.branch_id;
+    let branchName = null;
+
+    if (branchId) {
+      const branch = await Branch.findByPk(branchId, { raw: true });
+      branchName = branch?.branch_name;
+    }
+
+    userData.branch_name = branchName;
+
+    res.status(httpStatusCodes.success).json(userData);
+  } catch (error) {
+    res
+      .status(httpStatusCodes.internalServerError)
+      .json({ error: httpStatusErrors.internalServerError });
+  }
+};
+
 export const checkIdEmailExist = async (userId, email) => {
   const user = await User.findOne({
     where: {
@@ -295,28 +349,6 @@ export const checkIdEmailExist = async (userId, email) => {
   const isExist = !!user;
   return isExist;
 };
-
-// export const confirmSignin = (req, res) => {
-//   const { user_id } = req.body;
-
-//   if (!user_id) {
-//     return res.status(400).send({ message: "User ID is required" });
-//   }
-
-//   const query =
-//     "UPDATE user_db.users SET user_status = '1', updated_at = NOW() WHERE user_id = ?";
-//   userDb.query(query, [user_id], (err, result) => {
-//     if (err) {
-//       return res.status(500).send({ message: "Database error", error: err });
-//     }
-//     if (result.affectedRows === 0) {
-//       return res.status(404).send({ message: "User not found" });
-//     }
-//     res
-//       .status(200)
-//       .send({ message: "User confirmed successfully", status: 200 });
-//   });
-// };
 
 const sendAndSaveEmailVerificationCode = async (email) => {
   const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6자리 숫자 생성
