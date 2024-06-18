@@ -22,13 +22,11 @@ type UserTableProps<T> = {
   data: T[];
   columns: CustomColumnDef<T>[];
   isFetching?: boolean;
-  skeletonCount?: number;
   skeletonHeight?: number;
   pageCount?: number;
   page?: (page: number) => void;
   search?: (search: string) => void;
   onClickRow?: (cell: Cell<T, unknown>, row: Row<T>) => void;
-  searchLabel?: string;
   EmptyText?: string;
   handleRow?: () => void;
   onSortingChange?: (sorting: SortingState) => void;
@@ -38,13 +36,11 @@ const UserTable = <T extends object>({
   data,
   columns,
   isFetching = false,
-  skeletonCount = 10,
   skeletonHeight = 28,
   pageCount,
   search,
   onClickRow,
   page,
-  searchLabel = 'Search',
   EmptyText = 'No Data is found',
   handleRow,
   onSortingChange,
@@ -129,7 +125,7 @@ const UserTable = <T extends object>({
                     ))}
                   </TableRow>
                 ))
-              : Array.from({ length: skeletonCount }, (_, i) => (
+              : Array.from({ length: data.length }, (_, i) => (
                   <TableRow key={i}>
                     {Array.from({ length: columnCount }, (_, j) => (
                       <TableCell key={j}>

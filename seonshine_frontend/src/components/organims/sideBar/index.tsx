@@ -88,11 +88,9 @@ const Sidebar = ({ role }: SidebarPropsType) => {
         <IconButton
           aria-label="notifications"
           className="w-12 h-12"
+          onClick={handleOpenModal}
         >
-          <Avatar
-            className="bg-gray-200"
-            onClick={handleOpenModal}
-          />
+          <Avatar className="bg-gray-200" />
           {isModalOpen && (
             <UserProfileModal
               onSave={handleSaveUser}

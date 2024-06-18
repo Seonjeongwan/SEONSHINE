@@ -59,3 +59,12 @@ export const labelUserStatus: { [key in UserStatusEnum]: string } = {
   [UserStatusEnum.CLOSE]: 'Close',
   [UserStatusEnum.DEACTIVATED]: 'Deactivated',
 };
+
+export type ChangeStatusPayloadType = {
+  user_id: string;
+  status: number;
+};
+
+export type ChangeStatusResponseType = {
+  message: string;
+};

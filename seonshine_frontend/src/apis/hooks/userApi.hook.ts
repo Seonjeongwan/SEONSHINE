@@ -1,8 +1,13 @@
-import { useQuery, UseQueryResult } from '@tanstack/react-query';
+import { useMutation, UseMutationResult, useQuery, UseQueryResult } from '@tanstack/react-query';
 
-import { GetUserListApiPropsType, GetUserListResponseType } from '@/types/user';
+import {
+  ChangeStatusPayloadType,
+  ChangeStatusResponseType,
+  GetUserListApiPropsType,
+  GetUserListResponseType,
+} from '@/types/user';
 
-import { BranchResponseType, callBranches, getUserList } from '../user';
+import { BranchResponseType, callBranches, changeStatus, getUserList } from '../user';
 
 interface UseGetBranchProps {
   enabled?: boolean;
@@ -23,6 +28,14 @@ export const useGetUserListApi = (params: GetUserListApiPropsType): UseQueryResu
     queryKey: ['getUserList', params],
     queryFn: async () => {
       return getUserList(params);
+    },
+  });
+};
+
+export const useChangeStatusApi = (): UseMutationResult<ChangeStatusResponseType, unknown, ChangeStatusPayloadType> => {
+  return useMutation({
+    mutationFn: async (payload) => {
+      return changeStatus(payload);
     },
   });
 };

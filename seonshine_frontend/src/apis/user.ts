@@ -1,5 +1,10 @@
 import axiosInstance from '@/configs/axios';
-import { GetUserListApiPropsType, GetUserListResponseType } from '@/types/user';
+import {
+  ChangeStatusPayloadType,
+  ChangeStatusResponseType,
+  GetUserListApiPropsType,
+  GetUserListResponseType,
+} from '@/types/user';
 
 export type BranchResponseType = {
   branch_id: number;
@@ -17,5 +22,10 @@ export const getUserList = async (params: GetUserListApiPropsType): Promise<GetU
   const response = await axiosInstance.get<GetUserListResponseType>('/user/list', {
     params: params,
   });
+  return response.data;
+};
+
+export const changeStatus = async (payload: ChangeStatusPayloadType): Promise<ChangeStatusResponseType> => {
+  const response = await axiosInstance.post<ChangeStatusResponseType>('/user/change-status', payload);
   return response.data;
 };

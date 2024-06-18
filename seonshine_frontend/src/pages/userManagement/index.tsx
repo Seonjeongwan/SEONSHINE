@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { Box } from '@mui/material';
 
+import RestaurantManagementTab from './components/RestaurantManagementTab';
 import UserManagementTab from './components/UserManagementTab';
 import { StyledTab, StyledTabs } from './styled';
 
@@ -57,7 +58,7 @@ const UserManagement = () => {
           value={value}
           index={1}
         >
-          Restaurant Management
+          <RestaurantManagementTab />
         </TabPanel>
         <TabPanel
           value={value}

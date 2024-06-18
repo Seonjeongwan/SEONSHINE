@@ -5,7 +5,7 @@ import { labelUserStatus, UserStatusEnum, UserType } from '@/types/user';
 
 export const TableHeader = (
   handleView: () => void,
-  handleAction: (user_id: string, user_status: UserStatusEnum) => void,
+  handleAction: (user_status: UserStatusEnum) => void,
 ): CustomColumnDef<UserType>[] => [
   {
     accessorKey: 'no',
@@ -30,8 +30,8 @@ export const TableHeader = (
     },
   },
   {
-    accessorKey: 'branch_name',
-    header: 'Branch',
+    accessorKey: 'weekday',
+    header: 'Assigned date',
     cell: (user) => {
       return user.row.original.branch_name || '...';
     },
@@ -71,7 +71,7 @@ export const TableHeader = (
         <Button
           variant="contained"
           onClick={() => {
-            handleAction(user.row.original.user_id, user.row.original.user_status);
+            handleAction(user.row.original.user_status);
           }}
           sx={({ palette }) => ({
             backgroundColor: user.row.original.user_status === '1' ? palette.red[200] : palette.blue[400],
