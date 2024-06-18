@@ -84,69 +84,71 @@ const UserTable = <T extends object>({
   };
 
   return (
-    <TableContainer className="overflow-y-auto bg-white px-4 pb-4">
-      <MuiTable>
-        {!isFetching && (
-          <TableHead>
-            {getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableCell
-                    key={header.id}
-                    className="font-bold text-md border-black-300 px-2 py-5"
-                    sx={{ textAlign: (header.column.columnDef as CustomColumnDef<T>).align || 'left' }}
-                    onClick={() => header.column.getCanSort() && header.column.toggleSorting()}
-                  >
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                    {{
-                      asc: <ArrowDownward className="h-4 w-4" />,
-                      desc: <ArrowUpward className="h-4 w-4" />,
-                    }[header.column.getIsSorted() as string] ?? null}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableHead>
-        )}
-        <TableBody>
-          {!isFetching
-            ? getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  onClick={handleRow}
-                  className="hover:bg-black-100"
-                >
-                  {row.getVisibleCells().map((cell) => (
+    <Box className="overflow-y-auto bg-white px-4 pb-4">
+      <TableContainer>
+        <MuiTable>
+          {!isFetching && (
+            <TableHead>
+              {getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
                     <TableCell
-                      key={cell.id}
-                      onClick={() => onClickRow?.(cell, row)}
-                      className="text-black-500 text-md border-0 p-2"
-                      sx={{ textAlign: (cell.column.columnDef as CustomColumnDef<T>).align || 'left' }}
+                      key={header.id}
+                      className="font-bold text-md border-black-300 px-2 py-5 whitespace-nowrap"
+                      sx={{ textAlign: (header.column.columnDef as CustomColumnDef<T>).align || 'left' }}
+                      onClick={() => header.column.getCanSort() && header.column.toggleSorting()}
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            : Array.from({ length: skeletonCount }, (_, i) => (
-                <TableRow key={i}>
-                  {Array.from({ length: columnCount }, (_, j) => (
-                    <TableCell key={j}>
-                      <Skeleton height={skeletonHeight} />
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                      {{
+                        asc: <ArrowUpward className="h-4 w-4 ml-1" />,
+                        desc: <ArrowDownward className="h-4 w-4 ml-1" />,
+                      }[header.column.getIsSorted() as string] ?? null}
                     </TableCell>
                   ))}
                 </TableRow>
               ))}
-        </TableBody>
-      </MuiTable>
-      {noDataFound && (
-        <Box
-          my={4}
-          textAlign="center"
-        >
-          {EmptyText}
-        </Box>
-      )}
+            </TableHead>
+          )}
+          <TableBody>
+            {!isFetching
+              ? getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    onClick={handleRow}
+                    className="hover:bg-black-100"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        onClick={() => onClickRow?.(cell, row)}
+                        className="text-black-500 text-md border-0 p-2"
+                        sx={{ textAlign: (cell.column.columnDef as CustomColumnDef<T>).align || 'left' }}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              : Array.from({ length: skeletonCount }, (_, i) => (
+                  <TableRow key={i}>
+                    {Array.from({ length: columnCount }, (_, j) => (
+                      <TableCell key={j}>
+                        <Skeleton height={skeletonHeight} />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+          </TableBody>
+        </MuiTable>
+        {noDataFound && (
+          <Box
+            my={4}
+            textAlign="center"
+          >
+            {EmptyText}
+          </Box>
+        )}
+      </TableContainer>
       {pageCount && page && (
         <Pagination
           count={pageCount}
@@ -155,7 +157,7 @@ const UserTable = <T extends object>({
           className="flex justify-center mt-4"
         />
       )}
-    </TableContainer>
+    </Box>
   );
 };
 

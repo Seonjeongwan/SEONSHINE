@@ -98,6 +98,7 @@ const LoginPage = () => {
                 <Stack
                   justifyContent="center"
                   alignItems="center"
+                  className="mb-16"
                 >
                   <Box
                     className="hidden xs:block md:hidden"
@@ -132,14 +133,6 @@ const LoginPage = () => {
                     Seonshine
                   </Typography>
                 </Stack>
-
-                <Typography
-                  variant="heading2"
-                  component="h3"
-                  className="mt-14 md:mt-8 mb-8 text-center"
-                >
-                  Log In
-                </Typography>
 
                 <Box className="grid gap-4 mt-4">
                   <Stack

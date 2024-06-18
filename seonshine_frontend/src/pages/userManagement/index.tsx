@@ -46,24 +46,26 @@ const UserManagement = () => {
         <StyledTab label="Restaurant Management" />
         <StyledTab label="Approval" />
       </StyledTabs>
-      <TabPanel
-        value={value}
-        index={0}
-      >
-        <UserManagementTab />
-      </TabPanel>
-      <TabPanel
-        value={value}
-        index={1}
-      >
-        Restaurant Management
-      </TabPanel>
-      <TabPanel
-        value={value}
-        index={2}
-      >
-        Approval
-      </TabPanel>
+      <Box className="px-8">
+        <TabPanel
+          value={value}
+          index={0}
+        >
+          <UserManagementTab />
+        </TabPanel>
+        <TabPanel
+          value={value}
+          index={1}
+        >
+          Restaurant Management
+        </TabPanel>
+        <TabPanel
+          value={value}
+          index={2}
+        >
+          Approval
+        </TabPanel>
+      </Box>
     </Box>
   );
 };

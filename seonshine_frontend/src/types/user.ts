@@ -44,6 +44,18 @@ export type GetUserListResponseType = {
 export type UserType = {
   user_id: string;
   username: string;
-  user_status: string;
+  user_status: UserStatusEnum;
   branch_name: string;
+};
+
+export enum UserStatusEnum {
+  ACTIVE = '1',
+  CLOSE = '2',
+  DEACTIVATED = '9',
+}
+
+export const labelUserStatus: { [key in UserStatusEnum]: string } = {
+  [UserStatusEnum.ACTIVE]: 'Active',
+  [UserStatusEnum.CLOSE]: 'Close',
+  [UserStatusEnum.DEACTIVATED]: 'Deactivated',
 };

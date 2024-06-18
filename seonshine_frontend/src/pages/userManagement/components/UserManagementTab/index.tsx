@@ -10,14 +10,11 @@ import { useGetUserListApi } from '@/apis/hooks/userApi.hook';
 import UserTable from '../UserTable';
 import { Columns } from './TableHeader';
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 
 const UserManagementTab = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [sorting, setSorting] = useState<SortingState>([]);
-
-  console.log({ currentPage });
-
   const sortKey = sorting.length > 0 ? sorting[0].id : 'user_id';
   const sortType = sorting.length > 0 && sorting[0].desc ? 'desc' : 'asc';
 
@@ -39,7 +36,7 @@ const UserManagementTab = () => {
   return (
     <Stack direction="column">
       <Typography
-        variant="h4"
+        variant="heading4"
         component="h3"
         className="my-4"
       >
@@ -50,6 +47,7 @@ const UserManagementTab = () => {
         columns={Columns}
         searchLabel="Search by Name or job title"
         EmptyText="No staff found!"
+        skeletonCount={ITEMS_PER_PAGE}
         isFetching={isFetching}
         pageCount={data ? Math.ceil(data.total / ITEMS_PER_PAGE) : 0}
         page={handlePageChange}

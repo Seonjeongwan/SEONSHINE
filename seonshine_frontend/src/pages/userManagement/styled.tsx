@@ -25,7 +25,6 @@ export const StyledTab = styled((props: TabProps) => (
   />
 ))(({ theme }) => ({
   textTransform: 'none',
-  minWidth: '200px',
   width: 'calc(100% / 3)',
   minHeight: '44px',
   fontWeight: theme.typography.fontWeightBold,
@@ -49,5 +48,9 @@ export const StyledTab = styled((props: TabProps) => (
     backgroundColor: theme.palette.black[100],
     borderBottom: 'none',
     zIndex: 1,
+  },
+  '&:first-of-type': {
+    borderTopLeftRadius: '0px',
+    borderLeft: 'none',
   },
 }));

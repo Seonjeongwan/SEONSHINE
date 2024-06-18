@@ -1,7 +1,7 @@
 import { Button } from '@mui/material';
 
 import { CustomColumnDef } from '@/types/table';
-import { UserType } from '@/types/user';
+import { labelUserStatus, UserType } from '@/types/user';
 
 export const Columns: CustomColumnDef<UserType>[] = [
   {
@@ -48,12 +48,14 @@ export const Columns: CustomColumnDef<UserType>[] = [
       );
     },
     align: 'center',
+    enableSorting: false,
   },
   {
     accessorKey: 'user_status',
     header: 'Status of user',
     cell: (user) => {
-      return user.row.original.user_status || '...';
+      const status = user.row.original.user_status;
+      return labelUserStatus[status];
     },
     align: 'center',
   },
@@ -69,7 +71,8 @@ export const Columns: CustomColumnDef<UserType>[] = [
             fontSize: '13px',
             fontWeight: 400,
             width: {
-              xs: '50%',
+              xs: '80%',
+              md: '50%',
               xl: '40%',
             },
             borderRadius: '30px',
@@ -84,5 +87,6 @@ export const Columns: CustomColumnDef<UserType>[] = [
       );
     },
     align: 'center',
+    enableSorting: false,
   },
 ];
