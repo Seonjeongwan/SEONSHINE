@@ -21,4 +21,5 @@ export type CurrentUserType = {
   confirm_yn: string;
   created_at: string;
   updated_at: string;
+  token: string;
 };
