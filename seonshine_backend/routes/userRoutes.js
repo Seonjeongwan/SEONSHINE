@@ -1,6 +1,7 @@
 import express from "express";
 import { UserRole } from "../constants/auth.js";
 import {
+  getRestaurantList,
   getUserList,
   login,
   signUp,
@@ -16,6 +17,11 @@ userRouter.get(
   endpoints.users.list,
   authenticateToken({ role: UserRole.admin }),
   getUserList
+);
+userRouter.get(
+  endpoints.users.restaurantList,
+  authenticateToken({ role: UserRole.admin }),
+  getRestaurantList
 );
 userRouter.post(endpoints.login, login);
 userRouter.post(endpoints.signUpVerification, verifySignUp);
