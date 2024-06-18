@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { Op, QueryTypes } from "sequelize";
+import { Op, QueryTypes, Sequelize } from "sequelize";
 import { UserStatus } from "../constants/auth.js";
 import { errorCodes } from "../constants/errorCode.js";
 import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
@@ -252,6 +252,32 @@ export const login = async (req, res) => {
         .status(httpStatusCodes.badRequest)
         .json({ message: "User not exist" });
     }
+  } catch (error) {
+    res
+      .status(httpStatusCodes.internalServerError)
+      .json({ error: httpStatusErrors.internalServerError });
+  }
+};
+
+export const changeUserStatus = async (req, res) => {
+  try {
+    const {user_id, status} = req.body;
+    const user = await User.findByPk(user_id);
+
+    if (!user) {
+      return res
+        .status(httpStatusCodes.badRequest)
+        .json({ message: "User not found" });
+    }
+
+    user.user_status = status;
+    user.updated_at = Sequelize.literal("CURRENT_TIMESTAMP");
+
+    await user.save();
+
+    res
+      .status(httpStatusCodes.success)
+      .json({ message: "Change status successfully" });
   } catch (error) {
     res
       .status(httpStatusCodes.internalServerError)

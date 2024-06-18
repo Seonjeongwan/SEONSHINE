@@ -1,6 +1,7 @@
 import express from "express";
 import { UserRole } from "../constants/auth.js";
 import {
+  changeUserStatus,
   getRestaurantList,
   getUserList,
   login,
@@ -8,6 +9,7 @@ import {
   verifySignUp,
 } from "../controllers/userController.js";
 import { authenticateToken } from "../middleware/auth.js";
+import { validateChangeStatus } from "../middleware/validation/userValidate.js";
 import { endpoints } from "./endpoints.js";
 
 const userRouter = express.Router();
@@ -25,7 +27,11 @@ userRouter.get(
 );
 userRouter.post(endpoints.login, login);
 userRouter.post(endpoints.signUpVerification, verifySignUp);
-// router.post("/check-id-email", checkIdEmail);
-// router.post("/confirm_signin", confirmSignin);
+userRouter.post(
+  endpoints.users.changeStatus,
+  authenticateToken({ role: UserRole.admin }),
+  validateChangeStatus,
+  changeUserStatus
+);
 
 export default userRouter;
