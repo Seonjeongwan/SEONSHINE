@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import EditIcon from '@mui/icons-material/Edit';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { Avatar, Box, Button, IconButton, Modal } from '@mui/material';
 
+import DatePicker from '@/components/molecules/datePicker/DatePicker';
+
 import { userType } from '../sideBar';
-import DatePicker from './DatePicker';
 import { UserInfoSchema, userInfoSchema } from './schema';
 
 interface UserProfileModalProps {
@@ -18,6 +20,7 @@ interface UserProfileModalProps {
 
 const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, isOpen, onClose, onSave }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string>(user.profilePicture);
 
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -32,12 +35,13 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, isOpen, onClo
   const handleEditToggle = () => setIsEditing(!isEditing);
 
   const handleSave = (data: any) => {
-    onSave({ ...user, ...data });
+    onSave({ ...user, ...data, profilePicture: previewUrl });
     setIsEditing(false);
   };
 
   const handleCancel = () => {
     setIsEditing(false);
+    setPreviewUrl(user.profilePicture);
     reset({
       full_name: user.full_name,
       birth_date: user.birth_date,
@@ -49,12 +53,34 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, isOpen, onClo
   const handleClose = () => {
     onClose();
     setIsEditing(false);
+    setPreviewUrl(user.profilePicture);
     reset({
       full_name: user.full_name,
       birth_date: user.birth_date,
       address: user.address,
       phone_number: user.phone_number,
     });
+  };
+
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      // Auto upload logic
+      try {
+        // will call api upload photo later
+        // const uploadedImageUrl = await uploadToServer(file);
+        // setPreviewUrl(uploadedImageUrl);
+        console.log('upload image api');
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
+    }
   };
 
   const fields = [
@@ -81,12 +107,24 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, isOpen, onClo
           <Box className="w-1/4 bg-gray-100 flex flex-col items-center rounded-lg">
             <Avatar
               alt={user.full_name}
-              src={user.profilePicture}
+              src={previewUrl}
               className="w-24 h-24 mt-12"
             />
-            <Button className="hover:bg-green-300 hover:text-white hover:outline-green-300 bg-white text-green-200 font-bold outline outline-2 outline-green-200 mx-4 mt-8 rounded-xl">
-              Upload Photo
-            </Button>
+            <input
+              accept="image/*"
+              className="hidden"
+              id="upload-photo"
+              type="file"
+              onChange={handleImageChange}
+            />
+            <label htmlFor="upload-photo">
+              <Button
+                component="span"
+                className="hover:bg-green-300 hover:text-white hover:outline-green-300 bg-white text-green-200 font-bold outline outline-2 outline-green-200 mx-4 mt-8 rounded-xl"
+              >
+                Select Photo
+              </Button>
+            </label>
           </Box>
           <Box className="w-3/4 p-16 relative">
             {!isEditing ? (
