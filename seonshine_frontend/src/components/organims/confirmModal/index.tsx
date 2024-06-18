@@ -1,4 +1,5 @@
-import { Box, Button, Modal, Typography } from '@mui/material';
+import { Close } from '@mui/icons-material';
+import { Box, Button, IconButton, Modal, Stack, Typography } from '@mui/material';
 
 type CommonModalPropsType = {
   open: boolean;
@@ -16,47 +17,73 @@ const ConfirmModal = ({ open, title, description, handleClose, handleConfirm }: 
       aria-describedby="common-modal-description"
     >
       <Box
-        className="bg-white rounded-lg shadow-lg p-6 m-auto"
+        className="bg-white rounded-lg shadow-lg p-12 m-auto"
         sx={{
           position: 'absolute',
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: 400,
+          width: 'max-content',
         }}
       >
-        <Typography
-          id="common-modal-title"
-          variant="h6"
-          component="h2"
-          className="mb-4"
+        <IconButton
+          aria-label="close"
+          onClick={handleClose}
+          className="absolute top-2 right-2"
         >
-          {title}
-        </Typography>
-        <Typography
-          id="common-modal-description"
-          className="mb-6"
+          <Close />
+        </IconButton>
+        <Stack
+          direction="column"
+          gap={4}
+          className="mt-6"
         >
-          {description}
-        </Typography>
-        <div className="flex justify-end space-x-4">
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleConfirm}
-            className="bg-blue-500 text-white"
+          <Typography
+            id="common-modal-title"
+            variant="timer"
+            component="h2"
           >
-            Yes
-          </Button>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={handleClose}
-            className="text-blue-500 border-blue-500"
+            {title}
+          </Typography>
+          <Typography
+            id="common-modal-description"
+            className="text-center text-lg font-normal"
           >
-            No
-          </Button>
-        </div>
+            {description}
+          </Typography>
+          <Stack
+            justifyContent="space-around"
+            gap={8}
+            className="h-12 mt-12"
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleConfirm}
+              className="w-1/2"
+            >
+              <Typography
+                variant="buttonM"
+                className="uppercase"
+              >
+                yes
+              </Typography>
+            </Button>
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={handleClose}
+              className="w-1/2"
+            >
+              <Typography
+                variant="buttonM"
+                className="uppercase"
+              >
+                No
+              </Typography>
+            </Button>
+          </Stack>
+        </Stack>
       </Box>
     </Modal>
   );

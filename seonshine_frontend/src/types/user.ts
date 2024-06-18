@@ -56,7 +56,7 @@ export enum UserStatusEnum {
 
 export const labelUserStatus: { [key in UserStatusEnum]: string } = {
   [UserStatusEnum.ACTIVE]: 'Active',
-  [UserStatusEnum.CLOSE]: 'Close',
+  [UserStatusEnum.CLOSE]: 'Closed',
   [UserStatusEnum.DEACTIVATED]: 'Deactivated',
 };
 

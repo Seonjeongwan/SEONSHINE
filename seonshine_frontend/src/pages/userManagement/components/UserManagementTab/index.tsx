@@ -5,6 +5,7 @@ import { Stack, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 import { SortingState } from '@tanstack/react-table';
 
+import SearchBar from '@/components/molecules/searchBar';
 import ConfirmModal from '@/components/organims/confirmModal';
 import { userType } from '@/components/organims/sideBar';
 import UserProfileModal from '@/components/organims/userProfileModal';
@@ -38,8 +39,27 @@ const UserManagementTab = () => {
     profilePicture: '',
   });
 
-  const { currentPage, sortKey, sortType, pageSize, handlePageChange, handleSortingChange, searchField, searchQuery } =
-    useTable(ITEMS_PER_PAGE);
+  const {
+    currentPage,
+    sortKey,
+    sortType,
+    pageSize,
+    handlePageChange,
+    handleSortingChange,
+    searchField,
+    searchQuery,
+    handleSearchChange,
+  } = useTable(ITEMS_PER_PAGE);
+
+  const { data, isFetching } = useGetUserListApi({
+    page_size: pageSize,
+    page_number: currentPage,
+    sort_key: sortKey,
+    sort_type: sortType,
+    [searchField]: searchQuery,
+  });
+
+  const { mutate: exeChangeStatus } = useChangeStatusApi();
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -49,7 +69,7 @@ const UserManagementTab = () => {
 
   const handleClickAction = (user_id: string, user_type: UserStatusEnum) => {
     setIsConfirmModalOpen(true);
-    const status = user_type === '1' ? 2 : 1;
+    const status = user_type === '1' ? 9 : 1;
     setSelectedUser({ user_id, status });
   };
 
@@ -66,31 +86,35 @@ const UserManagementTab = () => {
     setIsConfirmModalOpen(false);
   };
 
-  const { data, isFetching } = useGetUserListApi({
-    page_size: pageSize,
-    page_number: currentPage,
-    sort_key: sortKey,
-    sort_type: sortType,
-    [searchField]: searchQuery,
-  });
-
-  const { mutate: exeChangeStatus, isPending } = useChangeStatusApi();
+  const handleSearch = (field: string, query: string) => {
+    handleSearchChange(field, query);
+  };
+  const options = [
+    { value: 'user_id', label: 'ID' },
+    { value: 'fullname', label: 'Fullname' },
+    { value: 'branch_name', label: 'Branch' },
+  ];
+  const defaultOption = options[0].value;
 
   const columns = TableHeader(handleOpenModal, handleClickAction);
 
   return (
     <Stack direction="column">
+      <SearchBar
+        onSearch={handleSearch}
+        options={options}
+        optionDefault={defaultOption}
+      />
       <Typography
         variant="heading4"
         component="h3"
-        className="my-4"
+        className="my-8"
       >
         User List
       </Typography>
       <UserTable<UserType>
         data={data?.data || []}
         columns={columns}
-        EmptyText="No staff found!"
         isFetching={isFetching}
         pageCount={data ? Math.ceil(data.total / pageSize) : 0}
         onSortingChange={handleSortingChange}

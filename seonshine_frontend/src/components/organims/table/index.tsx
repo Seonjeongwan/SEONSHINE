@@ -138,14 +138,14 @@ const UserTable = <T extends object>({
         </MuiTable>
         {noDataFound && (
           <Box
-            my={4}
+            my={16}
             textAlign="center"
           >
             {EmptyText}
           </Box>
         )}
       </TableContainer>
-      {pageCount && page && (
+      {!!pageCount && page && (
         <Pagination
           count={pageCount}
           page={paginationPage}
