@@ -1,12 +1,12 @@
-import { Button } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 
 import { CustomColumnDef } from '@/types/table';
-import { labelUserStatus, UserStatusEnum, UserType } from '@/types/user';
+import { labelUserStatus, RestaurantType, UserStatusEnum } from '@/types/user';
 
-export const TableHeader = (
+export const RestaurantTableHeader = (
   handleView: () => void,
-  handleAction: (user_status: UserStatusEnum) => void,
-): CustomColumnDef<UserType>[] => [
+  handleAction: (user_id: string, user_status: UserStatusEnum) => void,
+): CustomColumnDef<RestaurantType>[] => [
   {
     accessorKey: 'no',
     header: 'No',
@@ -24,16 +24,23 @@ export const TableHeader = (
   },
   {
     accessorKey: 'username',
-    header: 'Full name',
+    header: 'Restaurant name',
     cell: (user) => {
       return user.row.original.username || '...';
     },
   },
   {
     accessorKey: 'weekday',
-    header: 'Assigned date',
+    header: 'Assigned to',
     cell: (user) => {
-      return user.row.original.branch_name || '...';
+      return (
+        <Typography
+          variant="bodyS"
+          className="text-black-300"
+        >
+          {user.row.original.weekday || 'None'}
+        </Typography>
+      );
     },
   },
   {
@@ -71,7 +78,7 @@ export const TableHeader = (
         <Button
           variant="contained"
           onClick={() => {
-            handleAction(user.row.original.user_status);
+            handleAction(user.row.original.user_id, user.row.original.user_status);
           }}
           sx={({ palette }) => ({
             backgroundColor: user.row.original.user_status === '1' ? palette.red[200] : palette.blue[400],

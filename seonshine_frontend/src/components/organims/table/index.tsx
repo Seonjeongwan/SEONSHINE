@@ -25,20 +25,18 @@ type UserTableProps<T> = {
   skeletonHeight?: number;
   pageCount?: number;
   page?: (page: number) => void;
-  search?: (search: string) => void;
   onClickRow?: (cell: Cell<T, unknown>, row: Row<T>) => void;
   EmptyText?: string;
   handleRow?: () => void;
   onSortingChange?: (sorting: SortingState) => void;
 };
 
-const UserTable = <T extends object>({
+const Table = <T extends object>({
   data,
   columns,
   isFetching = false,
   skeletonHeight = 28,
   pageCount,
-  search,
   onClickRow,
   page,
   EmptyText = 'No Data is found',
@@ -68,10 +66,6 @@ const UserTable = <T extends object>({
 
   const columnCount = getAllColumns().length;
   const noDataFound = !isFetching && (!memoizedData || memoizedData.length === 0);
-
-  const handleSearchChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    search?.(e.target.value);
-  };
 
   const handlePageChange = (event: ChangeEvent<unknown>, currentPage: number) => {
     const newPage = currentPage === 0 ? 1 : currentPage;
@@ -157,4 +151,4 @@ const UserTable = <T extends object>({
   );
 };
 
-export default genericMemo(UserTable);
+export default genericMemo(Table);

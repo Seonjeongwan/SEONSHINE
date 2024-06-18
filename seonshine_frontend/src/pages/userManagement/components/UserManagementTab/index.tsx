@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { Stack, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
-import { SortingState } from '@tanstack/react-table';
 
 import SearchBar from '@/components/molecules/searchBar';
 import ConfirmModal from '@/components/organims/confirmModal';
 import { userType } from '@/components/organims/sideBar';
+import Table from '@/components/organims/table';
 import UserProfileModal from '@/components/organims/userProfileModal';
 
 import useTable from '@/hooks/useTable';
@@ -15,8 +15,7 @@ import { ChangeStatusPayloadType, UserStatusEnum, UserType } from '@/types/user'
 
 import { useChangeStatusApi, useGetUserListApi } from '@/apis/hooks/userApi.hook';
 
-import UserTable from '../../../../components/organims/table';
-import { TableHeader } from './TableHeader';
+import { UserTableHeader } from './UserTableHeader';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -59,44 +58,37 @@ const UserManagementTab = () => {
     [searchField]: searchQuery,
   });
 
-  const { mutate: exeChangeStatus } = useChangeStatusApi();
+  const { mutate: changeStatus } = useChangeStatusApi();
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
-  const handleSaveUser = (editedUser: userType) => {
-    setUser(editedUser);
-  };
+  const handleSaveUser = (editedUser: userType) => setUser(editedUser);
 
   const handleClickAction = (user_id: string, user_type: UserStatusEnum) => {
     setIsConfirmModalOpen(true);
-    const status = user_type === '1' ? 9 : 1;
-    setSelectedUser({ user_id, status });
+    setSelectedUser({ user_id, status: user_type === '1' ? 9 : 1 });
   };
 
   const handleConfirm = () => {
-    selectedUser &&
-      exeChangeStatus(selectedUser, {
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ['getUserList'] });
-        },
-        onError: () => {
-          toast.error('Can not change user status.');
-        },
+    if (selectedUser) {
+      changeStatus(selectedUser, {
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['getUserList'] }),
+        onError: () => toast.error('Cannot change user status.'),
       });
+    }
     setIsConfirmModalOpen(false);
   };
 
-  const handleSearch = (field: string, query: string) => {
-    handleSearchChange(field, query);
-  };
+  const handleSearch = (field: string, query: string) => handleSearchChange(field, query);
+
   const options = [
     { value: 'user_id', label: 'ID' },
-    { value: 'fullname', label: 'Fullname' },
+    { value: 'username', label: 'Full name' },
     { value: 'branch_name', label: 'Branch' },
   ];
   const defaultOption = options[0].value;
 
-  const columns = TableHeader(handleOpenModal, handleClickAction);
+  const columns = UserTableHeader(handleOpenModal, handleClickAction);
 
   return (
     <Stack direction="column">
@@ -112,7 +104,7 @@ const UserManagementTab = () => {
       >
         User List
       </Typography>
-      <UserTable<UserType>
+      <Table<UserType>
         data={data?.data || []}
         columns={columns}
         isFetching={isFetching}
@@ -132,9 +124,7 @@ const UserManagementTab = () => {
         open={isConfirmModalOpen}
         title="Deactivate Confirmation"
         description="Do you really want to deactivate this user?"
-        handleClose={() => {
-          setIsConfirmModalOpen(false);
-        }}
+        handleClose={() => setIsConfirmModalOpen(false)}
         handleConfirm={handleConfirm}
       />
     </Stack>

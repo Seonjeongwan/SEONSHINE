@@ -2,6 +2,8 @@ import axiosInstance from '@/configs/axios';
 import {
   ChangeStatusPayloadType,
   ChangeStatusResponseType,
+  GetRestaurantListApiPropsType,
+  GetRestaurantListResponseType,
   GetUserListApiPropsType,
   GetUserListResponseType,
 } from '@/types/user';
@@ -27,5 +29,14 @@ export const getUserList = async (params: GetUserListApiPropsType): Promise<GetU
 
 export const changeStatus = async (payload: ChangeStatusPayloadType): Promise<ChangeStatusResponseType> => {
   const response = await axiosInstance.post<ChangeStatusResponseType>('/user/change-status', payload);
+  return response.data;
+};
+
+export const getRestaurantList = async (
+  params: GetRestaurantListApiPropsType,
+): Promise<GetRestaurantListResponseType> => {
+  const response = await axiosInstance.get<GetRestaurantListResponseType>('/user/restaurant-list', {
+    params: params,
+  });
   return response.data;
 };

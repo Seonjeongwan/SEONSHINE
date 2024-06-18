@@ -3,11 +3,13 @@ import { useMutation, UseMutationResult, useQuery, UseQueryResult } from '@tanst
 import {
   ChangeStatusPayloadType,
   ChangeStatusResponseType,
+  GetRestaurantListApiPropsType,
+  GetRestaurantListResponseType,
   GetUserListApiPropsType,
   GetUserListResponseType,
 } from '@/types/user';
 
-import { BranchResponseType, callBranches, changeStatus, getUserList } from '../user';
+import { BranchResponseType, callBranches, changeStatus, getRestaurantList, getUserList } from '../user';
 
 interface UseGetBranchProps {
   enabled?: boolean;
@@ -36,6 +38,17 @@ export const useChangeStatusApi = (): UseMutationResult<ChangeStatusResponseType
   return useMutation({
     mutationFn: async (payload) => {
       return changeStatus(payload);
+    },
+  });
+};
+
+export const useGetRestaurantListApi = (
+  params: GetRestaurantListApiPropsType,
+): UseQueryResult<GetRestaurantListResponseType> => {
+  return useQuery({
+    queryKey: ['getRestaurantList', params],
+    queryFn: async () => {
+      return getRestaurantList(params);
     },
   });
 };

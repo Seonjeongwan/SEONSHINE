@@ -3,7 +3,7 @@ import { Button } from '@mui/material';
 import { CustomColumnDef } from '@/types/table';
 import { labelUserStatus, UserStatusEnum, UserType } from '@/types/user';
 
-export const TableHeader = (
+export const UserTableHeader = (
   handleView: () => void,
   handleAction: (user_id: string, user_status: UserStatusEnum) => void,
 ): CustomColumnDef<UserType>[] => [
