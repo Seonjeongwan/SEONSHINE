@@ -15,11 +15,13 @@ const Dashboard = () => {
     { value: 'branch', label: 'Branch' },
   ];
   const defaultOption = options[0].value;
+  const defaultValue = 'shinhanadmin';
   return (
     <div>
       <SearchBar
         onSearch={handleSearch}
         options={options}
+        optionDefault={defaultOption}
       />
       TestPage
       <Link to={paths.forgotPassword}>GO TO</Link>;

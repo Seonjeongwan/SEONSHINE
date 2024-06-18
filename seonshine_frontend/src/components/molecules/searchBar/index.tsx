@@ -15,11 +15,13 @@ import {
 interface SearchBarProps {
   onSearch: (field: string, query: string) => void;
   options: { value: string; label: string }[];
+  optionDefault: string;
+  valueDefault?: string;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onSearch, options }) => {
-  const [field, setField] = useState<string>(options[0]?.value);
-  const [query, setQuery] = useState<string>('');
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch, options, optionDefault, valueDefault }) => {
+  const [field, setField] = useState<string>(optionDefault);
+  const [query, setQuery] = useState<string>(valueDefault || '');
 
   const handleFieldChange = (event: SelectChangeEvent<string>) => {
     setField(event.target.value as string);
@@ -32,7 +34,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, options }) => {
   const handleSearch = () => {
     onSearch(field, query);
   };
- 
+
   return (
     <Stack className="flex items-center gap-6 md:gap-8 h-12 md:h-14">
       <FormControl
@@ -40,7 +42,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, options }) => {
         className="w-1/4 md:w-1/6 lg:w-1/12 h-full"
       >
         <Select
-          defaultValue={options[0]?.value}
+          defaultValue={optionDefault}
           displayEmpty
           inputProps={{ 'aria-label': 'Without label' }}
           value={field}
@@ -69,6 +71,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, options }) => {
       </FormControl>
       <Stack className="w-1/2 md:w-2/3 lg:w-5/6 h-full">
         <TextField
+          defaultValue={valueDefault}
           value={query}
           placeholder="Search for user"
           onChange={handleQueryChange}
