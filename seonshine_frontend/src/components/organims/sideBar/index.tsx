@@ -34,7 +34,7 @@ const Sidebar = ({ role }: SidebarPropsType) => {
     full_name: 'Shinhan User',
     email: 'shinhanuser@mail.com',
     branch_id: 'Centec',
-    birth_date: '2001-10-10', // Adjusted to ISO date format
+    birth_date: '10/12/2001',
     address: 'Thu Duc, HCMC',
     phone_number: '0123456789',
     status: 'Active',

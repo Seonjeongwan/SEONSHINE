@@ -6,8 +6,8 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { Avatar, Box, Button, IconButton, Modal } from '@mui/material';
 
 import { userType } from '../sideBar';
-import { UserInfoSchema, userInfoSchema } from './schema';
 import DatePicker from './DatePicker';
+import { UserInfoSchema, userInfoSchema } from './schema';
 
 interface UserProfileModalProps {
   user: userType;
@@ -112,34 +112,32 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, isOpen, onClo
                 >
                   <div className="w-1/2 font-bold">{field.label}</div>
                   <div className="w-1/2">
-                    {isEditing && field.name === 'birth_date' ? ( // Check for birth_date field
+                    {isEditing && field.name === 'birth_date' && !field.disabled ? (
                       <DatePicker
                         name={field.name}
                         control={control}
                         disabled={field.disabled}
                       />
+                    ) : isEditing && !field.disabled ? (
+                      <Controller
+                        name={field.name as keyof UserInfoSchema}
+                        control={control}
+                        render={({ field, fieldState: { error } }) => (
+                          <>
+                            <input
+                              {...field}
+                              type="text"
+                              disabled={field.disabled}
+                              className={`bg-white w-full outline-none border-b-2 border-black ${
+                                error ? 'border-red-500' : 'border-black'
+                              }`}
+                            />
+                            {error && <p className="text-red-500 text-xs">{error.message}</p>}
+                          </>
+                        )}
+                      />
                     ) : (
-                      isEditing && !field.disabled ? (
-                        <Controller
-                          name={field.name as keyof UserInfoSchema}
-                          control={control}
-                          render={({ field, fieldState: { error } }) => (
-                            <>
-                              <input
-                                {...field}
-                                type="text"
-                                disabled={field.disabled}
-                                className={`bg-white w-full outline-none border-b-2 border-black-500 ${
-                                  error ? 'border-red-500' : 'border-black-500'
-                                }`}
-                              />
-                              {error && <p className="text-red-500 text-xs">{error.message}</p>}
-                            </>
-                          )}
-                        />
-                      ) : (
-                        <span>{user[field.name as keyof userType]}</span>
-                      )
+                      <span>{user[field.name as keyof userType]}</span>
                     )}
                   </div>
                 </Box>
