@@ -15,6 +15,7 @@ import { ChangeStatusPayloadType, UserStatusEnum, UserType } from '@/types/user'
 
 import { useChangeStatusApi, useGetUserListApi } from '@/apis/hooks/userApi.hook';
 
+import { activeUserDescription, activeUserTitle, deactiveUserDescription, deactiveUserTitle } from './constants';
 import { UserTableHeader } from './UserTableHeader';
 
 const ITEMS_PER_PAGE = 5;
@@ -25,6 +26,7 @@ const UserManagementTab = () => {
   const [selectedUser, setSelectedUser] = useState<ChangeStatusPayloadType>();
 
   const queryClient = useQueryClient();
+
   const [user, setUser] = useState<userType>({
     user_id: 'shinhanuser',
     role_id: '1',
@@ -112,18 +114,16 @@ const UserManagementTab = () => {
         onSortingChange={handleSortingChange}
         page={handlePageChange}
       />
-      {isModalOpen && (
-        <UserProfileModal
-          onSave={handleSaveUser}
-          user={user}
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-        />
-      )}
+      <UserProfileModal
+        onSave={handleSaveUser}
+        user={user}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
       <ConfirmModal
         open={isConfirmModalOpen}
-        title="Deactivate Confirmation"
-        description="Do you really want to deactivate this user?"
+        title={selectedUser?.status === 1 ? activeUserTitle : deactiveUserTitle}
+        description={selectedUser?.status === 1 ? activeUserDescription : deactiveUserDescription}
         handleClose={() => setIsConfirmModalOpen(false)}
         handleConfirm={handleConfirm}
       />

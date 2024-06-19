@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { Box } from '@mui/material';
 
+import ApprovalTab from './components/ApprovalTab';
 import RestaurantManagementTab from './components/RestaurantManagementTab';
 import UserManagementTab from './components/UserManagementTab';
 import { StyledTab, StyledTabs } from './styled';
@@ -64,7 +65,7 @@ const UserManagement = () => {
           value={value}
           index={2}
         >
-          Approval
+          <ApprovalTab />
         </TabPanel>
       </Box>
     </Box>

@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 import { Stack, Typography } from '@mui/material';
+import { useQueryClient } from '@tanstack/react-query';
 import { SortingState } from '@tanstack/react-table';
 
 import SearchBar from '@/components/molecules/searchBar';
@@ -11,8 +13,14 @@ import UserProfileModal from '@/components/organims/userProfileModal';
 import useTable from '@/hooks/useTable';
 import { ChangeStatusPayloadType, RestaurantType, UserStatusEnum } from '@/types/user';
 
-import { useGetRestaurantListApi } from '@/apis/hooks/userApi.hook';
+import { useChangeStatusApi, useGetRestaurantListApi } from '@/apis/hooks/userApi.hook';
 
+import {
+  activeRestaurantDescription,
+  activeRestaurantTitle,
+  deactiveRestaurantDescription,
+  deactiveRestaurantTitle,
+} from './constants';
 import { RestaurantTableHeader } from './RestaurantTableHeader';
 
 const ITEMS_PER_PAGE = 10;
@@ -20,6 +28,8 @@ const ITEMS_PER_PAGE = 10;
 const RestaurantManagementTab = () => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
   const [selectedRestaurant, setSelectedRestaurant] = useState<ChangeStatusPayloadType>();
+
+  const queryClient = useQueryClient();
 
   const {
     currentPage,
@@ -41,6 +51,8 @@ const RestaurantManagementTab = () => {
     [searchField]: searchQuery,
   });
 
+  const { mutate: changeStatus } = useChangeStatusApi();
+
   const handleSearch = (field: string, query: string) => handleSearchChange(field, query);
 
   const options = [
@@ -49,7 +61,15 @@ const RestaurantManagementTab = () => {
   ];
   const defaultOption = options[0].value;
 
-  const handleConfirm = () => setIsConfirmModalOpen(false);
+  const handleConfirm = () => {
+    if (selectedRestaurant) {
+      changeStatus(selectedRestaurant, {
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['getRestaurantList'] }),
+        onError: () => toast.error('Cannot change restaurant status.'),
+      });
+    }
+    setIsConfirmModalOpen(false);
+  };
 
   const handleOpenModal = () => {};
 
@@ -84,8 +104,8 @@ const RestaurantManagementTab = () => {
       />
       <ConfirmModal
         open={isConfirmModalOpen}
-        title="Deactivate Confirmation"
-        description="Do you really want to deactivate this user?"
+        title={selectedRestaurant?.status === 1 ? activeRestaurantTitle : deactiveRestaurantTitle}
+        description={selectedRestaurant?.status === 1 ? activeRestaurantDescription : deactiveRestaurantDescription}
         handleClose={() => {
           setIsConfirmModalOpen(false);
         }}

@@ -119,7 +119,7 @@ const Table = <T extends object>({
                     ))}
                   </TableRow>
                 ))
-              : Array.from({ length: data.length }, (_, i) => (
+              : Array.from({ length: data.length || 4 }, (_, i) => (
                   <TableRow key={i}>
                     {Array.from({ length: columnCount }, (_, j) => (
                       <TableCell key={j}>

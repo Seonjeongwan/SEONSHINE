@@ -40,8 +40,8 @@ const ConfirmModal = ({ open, title, description, handleClose, handleConfirm }: 
         >
           <Typography
             id="common-modal-title"
-            variant="timer"
             component="h2"
+            className="font-bold text-2xl md:text-4xl"
           >
             {title}
           </Typography>
@@ -66,7 +66,7 @@ const ConfirmModal = ({ open, title, description, handleClose, handleConfirm }: 
                 variant="buttonM"
                 className="uppercase"
               >
-                yes
+                Yes
               </Typography>
             </Button>
             <Button
