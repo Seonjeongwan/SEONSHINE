@@ -13,7 +13,7 @@ export const endpoints = {
     detail: "/:id",
     restaurantDetail: "/:id",
     changeStatus: "/change-status",
-    changeAvatar: "/change-avatar",
+    changeAvatar: "/:id/change-avatar",
     waitingConfirm: "/waiting-confirm",
   },
   restaurant: {

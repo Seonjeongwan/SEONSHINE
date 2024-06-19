@@ -30,6 +30,7 @@ services:
       - COMMON_DB_NAME=common_db
       - RESTAURANT_DB_NAME=restaurant_db
       - ORDER_DB_NAME=order_db
+      - UPLOAD_API_URL=http://fileserver:4000
     ports:
       - "5050:5050"
     # command: sh -c "npm run migrate:all && npm run seed:all && npm run start"

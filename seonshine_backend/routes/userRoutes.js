@@ -1,4 +1,5 @@
 import express from "express";
+import { upload } from "../config/storage.js";
 import { UserRole } from "../constants/auth.js";
 import {
   changeUserAvatar,
@@ -49,6 +50,7 @@ userRouter.post(
 userRouter.post(
   endpoints.users.changeAvatar,
   authenticateToken(),
+  upload.single('file'),
   changeUserAvatar
 );
 

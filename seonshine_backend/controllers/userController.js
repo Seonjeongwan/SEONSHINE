@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
+import FormData from "form-data";
 import { Op, QueryTypes, Sequelize } from "sequelize";
+import httpUpload from "../config/axiosUpload.js";
 import { UserStatus } from "../constants/auth.js";
 import { errorCodes } from "../constants/errorCode.js";
 import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
@@ -8,6 +10,7 @@ import { verificationTypes } from "../constants/verification.js";
 import { sequelizeUserDb } from "../db/dbConfig.js";
 import Branch from "../models/branchModel.js";
 import { User, UserProfile } from "../models/index.js";
+import Upload from "../models/uploadModel.js";
 import Verification from "../models/verificationModel.js";
 import { sendVerificationCode } from "../utils/emailUtil.js";
 import { getResponseErrors } from "../utils/responseParser.js";
@@ -118,7 +121,7 @@ export const getUserWaitingConfirmList = async (req, res) => {
       total: count,
     });
   } catch (error) {
-    console.log('error :>> ', error);
+    console.log("error :>> ", error);
     res
       .status(httpStatusCodes.internalServerError)
       .send(httpStatusErrors.internalServerError);
@@ -320,8 +323,92 @@ export const getUserDetail = async (req, res) => {
   }
 };
 
-//TODO: Change user avatar and update user info
-export const changeUserAvatar = async (req, res) => {};
+export const changeUserAvatar = async (req, res) => {
+  try {
+    const file = req.file;
+    const userId = req.params.id;
+
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res
+        .status(httpStatusCodes.badRequest)
+        .json({ message: "User not found" });
+    }
+
+    const profile = await UserProfile.findOne({
+      where: {
+        user_id: userId,
+      },
+    });
+
+    // Delete avatar
+    if (!file) {
+      if (profile) {
+        profile.profile_picture_url = null;
+        profile.updated_at = Sequelize.literal("CURRENT_TIMESTAMP");
+        await profile.save();
+      } else {
+        const profile = {
+          user_id: userId,
+          profile_picture_url: null,
+        };
+        console.log('Delete');
+        await UserProfile.create(profile);
+      }
+
+      return res
+        .status(httpStatusCodes.success)
+        .json({ message: "Remove avatar successfully" });
+    }
+
+    // Create a FormData object and append the file buffer
+    const formData = new FormData();
+    formData.append("file", file.buffer, file.originalname);
+
+    // Send the file to another API
+    const response = await httpUpload.post("/upload", formData, {
+      headers: {
+        ...formData.getHeaders(),
+      },
+    });
+
+    if (response?.data?.file) {
+      const { originalname, mimetype, filename, path, size } = response.data.file;
+      const upload = {
+        original_name: originalname,
+        type: mimetype,
+        filename,
+        full_path: path,
+        size,
+      };
+
+      await Upload.create(upload);
+
+      if (profile) {
+        profile.profile_picture_url = path;
+        profile.updated_at = Sequelize.literal("CURRENT_TIMESTAMP");
+        await profile.save();
+      } else {
+        const profile = {
+          user_id: userId,
+          profile_picture_url: path,
+        };
+        await UserProfile.create(profile);
+      }
+
+      return res
+        .status(httpStatusCodes.success)
+        .json({ message: "Update avatar successfully" });
+    }
+
+  } catch (error) {
+    console.log('error :>> ', error);
+    res
+      .status(httpStatusCodes.internalServerError)
+      .json({ error: httpStatusErrors.internalServerError });
+  }
+};
 
 export const checkIdEmailExist = async (userId, email) => {
   const user = await User.findOne({

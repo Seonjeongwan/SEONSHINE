@@ -2,7 +2,6 @@ import { DataTypes, Model } from "sequelize";
 import { tables } from "../constants/database.js";
 import { sequelizeUserDb } from "../db/dbConfig.js";
 
-// export default (sequelize) => {
 class User extends Model {}
 User.init(
   {
@@ -48,10 +47,6 @@ User.init(
     },
     branch_id: {
       type: DataTypes.INTEGER,
-      // references: {
-      //   model: Branch,
-      //   key: "branch_id",
-      // },
     },
     email: {
       type: DataTypes.STRING,
@@ -87,20 +82,5 @@ User.init(
   }
 );
 
-// User.belongsTo(Branch, { foreignKey: "branch_id" });
-
 export default User;
-// };
 
-// const User = sequelizeUserDb.define(
-//   tables.user,
-//   {
-
-//   {
-//     timestamps: true,
-//     createdAt: "created_at",
-//     updatedAt: "updated_at",
-//   }
-// );
-
-// export default User;
