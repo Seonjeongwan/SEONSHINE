@@ -35,6 +35,8 @@ services:
       - ORDER_DB_NAME=order_db
     command: sh -c "npm run migrate:all && npm run seed:all && npm run dev"
     depends_on:
+      redis:
+        condition: service_started
       db:
         condition: service_healthy
     restart: always
@@ -58,17 +60,17 @@ services:
       start_period: 5s
     restart: always
 
-  # fileserver:
-  #   build:
-  #     context: ./seonshine_fileserver
-  #     dockerfile: Dockerfile.dev
-  #   ports:
-  #     - "4000:4000"
-  #   volumes:
-  #     - ./seonshine_fileserver/uploads:/app/uploads
-  #   environment:
-  #     - NODE_ENV=development
-  #   restart: always
+  fileserver:
+    build:
+      context: ./seonshine_fileserver
+      dockerfile: Dockerfile.dev
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./seonshine_fileserver/uploads:/app/uploads
+    environment:
+      - NODE_ENV=development
+    restart: always
   redis:
     image: redis:6.2
     ports:

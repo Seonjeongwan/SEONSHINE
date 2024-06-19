@@ -1,12 +1,13 @@
 import bcrypt from "bcrypt";
-import { Op, QueryTypes } from "sequelize";
+import { Op, QueryTypes, Sequelize } from "sequelize";
 import { UserStatus } from "../constants/auth.js";
 import { errorCodes } from "../constants/errorCode.js";
 import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
 import { messageErrors, statusWithMessageLogin } from "../constants/message.js";
 import { verificationTypes } from "../constants/verification.js";
 import { sequelizeUserDb } from "../db/dbConfig.js";
-import User from "../models/userModel.js";
+import Branch from "../models/branchModel.js";
+import { User, UserProfile } from "../models/index.js";
 import Verification from "../models/verificationModel.js";
 import { sendVerificationCode } from "../utils/emailUtil.js";
 import { getResponseErrors } from "../utils/responseParser.js";
@@ -22,18 +23,126 @@ export const getUserList = async (req, res) => {
   const {
     page_size = 25,
     page_number = 1,
+    sort_key = "updated_at",
+    sort_type = "asc",
+    user_id = "",
+    username = "",
+    branch_name = "",
+  } = req.query;
+  const offset = (page_number - 1) * page_size;
+  const select =
+    "SELECT u.user_id, u.username, u.user_status, b.branch_name FROM user_db.users u LEFT JOIN common_db.branch_info b ON u.branch_id = b.branch_id";
+  const where =
+    "WHERE user_status IN(:user_status) AND role_id = 1 AND user_id LIKE :user_id AND username LIKE :username AND branch_name LIKE :branch_name";
+  const sorting = `ORDER BY ${sort_key} ${sort_type.toUpperCase()}`;
+  const paging = "LIMIT :page_size OFFSET :offset";
+  const query = `${select} ${where} ${sorting} ${paging}`;
+
+  const countSelect = `SELECT COUNT(*) AS total FROM user_db.users u LEFT JOIN common_db.branch_info b ON u.branch_id = b.branch_id`;
+  const countQuery = `${countSelect} ${where}`;
+  const queryParams = {
+    page_size: Number(page_size),
+    offset: Number(offset),
+    user_id: `%${user_id}%`,
+    username: `%${username}%`,
+    branch_name: `%${branch_name}%`,
+    user_status: ["1", "2"],
+  };
+
+  try {
+    const users = await sequelizeUserDb.query(query, {
+      replacements: queryParams,
+      type: QueryTypes.SELECT,
+    });
+
+    const usersWithoutPassword = users.map((user) => {
+      delete user.password_hash;
+      return user;
+    });
+
+    const countResult = await sequelizeUserDb.query(countQuery, {
+      replacements: queryParams,
+      type: QueryTypes.SELECT,
+    });
+
+    const totalRecords = countResult?.[0]?.total || 0;
+
+    res.status(httpStatusCodes.success).send({
+      data: usersWithoutPassword,
+      page_number,
+      page_size,
+      sort_key,
+      sort_type,
+      total: totalRecords,
+    });
+  } catch (error) {
+    console.log("error :>> ", error);
+    res
+      .status(httpStatusCodes.internalServerError)
+      .send(httpStatusErrors.internalServerError);
+  }
+};
+
+export const getRestaurantList = async (req, res) => {
+  const {
+    page_size = 25,
+    page_number = 1,
+    sort_key = "updated_at",
+    sort_type = "asc",
     user_id = "",
     username = "",
   } = req.query;
-  const query = `SELECT u.*, b.branch_name FROM user_db.users u LEFT JOIN common_db.branch_info b ON u.branch_id = b.branch_id`;
-  const users = await sequelizeUserDb.query(query, {
-    type: QueryTypes.SELECT,
-  });
-  const usersWithoutPassword = users.map((user) => {
-    delete user.password_hash;
-    return user;
-  });
-  res.status(httpStatusCodes.success).send(usersWithoutPassword);
+  const offset = (page_number - 1) * page_size;
+  const select =
+    "SELECT u.user_id, u.username, u.user_status, r.weekday FROM user_db.users u LEFT JOIN restaurant_db.restaurant_assigned r ON u.user_id = r.restaurant_id";
+  const where =
+    "WHERE user_status IN(:user_status) AND role_id = 2 AND user_id LIKE :user_id AND username LIKE :username";
+  const sorting = `ORDER BY ${sort_key} ${sort_type.toUpperCase()}`;
+  const paging = "LIMIT :page_size OFFSET :offset";
+  const query = `${select} ${where} ${sorting} ${paging}`;
+
+  const countSelect = `SELECT COUNT(*) AS total FROM user_db.users`;
+  const countQuery = `${countSelect} ${where}`;
+  const queryParams = {
+    page_size: Number(page_size),
+    offset: Number(offset),
+    user_id: `%${user_id}%`,
+    username: `%${username}%`,
+    user_status: ["1", "2"],
+  };
+
+  try {
+    const users = await sequelizeUserDb.query(query, {
+      replacements: queryParams,
+      type: QueryTypes.SELECT,
+    });
+
+    const usersWithoutPassword = users.map((user) => {
+      delete user.password_hash;
+      return user;
+    });
+
+    const countResult = await sequelizeUserDb.query(countQuery, {
+      replacements: queryParams,
+      type: QueryTypes.SELECT,
+    });
+
+    const totalRecords = countResult?.[0]?.total || 0;
+
+    res.status(httpStatusCodes.success).send({
+      data: usersWithoutPassword,
+      page_number,
+      page_size,
+      sort_key,
+      sort_type,
+      total: totalRecords,
+    });
+  } catch (error) {
+    console.log("error :>> ", error);
+    res
+      .status(httpStatusCodes.internalServerError)
+      .send(httpStatusErrors.internalServerError);
+  }
 };
 
 export const signUp = async (req, res) => {
@@ -151,6 +260,85 @@ export const login = async (req, res) => {
   }
 };
 
+export const changeUserStatus = async (req, res) => {
+  try {
+    const { user_id, status } = req.body;
+    const user = await User.findByPk(user_id);
+
+    if (!user) {
+      return res
+        .status(httpStatusCodes.badRequest)
+        .json({ message: "User not found" });
+    }
+
+    user.user_status = status;
+    user.updated_at = Sequelize.literal("CURRENT_TIMESTAMP");
+
+    await user.save();
+
+    res
+      .status(httpStatusCodes.success)
+      .json({ message: "Change status successfully" });
+  } catch (error) {
+    res
+      .status(httpStatusCodes.internalServerError)
+      .json({ error: httpStatusErrors.internalServerError });
+  }
+};
+
+export const getUserDetail = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const user = await User.findOne({
+      where: { user_id: id },
+      attributes: [
+        "user_id",
+        "role_id",
+        "username",
+        "email",
+        "branch_id",
+        "phone_number",
+        "user_status",
+      ],
+      include: {
+        model: UserProfile,
+        as: "profile",
+        attributes: ["birth_date", "address", "profile_picture_url"],
+      },
+      raw: true,
+      nest: true,
+    });
+
+    if (!user) {
+      return res
+        .status(httpStatusCodes.badRequest)
+        .json({ message: "User not found" });
+    }
+
+    const userData = {
+      ...user,
+      ...user.profile,
+    };
+    delete userData.profile;
+
+    const branchId = user.branch_id;
+    let branchName = null;
+
+    if (branchId) {
+      const branch = await Branch.findByPk(branchId, { raw: true });
+      branchName = branch?.branch_name;
+    }
+
+    userData.branch_name = branchName;
+
+    res.status(httpStatusCodes.success).json(userData);
+  } catch (error) {
+    res
+      .status(httpStatusCodes.internalServerError)
+      .json({ error: httpStatusErrors.internalServerError });
+  }
+};
+
 export const checkIdEmailExist = async (userId, email) => {
   const user = await User.findOne({
     where: {
@@ -161,28 +349,6 @@ export const checkIdEmailExist = async (userId, email) => {
   const isExist = !!user;
   return isExist;
 };
-
-// export const confirmSignin = (req, res) => {
-//   const { user_id } = req.body;
-
-//   if (!user_id) {
-//     return res.status(400).send({ message: "User ID is required" });
-//   }
-
-//   const query =
-//     "UPDATE user_db.users SET user_status = '1', updated_at = NOW() WHERE user_id = ?";
-//   userDb.query(query, [user_id], (err, result) => {
-//     if (err) {
-//       return res.status(500).send({ message: "Database error", error: err });
-//     }
-//     if (result.affectedRows === 0) {
-//       return res.status(404).send({ message: "User not found" });
-//     }
-//     res
-//       .status(200)
-//       .send({ message: "User confirmed successfully", status: 200 });
-//   });
-// };
 
 const sendAndSaveEmailVerificationCode = async (email) => {
   const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6자리 숫자 생성

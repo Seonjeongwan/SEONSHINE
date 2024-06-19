@@ -10,5 +10,8 @@ export const endpoints = {
   },
   users: {
     list: '/list',
+    restaurantList: '/restaurant-list',
+    detail: '/:id',
+    changeStatus: '/change-status'
   }
 };
