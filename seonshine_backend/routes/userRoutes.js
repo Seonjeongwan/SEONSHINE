@@ -1,13 +1,14 @@
 import express from "express";
 import { UserRole } from "../constants/auth.js";
 import {
+  changeUserAvatar,
   changeUserStatus,
-  getRestaurantList,
   getUserDetail,
   getUserList,
+  getUserWaitingConfirmList,
   login,
   signUp,
-  verifySignUp,
+  verifySignUp
 } from "../controllers/userController.js";
 import { authenticateToken } from "../middleware/auth.js";
 import { validateChangeStatus } from "../middleware/validation/userValidate.js";
@@ -18,6 +19,7 @@ const userRouter = express.Router();
 //TODO: Using validate user middleware
 userRouter.post(endpoints.signUp, signUp);
 
+//TODO: Validate request params with validate middleware
 userRouter.get(
   endpoints.users.list,
   authenticateToken({ role: UserRole.admin }),
@@ -25,13 +27,13 @@ userRouter.get(
 );
 
 userRouter.get(
-  endpoints.users.restaurantList,
+  endpoints.users.waitingConfirm,
   authenticateToken({ role: UserRole.admin }),
-  getRestaurantList
+  getUserWaitingConfirmList
 );
 
 //TODO: Validate admin or current user can get detail
-userRouter.get(endpoints.users.detail, authenticateToken(), getUserDetail)
+userRouter.get(endpoints.users.detail, authenticateToken(), getUserDetail);
 
 userRouter.post(endpoints.login, login);
 
@@ -42,6 +44,12 @@ userRouter.post(
   authenticateToken({ role: UserRole.admin }),
   validateChangeStatus,
   changeUserStatus
+);
+
+userRouter.post(
+  endpoints.users.changeAvatar,
+  authenticateToken(),
+  changeUserAvatar
 );
 
 export default userRouter;
