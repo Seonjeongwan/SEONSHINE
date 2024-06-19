@@ -74,7 +74,8 @@ export const UserTableHeader = (
             handleAction(user.row.original.user_id, user.row.original.user_status);
           }}
           sx={({ palette }) => ({
-            backgroundColor: user.row.original.user_status === '1' ? palette.red[200] : palette.blue[400],
+            backgroundColor:
+              user.row.original.user_status == UserStatusEnum.ACTIVE ? palette.red[200] : palette.blue[400],
             fontSize: '13px',
             fontWeight: 400,
             width: {
@@ -85,11 +86,12 @@ export const UserTableHeader = (
             borderRadius: '30px',
             boxShadow: 'none',
             ':hover': {
-              backgroundColor: user.row.original.user_status === '1' ? palette.red[200] : palette.blue[400],
+              backgroundColor:
+                user.row.original.user_status == UserStatusEnum.ACTIVE ? palette.red[200] : palette.blue[400],
             },
           })}
         >
-          {user.row.original.user_status === '1' ? 'Deactivate' : 'Activate'}
+          {user.row.original.user_status == UserStatusEnum.ACTIVE ? 'Deactivate' : 'Activate'}
         </Button>
       );
     },

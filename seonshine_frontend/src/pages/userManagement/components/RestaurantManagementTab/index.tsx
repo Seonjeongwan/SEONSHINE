@@ -3,12 +3,10 @@ import { toast } from 'react-toastify';
 
 import { Stack, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
-import { SortingState } from '@tanstack/react-table';
 
 import SearchBar from '@/components/molecules/searchBar';
 import ConfirmModal from '@/components/organims/confirmModal';
 import Table from '@/components/organims/table';
-import UserProfileModal from '@/components/organims/userProfileModal';
 
 import useTable from '@/hooks/useTable';
 import { ChangeStatusPayloadType, RestaurantType, UserStatusEnum } from '@/types/user';
@@ -20,6 +18,7 @@ import {
   activeRestaurantTitle,
   deactiveRestaurantDescription,
   deactiveRestaurantTitle,
+  searchRestaurantOptions,
 } from './constants';
 import { RestaurantTableHeader } from './RestaurantTableHeader';
 
@@ -41,7 +40,7 @@ const RestaurantManagementTab = () => {
     handleSearchChange,
     searchField,
     searchQuery,
-  } = useTable();
+  } = useTable({ initCurrentPage: 1, initPageSize: ITEMS_PER_PAGE, initSortKey: 'user_id' });
 
   const { data, isFetching } = useGetRestaurantListApi({
     page_size: pageSize,
@@ -55,11 +54,7 @@ const RestaurantManagementTab = () => {
 
   const handleSearch = (field: string, query: string) => handleSearchChange(field, query);
 
-  const options = [
-    { value: 'user_id', label: 'ID' },
-    { value: 'username', label: 'Restaurant name' },
-  ];
-  const defaultOption = options[0].value;
+  const defaultOption = searchRestaurantOptions[0].value;
 
   const handleConfirm = () => {
     if (selectedRestaurant) {
@@ -73,9 +68,13 @@ const RestaurantManagementTab = () => {
 
   const handleOpenModal = () => {};
 
-  const handleClickAction = (user_id: string, user_type: UserStatusEnum) => {
+  const handleClickAction = (userId: string, userStatus: UserStatusEnum) => {
+    console.log({ userStatus, UserStatusEnum: userStatus === UserStatusEnum.ACTIVE });
     setIsConfirmModalOpen(true);
-    setSelectedRestaurant({ user_id, status: user_type === '1' ? 9 : 1 });
+    setSelectedRestaurant({
+      user_id: userId,
+      status: userStatus == UserStatusEnum.ACTIVE ? UserStatusEnum.DEACTIVATED : UserStatusEnum.ACTIVE,
+    });
   };
 
   const columns = RestaurantTableHeader(handleOpenModal, handleClickAction);
@@ -84,7 +83,7 @@ const RestaurantManagementTab = () => {
     <Stack direction="column">
       <SearchBar
         onSearch={handleSearch}
-        options={options}
+        options={searchRestaurantOptions}
         optionDefault={defaultOption}
       />
       <Typography
@@ -101,11 +100,17 @@ const RestaurantManagementTab = () => {
         pageCount={data ? Math.ceil(data.total / pageSize) : 0}
         onSortingChange={handleSortingChange}
         page={handlePageChange}
+        currentPage={currentPage}
+        onPageChange={handlePageChange}
       />
       <ConfirmModal
         open={isConfirmModalOpen}
-        title={selectedRestaurant?.status === 1 ? activeRestaurantTitle : deactiveRestaurantTitle}
-        description={selectedRestaurant?.status === 1 ? activeRestaurantDescription : deactiveRestaurantDescription}
+        title={selectedRestaurant?.status === UserStatusEnum.ACTIVE ? activeRestaurantTitle : deactiveRestaurantTitle}
+        description={
+          selectedRestaurant?.status === UserStatusEnum.ACTIVE
+            ? activeRestaurantDescription
+            : deactiveRestaurantDescription
+        }
         handleClose={() => {
           setIsConfirmModalOpen(false);
         }}

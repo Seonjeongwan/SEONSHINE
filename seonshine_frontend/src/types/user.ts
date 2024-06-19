@@ -49,12 +49,14 @@ export type UserType = {
 };
 
 export enum UserStatusEnum {
-  ACTIVE = '1',
-  CLOSE = '2',
-  DEACTIVATED = '9',
+  WAITING_CONFIRM = 0,
+  ACTIVE = 1,
+  CLOSE = 2,
+  DEACTIVATED = 9,
 }
 
 export const labelUserStatus: { [key in UserStatusEnum]: string } = {
+  [UserStatusEnum.WAITING_CONFIRM]: 'Waiting Confirm',
   [UserStatusEnum.ACTIVE]: 'Active',
   [UserStatusEnum.CLOSE]: 'Closed',
   [UserStatusEnum.DEACTIVATED]: 'Deactivated',

@@ -24,10 +24,11 @@ type UserTableProps<T> = {
   isFetching?: boolean;
   skeletonHeight?: number;
   pageCount?: number;
+  currentPage: number;
   page?: (page: number) => void;
-  onClickRow?: (cell: Cell<T, unknown>, row: Row<T>) => void;
-  EmptyText?: string;
-  handleRow?: () => void;
+  onPageChange: (page: number) => void;
+  emptyText?: string;
+  onClickRow?: (row: T) => void;
   onSortingChange?: (sorting: SortingState) => void;
 };
 
@@ -37,13 +38,13 @@ const Table = <T extends object>({
   isFetching = false,
   skeletonHeight = 28,
   pageCount,
-  onClickRow,
+  currentPage,
+  onPageChange,
   page,
-  EmptyText = 'No Data is found',
-  handleRow,
+  emptyText = 'No Data is found',
+  onClickRow,
   onSortingChange,
 }: UserTableProps<T>) => {
-  const [paginationPage, setPaginationPage] = useState(1);
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const memoizedData = useMemo(() => data, [data]);
@@ -67,10 +68,8 @@ const Table = <T extends object>({
   const columnCount = getAllColumns().length;
   const noDataFound = !isFetching && (!memoizedData || memoizedData.length === 0);
 
-  const handlePageChange = (event: ChangeEvent<unknown>, currentPage: number) => {
-    const newPage = currentPage === 0 ? 1 : currentPage;
-    setPaginationPage(newPage);
-    page?.(newPage);
+  const handlePageChange = (event: ChangeEvent<unknown>, newPage: number) => {
+    onPageChange(newPage);
   };
 
   return (
@@ -104,13 +103,12 @@ const Table = <T extends object>({
               ? getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    onClick={handleRow}
+                    onClick={() => onClickRow?.(row.original)}
                     className="hover:bg-black-100"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
-                        onClick={() => onClickRow?.(cell, row)}
                         className="text-black-500 text-md border-0 p-2"
                         sx={{ textAlign: (cell.column.columnDef as CustomColumnDef<T>).align || 'left' }}
                       >
@@ -135,14 +133,14 @@ const Table = <T extends object>({
             my={16}
             textAlign="center"
           >
-            {EmptyText}
+            {emptyText}
           </Box>
         )}
       </TableContainer>
       {!!pageCount && page && (
         <Pagination
           count={pageCount}
-          page={paginationPage}
+          page={currentPage}
           onChange={handlePageChange}
           className="flex justify-center mt-4"
         />

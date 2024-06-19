@@ -15,10 +15,16 @@ import { ChangeStatusPayloadType, UserStatusEnum, UserType } from '@/types/user'
 
 import { useChangeStatusApi, useGetUserListApi } from '@/apis/hooks/userApi.hook';
 
-import { activeUserDescription, activeUserTitle, deactiveUserDescription, deactiveUserTitle } from './constants';
+import {
+  activeUserDescription,
+  activeUserTitle,
+  deactiveUserDescription,
+  deactiveUserTitle,
+  searchUserOptions,
+} from './constants';
 import { UserTableHeader } from './UserTableHeader';
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 
 const UserManagementTab = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -37,7 +43,7 @@ const UserManagementTab = () => {
     searchField,
     searchQuery,
     handleSearchChange,
-  } = useTable(ITEMS_PER_PAGE);
+  } = useTable({ initPageSize: ITEMS_PER_PAGE, initSortKey: 'user_id' });
 
   const { data, isFetching } = useGetUserListApi({
     page_size: pageSize,
@@ -57,7 +63,10 @@ const UserManagementTab = () => {
 
   const handleClickAction = (userId: string, userStatus: UserStatusEnum) => {
     setIsConfirmModalOpen(true);
-    setSelectedUser({ user_id: userId, status: userStatus === '1' ? 9 : 1 });
+    setSelectedUser({
+      user_id: userId,
+      status: userStatus == UserStatusEnum.ACTIVE ? UserStatusEnum.DEACTIVATED : UserStatusEnum.ACTIVE,
+    });
   };
 
   const handleConfirm = () => {
@@ -72,12 +81,7 @@ const UserManagementTab = () => {
 
   const handleSearch = (field: string, query: string) => handleSearchChange(field, query);
 
-  const options = [
-    { value: 'user_id', label: 'ID' },
-    { value: 'username', label: 'Full name' },
-    { value: 'branch_name', label: 'Branch' },
-  ];
-  const defaultOption = options[0].value;
+  const defaultOption = searchUserOptions[0].value;
 
   const columns = UserTableHeader(handleOpenModal, handleClickAction);
 
@@ -85,7 +89,7 @@ const UserManagementTab = () => {
     <Stack direction="column">
       <SearchBar
         onSearch={handleSearch}
-        options={options}
+        options={searchUserOptions}
         optionDefault={defaultOption}
       />
       <Typography
@@ -102,6 +106,8 @@ const UserManagementTab = () => {
         pageCount={data ? Math.ceil(data.total / pageSize) : 0}
         onSortingChange={handleSortingChange}
         page={handlePageChange}
+        currentPage={currentPage}
+        onPageChange={handlePageChange}
       />
       {isModalOpen && (
         <UserProfileModal
@@ -113,8 +119,8 @@ const UserManagementTab = () => {
 
       <ConfirmModal
         open={isConfirmModalOpen}
-        title={selectedUser?.status === 1 ? activeUserTitle : deactiveUserTitle}
-        description={selectedUser?.status === 1 ? activeUserDescription : deactiveUserDescription}
+        title={selectedUser?.status === UserStatusEnum.ACTIVE ? activeUserTitle : deactiveUserTitle}
+        description={selectedUser?.status === UserStatusEnum.ACTIVE ? activeUserDescription : deactiveUserDescription}
         handleClose={() => setIsConfirmModalOpen(false)}
         handleConfirm={handleConfirm}
       />

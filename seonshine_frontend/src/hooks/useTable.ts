@@ -1,32 +1,25 @@
-import { ChangeEvent, useState } from 'react';
+import { useState } from 'react';
 
 import { SortingState } from '@tanstack/react-table';
 
-import { IPlainObject } from '@/types/common';
+import { UseTablePropsType, UseTableType } from '@/types/table';
 
-export type UseTableType = {
-  currentPage: number;
-  sorting: SortingState;
-  pageSize: number;
-  sortKey: string;
-  sortType: 'desc' | 'asc';
-  searchQuery: string;
-  searchField: string;
-  handlePageChange: (page: number) => void;
-  handleSortingChange: (newSorting: SortingState) => void;
-  handlePageSizeChange: (pageSize: number) => void;
-  handleSearchChange: (field: string, query: string) => void;
-};
-
-const useTable = (initPageSize?: number, initSearchField?: string, initSearchQuery?: string): UseTableType => {
-  const [currentPage, setCurrentPage] = useState<number>(1);
+const useTable = ({
+  initPageSize = 5,
+  initSearchField = '',
+  initSearchQuery = '',
+  initCurrentPage = 1,
+  initSortKey = 'updated_at',
+  intiSortType = 'asc',
+}: UseTablePropsType): UseTableType => {
+  const [currentPage, setCurrentPage] = useState<number>(initCurrentPage);
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [pageSize, setPageSize] = useState<number>(initPageSize || 5);
-  const [searchField, setSearchField] = useState<string>(initSearchField || '');
-  const [searchQuery, setSearchQuery] = useState<string>(initSearchQuery || '');
+  const [pageSize, setPageSize] = useState<number>(initPageSize);
+  const [searchField, setSearchField] = useState<string>(initSearchField);
+  const [searchQuery, setSearchQuery] = useState<string>(initSearchQuery);
 
-  const sortKey = sorting.length > 0 ? sorting[0].id : 'user_id';
-  const sortType = sorting.length > 0 && sorting[0].desc ? 'desc' : 'asc';
+  const sortKey = sorting.length > 0 ? sorting[0].id : initSortKey;
+  const sortType = sorting.length > 0 && sorting[0].desc ? 'desc' : intiSortType;
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);

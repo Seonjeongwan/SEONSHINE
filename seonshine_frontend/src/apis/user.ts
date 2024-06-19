@@ -37,7 +37,7 @@ export const changeStatus = async (payload: ChangeStatusPayloadType): Promise<Ch
 export const getRestaurantList = async (
   params: GetRestaurantListApiPropsType,
 ): Promise<GetRestaurantListResponseType> => {
-  const response = await axiosInstance.get<GetRestaurantListResponseType>('/user/restaurant-list', {
+  const response = await axiosInstance.get<GetRestaurantListResponseType>('/restaurant/list', {
     params: params,
   });
   return response.data;
