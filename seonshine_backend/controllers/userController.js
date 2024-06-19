@@ -353,7 +353,6 @@ export const changeUserAvatar = async (req, res) => {
           user_id: userId,
           profile_picture_url: null,
         };
-        console.log('Delete');
         await UserProfile.create(profile);
       }
 
@@ -374,7 +373,8 @@ export const changeUserAvatar = async (req, res) => {
     });
 
     if (response?.data?.file) {
-      const { originalname, mimetype, filename, path, size } = response.data.file;
+      const { originalname, mimetype, filename, path, size } =
+        response.data.file;
       const upload = {
         original_name: originalname,
         type: mimetype,
@@ -399,11 +399,17 @@ export const changeUserAvatar = async (req, res) => {
 
       return res
         .status(httpStatusCodes.success)
-        .json({ message: "Update avatar successfully" });
+        .json({
+          message: "Update avatar successfully",
+          profile_picture_url: path,
+        });
     }
 
+    return res
+      .status(httpStatusCodes.internalServerError)
+      .json({ error: httpStatusErrors.internalServerError });
   } catch (error) {
-    console.log('error :>> ', error);
+    console.log("error :>> ", error);
     res
       .status(httpStatusCodes.internalServerError)
       .json({ error: httpStatusErrors.internalServerError });
