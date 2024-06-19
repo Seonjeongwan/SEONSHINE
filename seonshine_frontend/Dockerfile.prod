@@ -12,8 +12,9 @@ RUN apk add --no-cache yarn && \
 # 패키지 파일 복사
 COPY package.json yarn.lock ./
 
-# 의존성 설치
-RUN yarn install --frozen-lockfile
+# 의존성 설치 (제외하고)
+RUN yarn install 
+#--frozen-lockfile
 
 # 애플리케이션 코드 복사
 COPY . ./
@@ -31,7 +32,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 COPY default.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
-# EXPOSE 443
+EXPOSE 443
 
 CMD ["nginx", "-g", "daemon off;"]
 

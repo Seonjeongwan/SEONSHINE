@@ -13,6 +13,7 @@ const Header = () => {
     <Stack
       direction="column"
       gap={4}
+      className="px-8"
     >
       <Typography
         variant="heading2"

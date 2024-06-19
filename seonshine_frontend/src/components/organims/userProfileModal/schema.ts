@@ -5,7 +5,7 @@ import { errorMessages } from '@/constants/errorMessages';
 import { phoneNumberRegex } from '@/constants/regex';
 
 export const userInfoSchema = zod.object({
-  full_name: zod.string().min(1, { message: errorMessages.require }),
+  username: zod.string().min(1, { message: errorMessages.require }),
   birth_date: zod
     .string()
     .min(1, { message: errorMessages.require })
