@@ -16,39 +16,24 @@ import { MenuItemType, SidebarPropsType } from './types';
 export type userType = {
   user_id: string;
   role_id: string;
-  full_name: string;
+  username: string;
   email: string;
   branch_id: string;
   birth_date: string;
   address: string;
   phone_number: string;
-  status: string;
-  profilePicture: string;
+  user_status: string;
+  profile_picture_url: string;
 };
 
 const Sidebar = ({ role }: SidebarPropsType) => {
   const { logout } = useAuth();
-  const [user, setUser] = useState<userType>({
-    user_id: 'shinhanuser',
-    role_id: '1',
-    full_name: 'Shinhan User',
-    email: 'shinhanuser@mail.com',
-    branch_id: 'Centec',
-    birth_date: '10/12/2001',
-    address: 'Thu Duc, HCMC',
-    phone_number: '0123456789',
-    status: 'Active',
-    profilePicture: '',
-  });
 
   const allowedMenuItems = menuItems.filter((item) => item.permission.includes(role));
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
-  const handleSaveUser = (editedUser: userType) => {
-    setUser(editedUser);
-  };
 
   return (
     <Stack
@@ -91,15 +76,14 @@ const Sidebar = ({ role }: SidebarPropsType) => {
           onClick={handleOpenModal}
         >
           <Avatar className="bg-gray-200" />
-          {isModalOpen && (
-            <UserProfileModal
-              onSave={handleSaveUser}
-              user={user}
-              isOpen={isModalOpen}
-              onClose={handleCloseModal}
-            />
-          )}
         </IconButton>
+        {isModalOpen && (
+          <UserProfileModal
+            userId={'shinhanadmin'}
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
+          />
+        )}
 
         <IconButton
           aria-label="notifications"

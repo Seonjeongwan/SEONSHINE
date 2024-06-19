@@ -27,19 +27,6 @@ const UserManagementTab = () => {
 
   const queryClient = useQueryClient();
 
-  const [user, setUser] = useState<userType>({
-    user_id: 'shinhanuser',
-    role_id: '1',
-    full_name: 'Shinhan User',
-    email: 'shinhanuser@mail.com',
-    branch_id: 'Centec',
-    birth_date: '10/12/2001',
-    address: 'Thu Duc, HCMC',
-    phone_number: '0123456789',
-    status: 'Active',
-    profilePicture: '',
-  });
-
   const {
     currentPage,
     sortKey,
@@ -62,13 +49,15 @@ const UserManagementTab = () => {
 
   const { mutate: changeStatus } = useChangeStatusApi();
 
-  const handleOpenModal = () => setIsModalOpen(true);
+  const handleOpenModal = (userId: string) => {
+    setSelectedUser({ user_id: userId, status: -1 });
+    setIsModalOpen(true);
+  };
   const handleCloseModal = () => setIsModalOpen(false);
-  const handleSaveUser = (editedUser: userType) => setUser(editedUser);
 
-  const handleClickAction = (user_id: string, user_type: UserStatusEnum) => {
+  const handleClickAction = (userId: string, userStatus: UserStatusEnum) => {
     setIsConfirmModalOpen(true);
-    setSelectedUser({ user_id, status: user_type === '1' ? 9 : 1 });
+    setSelectedUser({ user_id: userId, status: userStatus === '1' ? 9 : 1 });
   };
 
   const handleConfirm = () => {
@@ -114,12 +103,14 @@ const UserManagementTab = () => {
         onSortingChange={handleSortingChange}
         page={handlePageChange}
       />
-      <UserProfileModal
-        onSave={handleSaveUser}
-        user={user}
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-      />
+      {isModalOpen && (
+        <UserProfileModal
+          userId={selectedUser?.user_id || ''}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+        />
+      )}
+
       <ConfirmModal
         open={isConfirmModalOpen}
         title={selectedUser?.status === 1 ? activeUserTitle : deactiveUserTitle}

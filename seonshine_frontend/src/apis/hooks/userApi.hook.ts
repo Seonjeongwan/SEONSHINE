@@ -5,11 +5,13 @@ import {
   ChangeStatusResponseType,
   GetRestaurantListApiPropsType,
   GetRestaurantListResponseType,
+  GetUserDetailApiPropsType,
+  GetUserDetailResponseType,
   GetUserListApiPropsType,
   GetUserListResponseType,
 } from '@/types/user';
 
-import { BranchResponseType, callBranches, changeStatus, getRestaurantList, getUserList } from '../user';
+import { BranchResponseType, callBranches, changeStatus, getRestaurantList, getUserDetail, getUserList } from '../user';
 
 interface UseGetBranchProps {
   enabled?: boolean;
@@ -49,6 +51,15 @@ export const useGetRestaurantListApi = (
     queryKey: ['getRestaurantList', params],
     queryFn: async () => {
       return getRestaurantList(params);
+    },
+  });
+};
+
+export const useGetUserDetailApi = (params: GetUserDetailApiPropsType): UseQueryResult<GetUserDetailResponseType> => {
+  return useQuery({
+    queryKey: ['getUserDetail', params],
+    queryFn: async () => {
+      return getUserDetail(params);
     },
   });
 };

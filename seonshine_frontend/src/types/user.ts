@@ -92,3 +92,21 @@ export type RestaurantType = {
   user_status: UserStatusEnum;
   weekday: string;
 };
+
+export type GetUserDetailApiPropsType = {
+  user_id: string;
+};
+
+export type GetUserDetailResponseType = {
+  user_id: string;
+  role_id: string;
+  username: string;
+  email: string;
+  branch_id: number;
+  phone_number: string;
+  user_status: string;
+  birth_date: string | null;
+  address: string | null;
+  profile_picture_url: string | null;
+  branch_name: string;
+};

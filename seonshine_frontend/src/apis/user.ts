@@ -4,6 +4,8 @@ import {
   ChangeStatusResponseType,
   GetRestaurantListApiPropsType,
   GetRestaurantListResponseType,
+  GetUserDetailApiPropsType,
+  GetUserDetailResponseType,
   GetUserListApiPropsType,
   GetUserListResponseType,
 } from '@/types/user';
@@ -38,5 +40,10 @@ export const getRestaurantList = async (
   const response = await axiosInstance.get<GetRestaurantListResponseType>('/user/restaurant-list', {
     params: params,
   });
+  return response.data;
+};
+
+export const getUserDetail = async ({ user_id }: GetUserDetailApiPropsType): Promise<GetUserDetailResponseType> => {
+  const response = await axiosInstance.get<GetUserDetailResponseType>(`/user/${user_id}`);
   return response.data;
 };
