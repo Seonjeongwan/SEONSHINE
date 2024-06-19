@@ -15,7 +15,6 @@ services:
     depends_on:
       - backend
       - fileserver
-      - certbot
     environment:
       - NODE_ENV=production
     restart: always
@@ -93,22 +92,8 @@ services:
     volumes:
       - certbot-etc:/etc/letsencrypt
       - certbot-www:/var/www/certbot
-    entrypoint: sh -c "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done"
-    command:
-      [
-        "certonly",
-        "--webroot",
-        "-w",
-        "/var/www/certbot",
-        "--email",
-        "seonshine.vn@gmail.com",
-        "-d",
-        "seonshine.net",
-        "-d",
-        "www.seonshine.net",
-        "--agree-tos",
-        "--no-eff-email",
-      ]
+    entrypoint: sh -c "trap exit TERM; while :; do if curl -s http://frontend:80 > /dev/null; then certbot certonly --webroot -w /var/www/certbot --email your-email@example.com -d seonshine.net -d www.seonshine.net --agree-tos --no-eff-email; certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h; else echo 'Waiting for frontend to be available...'; sleep 30; fi; done"
+    restart: always
 
 volumes:
   mysql-data:
