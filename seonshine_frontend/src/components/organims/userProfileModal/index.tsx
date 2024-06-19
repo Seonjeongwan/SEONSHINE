@@ -21,6 +21,7 @@ interface UserProfileModalProps {
 const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, isOpen, onClose, onSave }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string>(user.profilePicture);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -63,15 +64,27 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, isOpen, onClo
   };
 
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    setUploadError(null);
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
+      const validExtensions = ['image/png', 'image/jpeg', 'image/jpg'];
+      const maxFileSize = 5 * 1024 * 1024;
+
+      if (!validExtensions.includes(file.type)) {
+        setUploadError('Invalid file type. Only PNG, JPG and JPEG are allowed.');
+        return;
+      }
+
+      if (file.size > maxFileSize) {
+        setUploadError('File size exceeds 5MB.');
+        return;
+      }
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewUrl(reader.result as string);
       };
       reader.readAsDataURL(file);
-
-      // Auto upload logic
       try {
         // will call api upload photo later
         // const uploadedImageUrl = await uploadToServer(file);
@@ -79,6 +92,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, isOpen, onClo
         console.log('upload image api');
       } catch (error) {
         console.error('Error uploading image:', error);
+        setUploadError('Error uploading image. Please try again.');
       }
     }
   };
@@ -102,13 +116,13 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, isOpen, onClo
       aria-labelledby="user-profile-modal-title"
       aria-describedby="user-profile-modal-description"
     >
-      <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2/5 bg-white shadow-xl rounded-lg">
-        <Box className="flex">
-          <Box className="w-1/4 bg-gray-100 flex flex-col items-center rounded-lg">
+      <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full md:w-2/3 lg:w-2/5 bg-white shadow-xl rounded-lg">
+        <Box className="flex flex-col md:flex-row">
+          <Box className="w-full md:w-1/4 bg-gray-100 flex flex-col items-center rounded-lg p-4 md:p-0">
             <Avatar
               alt={user.full_name}
               src={previewUrl}
-              className="w-24 h-24 mt-12"
+              className="w-24 h-24 mt-4 md:mt-12"
             />
             <input
               accept="image/*"
@@ -120,13 +134,14 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, isOpen, onClo
             <label htmlFor="upload-photo">
               <Button
                 component="span"
-                className="hover:bg-green-300 hover:text-white hover:outline-green-300 bg-white text-green-200 font-bold outline outline-2 outline-green-200 mx-4 mt-8 rounded-xl"
+                className="hover:bg-green-300 hover:text-white hover:outline-green-300 bg-white text-green-200 font-bold outline outline-2 outline-green-200 mx-4 mt-4 md:mt-8 rounded-xl"
               >
                 Select Photo
               </Button>
             </label>
+            {uploadError && <p className="text-red-500 text-xs m-2">{uploadError}</p>}
           </Box>
-          <Box className="w-3/4 p-16 relative">
+          <Box className="w-full md:w-3/4 p-4 md:p-16 relative">
             {!isEditing ? (
               <IconButton
                 className="absolute top-6 right-6"
