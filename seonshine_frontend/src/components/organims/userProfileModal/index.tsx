@@ -8,6 +8,8 @@ import { Avatar, Box, Button, IconButton, Modal } from '@mui/material';
 
 import DatePicker from '@/components/molecules/datePicker/DatePicker';
 
+import { isValidImageFile } from '@/utils/file';
+
 import { userType } from '../sideBar';
 import { UserInfoSchema, userInfoSchema } from './schema';
 
@@ -67,17 +69,12 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, isOpen, onClo
     setUploadError(null);
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
-      const validExtensions = ['image/png', 'image/jpeg', 'image/jpg'];
-      const maxFileSize = 5 * 1024 * 1024;
-
-      if (!validExtensions.includes(file.type)) {
-        setUploadError('Invalid file type. Only PNG, JPG and JPEG are allowed.');
+      const validationResult = isValidImageFile(file);
+      if (!validationResult.isValid) {
+        setUploadError(validationResult.messageError || null);
         return;
-      }
-
-      if (file.size > maxFileSize) {
-        setUploadError('File size exceeds 5MB.');
-        return;
+      } else {
+        setUploadError(null);
       }
 
       const reader = new FileReader();
