@@ -1,41 +1,50 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import Slider from 'react-slick';
 
 import { Box, Stack } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
+import 'slick-carousel/slick/slick-theme.css';
+import 'slick-carousel/slick/slick.css';
 
-import SearchBar from '@/components/molecules/searchBar';
 import Table from '@/components/organims/table';
 
 import useTable from '@/hooks/useTable';
-import { paths } from '@/routes/paths';
-import { ChangeStatusPayloadType} from '@/types/user';
+import { OrderListType } from '@/types/order';
+import { ChangeStatusPayloadType } from '@/types/user';
 
-import { useChangeStatusApi, useGetUserListApi } from '@/apis/hooks/userApi.hook';
+import { useGetOrderListApi } from '@/apis/hooks/orderListApi.hook';
 
-import { UserTableHeader } from '../userManagement/components/UserManagementTab/UserTableHeader';
 import { OrderListHeader } from './OrderListHeader';
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
   const ITEMS_PER_PAGE = 10;
 
-  const handleSearch = (field: string, query: string) => {
-    console.log(`Searching for ${query} in field ${field}`);
-  };
-  const options = [
-    { value: 'user_id', label: 'ID' },
-    { value: 'fullname', label: 'Fullname' },
-    { value: 'branch', label: 'Branch' },
-  ];
-  const defaultOption = options[0].value;
-  const defaultValue = 'shinhanadmin';
   const settings = {
-    dots: false,
+    className: 'center',
     infinite: true,
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
+    centerPadding: '60px',
+    slidesToShow: 5,
     swipeToSlide: true,
+    afterChange: function (index) {
+      console.log(`Slider Changed to: ${index + 1}, background: #222; color: #bada55`);
+    },
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 3,
+          centerPadding: '40px',
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 2,
+          centerPadding: '20px',
+        },
+      },
+    ],
   };
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -44,69 +53,117 @@ const Dashboard = () => {
 
   const queryClient = useQueryClient();
 
-  const {
-    currentPage,
-    sortKey,
-    sortType,
-    pageSize,
-    handlePageChange,
-    handleSortingChange,
-    searchField,
-    searchQuery,
-  } = useTable({ initPageSize: ITEMS_PER_PAGE, initSortKey: 'user_id' });
+  const { currentPage, sortKey, sortType, pageSize, handlePageChange, handleSortingChange, searchField, searchQuery } =
+    useTable({ initPageSize: ITEMS_PER_PAGE, initSortKey: 'user_id' });
 
-  const { data, isFetching } = useGetUserListApi({
-    page_size: pageSize,
-    page_number: currentPage,
-    sort_key: sortKey,
-    sort_type: sortType,
+  const { data, isFetching } = useGetOrderListApi({
     [searchField]: searchQuery,
   });
 
   const columns = OrderListHeader();
   const dishes = [
-    { name: 'Dish 1', img: 'https://via.placeholder.com/150' },
-    { name: 'Dish 2', img: 'https://via.placeholder.com/150' },
-    { name: 'Dish 3', img: 'https://via.placeholder.com/150' },
-    { name: 'Dish 4', img: 'https://via.placeholder.com/150' },
-    { name: 'Dish 5', img: 'https://via.placeholder.com/150' },
-    { name: 'Dish 6', img: 'https://via.placeholder.com/150' },
+    {
+      name: 'Pho',
+      img: 'https://cdn.tgdd.vn/Files/2022/01/25/1412805/cach-nau-pho-bo-nam-dinh-chuan-vi-thom-ngon-nhu-hang-quan-202201250230038502.jpg ',
+    },
+    {
+      name: 'Bun Bo Hue',
+      img: 'https://cdn.tgdd.vn/Files/2018/04/01/1078873/nau-bun-bo-hue-cuc-de-tai-nha-tu-vien-gia-vi-co-san-202109161718049940.jpg',
+    },
+    {
+      name: 'Noodle',
+      img: 'https://cdn.mediamart.vn/images/news/di-mon-vi-hung-dn-lam-mi-kho-xa-xiu-ngon-nhu-ngoai-hang_16bbe0f5.jpg',
+    },
+    {
+      name: 'Banh mi Sai Gon',
+      img: 'https://static.vinwonders.com/production/banh-mi-sai-gon-2.jpg',
+    },
+    {
+      name: 'Grill Pork Rice',
+      img: 'https://i.ytimg.com/vi/h__kLq8NG2I/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLDqn7vasJHB1JVJB8uobiB67rxztw',
+    },
+    {
+      name: 'Bun Dau Mam Tom',
+      img: 'https://vietnamnomad.com/wp-content/uploads/2023/05/What-is-bun-dau-mam-tom.jpg',
+    },
   ];
+
   return (
-    <Box className="px-8">
-      <Stack className="flex h-1/6 gap-6">
-        <Box className="h-1/6 w-1/4 flex flex-col bg-white rounded-lg p-4">
+    <Box className="px-4 py-2 md:px-8 md:py-4">
+      <Stack className="flex flex-wrap md:flex-nowrap gap-4 md:gap-6">
+        <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-lg p-4">
           <Stack className="flex-grow">Today's Restaurant</Stack>
           <Stack className="font-bold text-2xl">PAPA'S CHICKEN</Stack>
         </Box>
-        <Box className="h-1/6 w-1/4 flex flex-col bg-white rounded-lg p-4">
+        <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-lg p-4">
           <Stack className="flex-grow">Ordered Users</Stack>
           <Stack className="self-end font-bold text-2xl">12</Stack>
         </Box>
-        <Box className="h-1/6 w-1/4 flex flex-col bg-white rounded-lg p-4">
+        <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-lg p-4">
           <Stack className="flex-grow">Active Users</Stack>
           <Stack className="self-end font-bold text-2xl">32</Stack>
         </Box>
-        <Box className="h-1/6 w-1/4 flex flex-col bg-white rounded-lg p-4">
+        <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-lg p-4">
           <Stack className="flex-grow">Waiting for Approval</Stack>
           <Stack className="self-end font-bold text-2xl">8</Stack>
         </Box>
       </Stack>
-      <Stack className="h-1/3 mt-6 w-max">
-        {/* <Slider></Slider> */}
-        <Box className="h-2/5">
-          <h2 className="text-2xl font-bold">Today's Menu</h2>
-          <Box className="w-full h-full flex flex-col bg-white rounded-lg p-4"></Box>
+      <Stack className="mt-6 w-full">
+        <Box className="w-full">
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <h2 className="text-2xl font-bold">Today's Menu</h2>
+            <Link
+              to="/restaurant-menu"
+              className="text-blue-500 hover:underline"
+            >
+              Show more
+            </Link>
+          </Stack>
+          <Box className="flex flex-col bg-white rounded-lg mt-2">
+            <Slider {...settings}>
+              {dishes.map((dish, index) => (
+                <Box
+                  key={index}
+                  className="p-2 md:p-4 outline-none"
+                >
+                  <img
+                    src={dish.img}
+                    alt={dish.name}
+                    className="w-full h-32 md:h-40 object-cover rounded-lg"
+                  />
+                  <h3 className="text-center mt-2">{dish.name}</h3>
+                </Box>
+              ))}
+            </Slider>
+          </Box>
         </Box>
       </Stack>
       <Stack className="flex-1 mt-6">
         <Box className="w-full">
-          <h2 className="text-2xl font-bold">Order List</h2>
+        <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            className='mb-2'
+          >
+            <h2 className="text-2xl font-bold">Order List</h2>
+            <Link
+              to="/order-list"
+              className="text-blue-500 hover:underline"
+            >
+              Show more
+            </Link>
+          </Stack>
           <Table<OrderListType>
             data={data?.data || []}
             columns={columns}
             isFetching={isFetching}
-            currentPage={currentPage}
+            currentPage={0}
+            onPageChange={() => {}}
           />
         </Box>
       </Stack>

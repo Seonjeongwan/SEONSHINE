@@ -13,17 +13,24 @@ export const OrderListHeader = (): CustomColumnDef<OrderListType>[] => [
     enableSorting: false,
   },
   {
-    accessorKey: 'username',
+    accessorKey: 'restaurant_name',
     header: 'Restaurant',
     cell: (user) => {
-      return user.row.original.username || '...';
+      return user.row.original.restaurant_name || '...';
     },
   },
   {
-    accessorKey: 'odered_items',
+    accessorKey: 'employee_name',
+    header: 'Employee Name',
+    cell: (user) => {
+      return user.row.original.employee_name || '...';
+    },
+  },
+  {
+    accessorKey: 'ordered_items',
     header: 'Ordered Items',
     cell: (user) => {
-      return user.row.original.odered_items || '...';
+      return user.row.original.ordered_items || '...';
     },
   },
   {
