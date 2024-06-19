@@ -13,6 +13,7 @@ import express from "express";
 // import commonRouter from "./routes/commonRoutes";
 // import "./db/sync.js";
 import commonRouter from "./routes/commonRoutes.js";
+import restaurantRouter from "./routes/restaurantRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 //const orderRoutes = require("./routes/orderRoutes");
 
@@ -32,6 +33,7 @@ app.use(bodyParser.json());
 // Define route handlers
 // app.use("/auth", authRoutes);
 app.use("/api/user", userRouter);
+app.use("/api/restaurant", restaurantRouter);
 app.use("/api/common", commonRouter);
 // app.use("/order", orderRoutes);
 

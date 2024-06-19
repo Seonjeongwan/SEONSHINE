@@ -9,9 +9,15 @@ export const endpoints = {
     delete: "/branches/:id",
   },
   users: {
-    list: '/list',
-    restaurantList: '/restaurant-list',
-    detail: '/:id',
-    changeStatus: '/change-status'
-  }
+    list: "/list",
+    detail: "/:id",
+    restaurantDetail: "/:id",
+    changeStatus: "/change-status",
+    changeAvatar: "/change-avatar",
+    waitingConfirm: "/waiting-confirm",
+  },
+  restaurant: {
+    list: "/list",
+    detail: "/:id",
+  },
 };
