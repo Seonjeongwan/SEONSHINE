@@ -3,15 +3,28 @@ import { useMutation, UseMutationResult, useQuery, UseQueryResult } from '@tanst
 import {
   ChangeStatusPayloadType,
   ChangeStatusResponseType,
+  GetRestaurantDetailApiPropsType,
+  GetRestaurantDetailResponseType,
   GetRestaurantListApiPropsType,
   GetRestaurantListResponseType,
   GetUserDetailApiPropsType,
   GetUserDetailResponseType,
   GetUserListApiPropsType,
   GetUserListResponseType,
+  GetWaitingUserListApiPropsType,
+  GetWaitingUserListResponseType,
 } from '@/types/user';
 
-import { BranchResponseType, callBranches, changeStatus, getRestaurantList, getUserDetail, getUserList } from '../user';
+import {
+  BranchResponseType,
+  callBranches,
+  changeStatus,
+  getRestaurantDetail,
+  getRestaurantList,
+  getUserDetail,
+  getUserList,
+  getWaitingUserList,
+} from '../user';
 
 interface UseGetBranchProps {
   enabled?: boolean;
@@ -60,6 +73,28 @@ export const useGetUserDetailApi = (params: GetUserDetailApiPropsType): UseQuery
     queryKey: ['getUserDetail', params],
     queryFn: async () => {
       return getUserDetail(params);
+    },
+  });
+};
+
+export const useGetRestaurantDetailApi = (
+  params: GetRestaurantDetailApiPropsType,
+): UseQueryResult<GetRestaurantDetailResponseType> => {
+  return useQuery({
+    queryKey: ['getRestaurantDetail', params],
+    queryFn: async () => {
+      return getRestaurantDetail(params);
+    },
+  });
+};
+
+export const useWaitingUserListApi = (
+  params: GetWaitingUserListApiPropsType,
+): UseQueryResult<GetWaitingUserListResponseType> => {
+  return useQuery({
+    queryKey: ['getWaitingUserList', params],
+    queryFn: async () => {
+      return getWaitingUserList(params);
     },
   });
 };

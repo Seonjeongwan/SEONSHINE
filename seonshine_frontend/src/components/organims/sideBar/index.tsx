@@ -13,19 +13,6 @@ import UserProfileModal from '../userProfileModal';
 import { iconMap } from './constants';
 import { MenuItemType, SidebarPropsType } from './types';
 
-export type userType = {
-  user_id: string;
-  role_id: string;
-  username: string;
-  email: string;
-  branch_id: string;
-  birth_date: string;
-  address: string;
-  phone_number: string;
-  user_status: string;
-  profile_picture_url: string;
-};
-
 const Sidebar = ({ role }: SidebarPropsType) => {
   const { logout } = useAuth();
 

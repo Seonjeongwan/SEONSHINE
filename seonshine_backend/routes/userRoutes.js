@@ -7,6 +7,7 @@ import {
   getUserDetail,
   getUserList,
   getUserWaitingConfirmList,
+  updateUser,
 } from "../controllers/userController.js";
 import { authenticateToken } from "../middleware/auth.js";
 import { validateChangeStatus } from "../middleware/validation/userValidate.js";
@@ -44,10 +45,10 @@ userRouter.post(
   changeUserAvatar
 );
 
-// userRouter.put(
-//   endpoints.users.edit,
-//   authenticateToken(),
-//   updateUser
-// );
+userRouter.put(
+  endpoints.users.edit,
+  authenticateToken(),
+  updateUser
+);
 
 export default userRouter;
