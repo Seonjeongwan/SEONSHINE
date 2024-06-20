@@ -58,8 +58,13 @@ export const uploadImage = async (
   payload: UploadImagePayloadType,
   user_id: string,
 ): Promise<UploadImageResponseType> => {
-  console.log({ payload });
-  const response = await axiosInstance.post<UploadImageResponseType>(`/user/${user_id}/change-avatar`, payload);
+  const formData = new FormData();
+  formData.append('file', payload.file);
+  const response = await axiosInstance.post<UploadImageResponseType>(`/user/${user_id}/change-avatar`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return response.data;
 };
 
