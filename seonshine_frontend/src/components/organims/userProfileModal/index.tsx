@@ -4,14 +4,14 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import EditIcon from '@mui/icons-material/Edit';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import { Avatar, Box, Button, IconButton, Modal, Skeleton } from '@mui/material';
+import { Avatar, Box, Button, IconButton, MenuItem, Modal, Select, Skeleton } from '@mui/material';
 
 import DatePicker from '@/components/molecules/datePicker/DatePicker';
 
-import { UserDetailType } from '@/types/user';
+import { labelRoleById, labelUserStatus, RoleEnum, UserDetailType, UserStatusEnum } from '@/types/user';
 import { isValidImageFile } from '@/utils/file';
 
-import { useGetUserDetailApi } from '@/apis/hooks/userApi.hook';
+import { useGetBranches, useGetUserDetailApi } from '@/apis/hooks/userApi.hook';
 
 import { UserInfoSchema, userInfoSchema } from './schema';
 
@@ -21,16 +21,31 @@ interface UserProfileModalProps {
   onClose: () => void;
 }
 
-const fields = [
+const fields: Array<{
+  name: keyof UserDetailType;
+  label: string;
+  disabled: boolean;
+  useLabel?: (id: string) => string;
+}> = [
   { name: 'user_id', label: 'ID', disabled: true },
-  { name: 'role_id', label: 'Type of User', disabled: true },
+  {
+    name: 'role_id',
+    label: 'Type of User',
+    disabled: true,
+    useLabel: (id: string) => labelRoleById[id as RoleEnum],
+  },
   { name: 'username', label: 'Full name', disabled: false },
   { name: 'email', label: 'Email', disabled: true },
-  { name: 'branch_id', label: 'Branch', disabled: true },
+  { name: 'branch_name', label: 'Branch', disabled: false },
   { name: 'birth_date', label: 'Birth Date', disabled: false },
   { name: 'address', label: 'Address', disabled: false },
   { name: 'phone_number', label: 'Phone Number', disabled: false },
-  { name: 'user_status', label: 'Status', disabled: true },
+  {
+    name: 'user_status',
+    label: 'Status',
+    disabled: true,
+    useLabel: (id: string) => labelUserStatus[Number(id) as UserStatusEnum],
+  },
 ];
 
 const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onClose }) => {
@@ -44,16 +59,20 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
     defaultValues: {
       username: user?.username,
       birth_date: user?.birth_date,
+      branch_id: user?.branch_id,
       address: user?.address,
       phone_number: user?.phone_number,
     },
     resolver: zodResolver(userInfoSchema),
   });
 
+  const { data: branchData = [] } = useGetBranches({ enabled: true });
+
   const handleEditToggle = () => setIsEditing(!isEditing);
 
   const handleSave = (data: any) => {
     // onSave({ ...user, ...data, profilePicture: previewUrl });
+    console.log({ data });
     setIsEditing(false);
   };
 
@@ -63,6 +82,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
     reset({
       username: user?.username,
       birth_date: user?.birth_date,
+      branch_id: user?.branch_id,
       address: user?.address,
       phone_number: user?.phone_number,
     });
@@ -107,6 +127,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
     reset({
       username: user?.username,
       birth_date: user?.birth_date,
+      branch_id: user?.branch_id,
       address: user?.address,
       phone_number: user?.phone_number,
     });
@@ -163,7 +184,10 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
             <form onSubmit={handleSubmit(handleSave)}>
               {fields.map((field) => {
                 return isLoading ? (
-                  <Skeleton height={30} />
+                  <Skeleton
+                    height={30}
+                    key={field.name}
+                  />
                 ) : (
                   <Box
                     key={field.name}
@@ -176,6 +200,29 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
                           name={field.name}
                           control={control}
                           disabled={field.disabled}
+                        />
+                      ) : isEditing && field.name === 'branch_name' && !field.disabled ? (
+                        <Controller
+                          name="branch_id"
+                          control={control}
+                          render={({ field, fieldState: { error } }) => (
+                            <select
+                              {...field}
+                              className={`bg-white w-full outline-none border-b-2 border-black ${
+                                !!error ? 'border-red-500' : 'border-black'
+                              }`}
+                            >
+                              {Array.isArray(branchData) &&
+                                branchData.map((branch) => (
+                                  <option
+                                    key={branch.branch_id}
+                                    value={branch.branch_id}
+                                  >
+                                    {branch.branch_name}
+                                  </option>
+                                ))}
+                            </select>
+                          )}
                         />
                       ) : isEditing && !field.disabled ? (
                         <Controller
@@ -196,6 +243,8 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
                             </>
                           )}
                         />
+                      ) : !!field.useLabel ? (
+                        <span>{field.useLabel(user?.[field.name] as string)}</span>
                       ) : (
                         <span>{user?.[field.name as keyof UserDetailType]}</span>
                       )}

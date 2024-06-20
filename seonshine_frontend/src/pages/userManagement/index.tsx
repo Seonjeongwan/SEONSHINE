@@ -18,15 +18,15 @@ function TabPanel(props: TabPanelPropsType) {
   const { children, value, index, ...other } = props;
 
   return (
-    <div
+    <Box
       role="tabpanel"
       hidden={value !== index}
       id={`full-width-tabpanel-${index}`}
       aria-labelledby={`full-width-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
-    </div>
+      {value === index && <Box>{children}</Box>}
+    </Box>
   );
 }
 
@@ -48,7 +48,7 @@ const UserManagement = () => {
         <StyledTab label="Restaurant Management" />
         <StyledTab label="Approval" />
       </StyledTabs>
-      <Box className="px-8 mt-4">
+      <Box className="px-4 md:px-8 mt-8">
         <TabPanel
           value={value}
           index={0}

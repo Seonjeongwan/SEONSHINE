@@ -4,7 +4,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { Control, Controller, useFormState } from 'react-hook-form';
 
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import { format, isValid, parse } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
 
 interface DatePickerProps {
   name: string;
@@ -30,10 +30,10 @@ const DatePicker: React.FC<DatePickerProps> = ({ name, control, disabled = false
         validate: (value) => {
           if (!value) return 'Date is required';
 
-          const parsedDate = parse(value, 'dd/MM/yyyy', new Date());
+          const parsedDate = parseISO(value);
           if (!isValid(parsedDate)) return 'Invalid date';
 
-          const [day, month, year] = value.split('/');
+          const [year, month, day] = value.split('-');
           if (parseInt(day, 10) < 1 || parseInt(day, 10) > 31) return 'Invalid day';
           if (parseInt(month, 10) < 1 || parseInt(month, 10) > 12) return 'Invalid month';
           if (parseInt(year, 10) < 1900 || parseInt(year, 10) > new Date().getFullYear()) return 'Invalid year';
@@ -42,24 +42,20 @@ const DatePicker: React.FC<DatePickerProps> = ({ name, control, disabled = false
         },
       }}
       render={({ field: { onChange, value }, fieldState: { error } }) => {
-        const dateValue = value
-          ? typeof value === 'string'
-            ? parse(value, 'dd/MM/yyyy', new Date())
-            : new Date(value)
-          : null;
+        const dateValue = value ? (typeof value === 'string' ? parseISO(value) : new Date(value)) : null;
 
         return (
           <div className="flex items-center">
             <ReactDatePicker
               ref={datePickerRef}
               selected={dateValue && isValid(dateValue) ? dateValue : null}
-              onChange={(date) => onChange(date ? format(date, 'dd/MM/yyyy') : '')}
+              onChange={(date) => onChange(date ? format(date, 'yyyy-MM-dd') : '')}
               disabled={disabled}
               className={`bg-white w-full outline-none border-b-2 border-black ${
                 error ? 'border-red-500' : 'border-black'
               }`}
               placeholderText="Select date"
-              dateFormat="dd/MM/yyyy"
+              dateFormat="yyyy-MM-dd"
             />
             <CalendarMonthIcon
               className="ml-2 text-gray-600 cursor-pointer"
