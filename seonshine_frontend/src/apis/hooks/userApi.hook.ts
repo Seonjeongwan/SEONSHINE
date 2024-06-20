@@ -3,12 +3,16 @@ import { useMutation, UseMutationResult, useQuery, UseQueryResult } from '@tanst
 import {
   ChangeStatusPayloadType,
   ChangeStatusResponseType,
+  GetRestaurantDetailApiPropsType,
+  GetRestaurantDetailResponseType,
   GetRestaurantListApiPropsType,
   GetRestaurantListResponseType,
   GetUserDetailApiPropsType,
   GetUserDetailResponseType,
   GetUserListApiPropsType,
   GetUserListResponseType,
+  GetWaitingUserListApiPropsType,
+  GetWaitingUserListResponseType,
   UploadImagePayloadType,
   UploadImageResponseType,
 } from '@/types/user';
@@ -17,9 +21,11 @@ import {
   BranchResponseType,
   callBranches,
   changeStatus,
+  getRestaurantDetail,
   getRestaurantList,
   getUserDetail,
   getUserList,
+  getWaitingUserList,
   uploadImage,
 } from '../user';
 
@@ -80,6 +86,28 @@ export const useUploadImageApi = (
   return useMutation({
     mutationFn: async (payload) => {
       return uploadImage(payload, user_id);
+    },
+  });
+};
+
+export const useGetRestaurantDetailApi = (
+  params: GetRestaurantDetailApiPropsType,
+): UseQueryResult<GetRestaurantDetailResponseType> => {
+  return useQuery({
+    queryKey: ['getRestaurantDetail', params],
+    queryFn: async () => {
+      return getRestaurantDetail(params);
+    },
+  });
+};
+
+export const useWaitingUserListApi = (
+  params: GetWaitingUserListApiPropsType,
+): UseQueryResult<GetWaitingUserListResponseType> => {
+  return useQuery({
+    queryKey: ['getWaitingUserList', params],
+    queryFn: async () => {
+      return getWaitingUserList(params);
     },
   });
 };

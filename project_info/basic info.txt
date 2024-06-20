@@ -50,4 +50,8 @@ seonshine_backend
 
 
 ssl 초기 발급을 위해서 명령어 실행 필요 (맨초기만)
+docker-compose -f docker-compose.prod.yml up -d frontend
 docker-compose -f docker-compose.prod.yml run -d certbot certonly --webroot -w /var/www/certbot --seonshine.vn@gmail.com -d seonshine.net -d www.seonshine.net --agree-tos --no-eff-email
+
+권한 이슈 존재
+chmod +x ./seonshine_frontend/renewal-hooks/deploy/reload-nginx.sh

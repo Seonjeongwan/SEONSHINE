@@ -2,12 +2,16 @@ import axiosInstance from '@/configs/axios';
 import {
   ChangeStatusPayloadType,
   ChangeStatusResponseType,
+  GetRestaurantDetailApiPropsType,
+  GetRestaurantDetailResponseType,
   GetRestaurantListApiPropsType,
   GetRestaurantListResponseType,
   GetUserDetailApiPropsType,
   GetUserDetailResponseType,
   GetUserListApiPropsType,
   GetUserListResponseType,
+  GetWaitingUserListApiPropsType,
+  GetWaitingUserListResponseType,
   UploadImagePayloadType,
   UploadImageResponseType,
 } from '@/types/user';
@@ -56,5 +60,21 @@ export const uploadImage = async (
 ): Promise<UploadImageResponseType> => {
   console.log({ payload });
   const response = await axiosInstance.post<UploadImageResponseType>(`/user/${user_id}/change-avatar`, payload);
+  return response.data;
+};
+
+export const getRestaurantDetail = async ({
+  restaurant_id,
+}: GetRestaurantDetailApiPropsType): Promise<GetRestaurantDetailResponseType> => {
+  const response = await axiosInstance.get<GetRestaurantDetailResponseType>(`/restaurant/${restaurant_id}`);
+  return response.data;
+};
+
+export const getWaitingUserList = async (
+  params: GetWaitingUserListApiPropsType,
+): Promise<GetWaitingUserListResponseType> => {
+  const response = await axiosInstance.get<GetWaitingUserListResponseType>('/user/waiting-confirm', {
+    params: params,
+  });
   return response.data;
 };

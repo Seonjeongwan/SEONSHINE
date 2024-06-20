@@ -1,6 +1,6 @@
 import express from "express";
 import { UserRole } from "../constants/auth.js";
-import { getRestaurantDetail, getRestaurantList } from "../controllers/restaurantController.js";
+import { getRestaurantDetail, getRestaurantList, updateRestaurant } from "../controllers/restaurantController.js";
 import { authenticateToken } from "../middleware/auth.js";
 import { endpoints } from "./endpoints.js";
 
@@ -17,5 +17,7 @@ restaurantRouter.get(
   authenticateToken({ role: UserRole.admin }),
   getRestaurantDetail
 );
+
+restaurantRouter.put(endpoints.restaurant.edit, authenticateToken(), updateRestaurant);
 
 export default restaurantRouter;

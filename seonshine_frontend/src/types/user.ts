@@ -10,6 +10,12 @@ export const labelIDByRole: { [key in RoleEnum]: string } = {
   [RoleEnum.RESTAURANT]: 'ID',
 };
 
+export const labelRoleById: { [key in RoleEnum]: string } = {
+  [RoleEnum.ADMIN]: 'Admin',
+  [RoleEnum.USER]: 'User',
+  [RoleEnum.RESTAURANT]: 'Restaurant',
+};
+
 export type CurrentUserType = {
   user_id: string;
   role_id: RoleEnum;
@@ -99,6 +105,10 @@ export type GetUserDetailApiPropsType = {
   user_id: string;
 };
 
+export type GetRestaurantDetailApiPropsType = {
+  restaurant_id: string;
+};
+
 export type GetUserDetailResponseType = {
   user_id: string;
   role_id: string;
@@ -119,5 +129,44 @@ export type UploadImagePayloadType = {
 
 export type UploadImageResponseType = {
   message: string;
-  profile_picture_url: string;
+  profile_picture_url: string;};
+
+export type UserDetailType = GetUserDetailResponseType;
+
+export type GetRestaurantDetailResponseType = {
+  user_id: string;
+  role_id: string;
+  username: string;
+  email: string;
+  phone_number: string;
+  user_status: string;
+  address: string | null;
+  profile_picture_url: string | null;
+  weekday: string | null;
 };
+
+export type RestaurantDetailType = GetRestaurantDetailResponseType;
+
+export type WaitingUserType = {
+  user_id: string;
+  username: string;
+  role_id: RoleEnum;
+  email: string;
+};
+
+export type GetWaitingUserListResponseType = {
+  data: WaitingUserType[];
+  page_number: string;
+  page_size: string;
+  sort_key: string;
+  sort_type: string;
+  total: number;
+};
+
+export type GetWaitingUserListApiPropsType = {
+  page_size: number;
+  page_number: number;
+  sort_key?: string;
+  sort_type?: 'asc' | 'desc';
+  searchField?: string;
+}
