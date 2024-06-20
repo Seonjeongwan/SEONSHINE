@@ -3,7 +3,7 @@ import { Op, QueryTypes, Sequelize } from "sequelize";
 import httpUpload from "../config/axiosUpload.js";
 import { UserRole, UserStatus } from "../constants/auth.js";
 import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
-import { sequelizeCommonDb, sequelizeUserDb } from "../db/dbConfig.js";
+import { sequelizeUserDb } from "../db/dbConfig.js";
 import Branch from "../models/branchModel.js";
 import { User, UserProfile } from "../models/index.js";
 import Upload from "../models/uploadModel.js";
@@ -291,7 +291,6 @@ export const updateUser = async (req, res) => {
   const userId = req.params.id;
   const { username, branch_id, address, phone_number, birth_date } = req.body;
   const transactionUserDb = await sequelizeUserDb.transaction();
-  const transactionCommonDb = await sequelizeCommonDb.transaction();
 
   try {
     const user = await User.findOne({
@@ -341,7 +340,6 @@ export const updateUser = async (req, res) => {
       .json({ message: "Updated successfully" });
   } catch (error) {
     await transactionUserDb.rollback();
-    await transactionCommonDb.rollback();
     res
       .status(httpStatusCodes.internalServerError)
       .json({ error: httpStatusErrors.internalServerError });

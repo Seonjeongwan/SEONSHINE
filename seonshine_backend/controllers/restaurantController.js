@@ -1,4 +1,5 @@
 import { QueryTypes } from "sequelize";
+import { UserRole } from "../constants/auth.js";
 import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
 import { sequelizeUserDb } from "../db/dbConfig.js";
 import { User, UserProfile } from "../models/index.js";
@@ -103,13 +104,70 @@ export const getRestaurantDetail = async (req, res) => {
     const restaurantAssigned = await RestaurantAssigned.findOne({
       attributes: ["weekday"],
       where: { restaurant_id: id },
-      raw: true
+      raw: true,
     });
 
     restaurantData.weekday = restaurantAssigned?.weekday || null;
 
     res.status(httpStatusCodes.success).json(restaurantData);
   } catch (error) {
+    res
+      .status(httpStatusCodes.internalServerError)
+      .json({ error: httpStatusErrors.internalServerError });
+  }
+};
+
+export const updateRestaurant = async (req, res) => {
+  const userId = req.params.id;
+  const { username, address, phone_number } = req.body;
+  const transactionUserDb = await sequelizeUserDb.transaction();
+
+  try {
+    const user = await User.findOne({
+      where: { user_id: userId, role_id: UserRole.restaurant },
+      transaction: transactionUserDb,
+    });
+
+    if (!user) {
+      res.status(httpStatusCodes.badRequest).json({ error: "User not found" });
+    }
+
+    const userUpdates = {
+      username,
+      phone_number,
+    };
+
+    await user.update(userUpdates, { transaction: transactionUserDb });
+
+    const profileUpdates = {
+      address,
+    };
+
+    const profile = await UserProfile.findOne({
+      where: {
+        user_id: userId,
+      },
+    });
+
+    if (profile) {
+      await profile.update(profileUpdates, {
+        transaction: transactionUserDb,
+      });
+    } else {
+      const profile = {
+        ...profileUpdates,
+        user_id: userId,
+      };
+      await UserProfile.create(profile, { transaction: transactionUserDb });
+    }
+
+    await transactionUserDb.commit();
+
+    res
+      .status(httpStatusCodes.success)
+      .json({ message: "Updated successfully" });
+  } catch (error) {
+    await transactionUserDb.rollback();
     res
       .status(httpStatusCodes.internalServerError)
       .json({ error: httpStatusErrors.internalServerError });
