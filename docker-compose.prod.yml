@@ -106,6 +106,8 @@ services:
       certbot renew --webroot -w /var/www/certbot --quiet && sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
       sleep 86400;
       done'
+    depends_on:
+      - frontend
     restart: always
 
 volumes:
