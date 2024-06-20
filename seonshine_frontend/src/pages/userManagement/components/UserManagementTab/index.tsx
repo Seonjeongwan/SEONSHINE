@@ -6,7 +6,6 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import SearchBar from '@/components/molecules/searchBar';
 import ConfirmModal from '@/components/organims/confirmModal';
-import { userType } from '@/components/organims/sideBar';
 import Table from '@/components/organims/table';
 import UserProfileModal from '@/components/organims/userProfileModal';
 
@@ -59,6 +58,7 @@ const UserManagementTab = () => {
     setSelectedUser({ user_id: userId, status: -1 });
     setIsModalOpen(true);
   };
+
   const handleCloseModal = () => setIsModalOpen(false);
 
   const handleClickAction = (userId: string, userStatus: UserStatusEnum) => {
@@ -105,7 +105,6 @@ const UserManagementTab = () => {
         isFetching={isFetching}
         pageCount={data ? Math.ceil(data.total / pageSize) : 0}
         onSortingChange={handleSortingChange}
-        page={handlePageChange}
         currentPage={currentPage}
         onPageChange={handlePageChange}
       />

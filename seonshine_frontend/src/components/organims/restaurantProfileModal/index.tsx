@@ -8,12 +8,12 @@ import { Avatar, Box, Button, IconButton, Modal, Skeleton } from '@mui/material'
 
 import DatePicker from '@/components/molecules/datePicker/DatePicker';
 
-import { UserDetailType } from '@/types/user';
+import { RestaurantDetailType } from '@/types/user';
 import { isValidImageFile } from '@/utils/file';
 
-import { useGetUserDetailApi } from '@/apis/hooks/userApi.hook';
+import { useGetRestaurantDetailApi, useGetUserDetailApi } from '@/apis/hooks/userApi.hook';
 
-import { UserInfoSchema, userInfoSchema } from './schema';
+import { RestaurantInfoSchema, restaurantInfoSchema } from './schema';
 
 interface UserProfileModalProps {
   userId: string;
@@ -21,21 +21,20 @@ interface UserProfileModalProps {
   onClose: () => void;
 }
 
-const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onClose }) => {
-  const { data: user, isLoading } = useGetUserDetailApi({ user_id: userId });
+const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onClose }) => {
+  const { data: restaurant, isLoading } = useGetRestaurantDetailApi({ restaurant_id: userId });
 
   const [isEditing, setIsEditing] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string>(user?.profile_picture_url || '');
+  const [previewUrl, setPreviewUrl] = useState<string>(restaurant?.profile_picture_url || '');
 
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
-      username: user?.username,
-      birth_date: user?.birth_date,
-      address: user?.address,
-      phone_number: user?.phone_number,
+      username: restaurant?.username,
+      address: restaurant?.address,
+      phone_number: restaurant?.phone_number,
     },
-    resolver: zodResolver(userInfoSchema),
+    resolver: zodResolver(restaurantInfoSchema),
   });
 
   const handleEditToggle = () => setIsEditing(!isEditing);
@@ -47,24 +46,22 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
 
   const handleCancel = () => {
     setIsEditing(false);
-    setPreviewUrl(user?.profile_picture_url || '');
+    setPreviewUrl(restaurant?.profile_picture_url || '');
     reset({
-      username: user?.username,
-      birth_date: user?.birth_date,
-      address: user?.address,
-      phone_number: user?.phone_number,
+      username: restaurant?.username,
+      address: restaurant?.address,
+      phone_number: restaurant?.phone_number,
     });
   };
 
   const handleClose = () => {
     onClose();
     setIsEditing(false);
-    setPreviewUrl(user?.profile_picture_url || '');
+    setPreviewUrl(restaurant?.profile_picture_url || '');
     reset({
-      username: user?.username,
-      birth_date: user?.birth_date,
-      address: user?.address,
-      phone_number: user?.phone_number,
+      username: restaurant?.username,
+      address: restaurant?.address,
+      phone_number: restaurant?.phone_number,
     });
   };
 
@@ -102,8 +99,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
     { name: 'role_id', label: 'Type of User', disabled: true },
     { name: 'username', label: 'Full name', disabled: false },
     { name: 'email', label: 'Email', disabled: true },
-    { name: 'branch_id', label: 'Branch', disabled: true },
-    { name: 'birth_date', label: 'Birth Date', disabled: false },
+    { name: 'weekday', label: 'Assigned date', disabled: true },
     { name: 'address', label: 'Address', disabled: false },
     { name: 'phone_number', label: 'Phone Number', disabled: false },
     { name: 'user_status', label: 'Status', disabled: true },
@@ -111,12 +107,11 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
 
   useEffect(() => {
     reset({
-      username: user?.username,
-      birth_date: user?.birth_date,
-      address: user?.address,
-      phone_number: user?.phone_number,
+      username: restaurant?.username,
+      address: restaurant?.address,
+      phone_number: restaurant?.phone_number,
     });
-  }, [user]);
+  }, [restaurant]);
 
   return (
     <Modal
@@ -136,7 +131,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
               />
             ) : (
               <Avatar
-                alt={user?.username}
+                alt={restaurant?.username}
                 src={previewUrl}
                 className="w-24 h-24 mt-4 md:mt-12"
               />
@@ -185,15 +180,9 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
                   >
                     <div className="w-1/2 font-bold">{field.label}</div>
                     <div className="w-1/2">
-                      {isEditing && field.name === 'birth_date' && !field.disabled ? (
-                        <DatePicker
-                          name={field.name}
-                          control={control}
-                          disabled={field.disabled}
-                        />
-                      ) : isEditing && !field.disabled ? (
+                      {isEditing && !field.disabled ? (
                         <Controller
-                          name={field.name as keyof UserInfoSchema}
+                          name={field.name as keyof RestaurantInfoSchema}
                           control={control}
                           render={({ field, fieldState: { error } }) => (
                             <>
@@ -211,7 +200,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
                           )}
                         />
                       ) : (
-                        <span>{user?.[field.name as keyof UserDetailType]}</span>
+                        <span>{restaurant?.[field.name as keyof RestaurantDetailType]}</span>
                       )}
                     </div>
                   </Box>
@@ -248,4 +237,4 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
   );
 };
 
-export default UserProfileModal;
+export default RestaurantProfileModal;
