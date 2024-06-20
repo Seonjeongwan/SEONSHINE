@@ -98,11 +98,12 @@ services:
     entrypoint: sh -c '
       if [ ! -f /etc/letsencrypt/live/seonshine.net/fullchain.pem ]; then
       certbot certonly --webroot -w /var/www/certbot --email your-email@example.com -d seonshine.net -d www.seonshine.net --agree-tos --no-eff-email;
-      docker-compose -f docker-compose.prod.yml exec frontend sh -c "mv /etc/nginx/conf.d/default.ssl.conf /etc/nginx/conf.d/default.conf && nginx -s reload";
+      mv /etc/nginx/conf.d/default.ssl.conf /etc/nginx/conf.d/default.conf;
+      nginx -s reload;
       fi;
       trap exit TERM;
       while :; do
-      certbot renew --webroot -w /var/www/certbot --quiet && docker-compose -f docker-compose.prod.yml exec frontend sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
+      certbot renew --webroot -w /var/www/certbot --quiet && /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
       sleep 86400;
       done'
     depends_on:
