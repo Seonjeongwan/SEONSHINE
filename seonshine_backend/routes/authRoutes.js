@@ -1,8 +1,14 @@
-import express from 'express';
-const router = express.Router();
-const authController = require("../controllers/authController");
+import express from "express";
+import { login, signUp, verifySignUp } from "../controllers/authController.js";
+import { endpoints } from "./endpoints.js";
 
-router.post("/request-code", authController.requestCode);
-router.post("/verify-code", authController.verifyCode);
+const authRouter = express.Router();
 
-export default router;
+//TODO: Using validate user middleware
+authRouter.post(endpoints.signUp, signUp);
+
+authRouter.post(endpoints.login, login);
+
+authRouter.post(endpoints.signUpVerification, verifySignUp);
+
+export default authRouter;
