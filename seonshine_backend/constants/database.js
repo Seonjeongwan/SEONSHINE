@@ -15,4 +15,5 @@ export const tables = {
   menuItems: "menu_items",
   orderHistory: "order_history",
   orderItems: "order_items",
+  uploads: "uploads",
 };

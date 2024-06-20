@@ -6,14 +6,15 @@ services:
     pull_policy: always
     ports:
       - "80:80"
-      # - "443:443"
+      - "443:443"
     volumes:
       - ./seonshine_frontend/nginx.conf:/etc/nginx/nginx.conf
       - ./seonshine_frontend/default.conf:/etc/nginx/conf.d/default.conf
-      # - ./certbot/conf:/etc/letsencrypt
-      # - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
     depends_on:
       - backend
+      - fileserver
     environment:
       - NODE_ENV=production
     restart: always
@@ -30,6 +31,7 @@ services:
       - COMMON_DB_NAME=common_db
       - RESTAURANT_DB_NAME=restaurant_db
       - ORDER_DB_NAME=order_db
+      - UPLOAD_API_URL=http://fileserver:4000
     ports:
       - "5050:5050"
     # command: sh -c "npm run migrate:all && npm run seed:all && npm run start"
@@ -85,15 +87,18 @@ services:
     ports:
       - "6379:6379"
 
-  # certbot:
-  #   image: certbot/certbot
-  #   volumes:
-  #     - ./certbot/conf:/etc/letsencrypt
-  #     - ./certbot/www:/var/www/certbot
-  #   entrypoint: sh -c "trap exit TERM; while :; do certbot certonly --webroot -w /var/www/certbot --email seonshine.vn@gmail.com -d seonshine.net -d www.seonshine.net --agree-tos --no-eff-email; sleep 12h & wait $${!}; done"
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+      - ./seonshine_frontend/default.ssl.conf:/etc/nginx/conf.d/default.ssl.conf
+      - ./seonshine_frontend/renewal-hooks/deploy/reload-nginx.sh:/etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
+    entrypoint: sh sh -c "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet && sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh; sleep 86400; done"
+    restart: always
 
 volumes:
   mysql-data:
   portainer_data:
-  # certbot-etc:
-  # certbot-www:
+  certbot-etc:
+  certbot-www:

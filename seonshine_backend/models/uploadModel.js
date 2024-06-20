@@ -1,37 +1,38 @@
 import { DataTypes, Model } from "sequelize";
 import { tables } from "../constants/database.js";
-import { sequelizeUserDb } from "../db/dbConfig.js";
+import { sequelizeCommonDb } from "../db/dbConfig.js";
 
-class UserProfile extends Model {}
-UserProfile.init(
+class Upload extends Model {}
+Upload.init(
   {
-    profile_id: {
+    file_id: {
       type: DataTypes.INTEGER,
-      primaryKey: true,
-      allowNull: false,
       autoIncrement: true,
+      primaryKey: true,
     },
-    user_id: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    birth_date: {
+    original_name: {
       type: DataTypes.STRING,
     },
-    address: {
+    type: {
       type: DataTypes.STRING,
     },
-    profile_picture_url: {
+    filename: {
       type: DataTypes.STRING,
+    },
+    full_path: {
+      type: DataTypes.STRING,
+    },
+    size: {
+      type: DataTypes.INTEGER,
     },
   },
   {
-    sequelize: sequelizeUserDb,
-    modelName: tables.userProfile,
+    sequelize: sequelizeCommonDb,
+    modelName: tables.uploads,
     timestamps: true,
     createdAt: "created_at",
     updatedAt: "updated_at",
   }
 );
 
-export default UserProfile;
+export default Upload;

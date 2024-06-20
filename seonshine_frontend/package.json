@@ -16,6 +16,7 @@
     "@mui/icons-material": "^5.15.19",
     "@mui/material": "^5.15.19",
     "@tanstack/react-query": "^5.40.0",
+    "@tanstack/react-table": "^8.17.3",
     "@types/date-fns": "^2.6.0",
     "@types/js-cookie": "^3.0.6",
     "@types/react-datepicker": "^6.2.0",
