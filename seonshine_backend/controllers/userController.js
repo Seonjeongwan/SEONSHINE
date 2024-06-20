@@ -286,3 +286,4 @@ export const changeUserAvatar = async (req, res) => {
       .json({ error: httpStatusErrors.internalServerError });
   }
 };
+
