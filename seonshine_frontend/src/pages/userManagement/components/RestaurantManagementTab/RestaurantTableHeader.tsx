@@ -4,7 +4,7 @@ import { CustomColumnDef } from '@/types/table';
 import { labelUserStatus, RestaurantType, UserStatusEnum } from '@/types/user';
 
 export const RestaurantTableHeader = (
-  handleView: () => void,
+  handleView: (userId: string) => void,
   handleAction: (userId: string, userStatus: UserStatusEnum) => void,
 ): CustomColumnDef<RestaurantType>[] => [
   {
@@ -46,13 +46,13 @@ export const RestaurantTableHeader = (
   {
     accessorKey: 'details',
     header: 'Details',
-    cell: () => {
+    cell: (user) => {
       return (
         <Button
           variant="text"
           color="primary"
           className="hover:bg-transparent underline"
-          onClick={handleView}
+          onClick={() => handleView(user.row.original.user_id)}
         >
           View
         </Button>

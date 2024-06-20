@@ -7,14 +7,16 @@ export const StyledTabs = styled(Tabs)(({ theme }) => ({
   '& .MuiTabs-indicator': {
     backgroundColor: 'transparent',
   },
-  '&::after': {
-    content: '""',
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: '2px',
-    backgroundColor: theme.palette.black[300],
+  [theme.breakpoints.up('lg')]: {
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 0,
+      height: '2px',
+      backgroundColor: theme.palette.black[300],
+    },
   },
 }));
 
@@ -52,5 +54,12 @@ export const StyledTab = styled((props: TabProps) => (
   '&:first-of-type': {
     borderTopLeftRadius: '0px',
     borderLeft: 'none',
+  },
+
+  [theme.breakpoints.down('lg')]: {
+    '&:last-of-type': {
+      borderTopRightRadius: '0px',
+      borderRight: 'none',
+    },
   },
 }));

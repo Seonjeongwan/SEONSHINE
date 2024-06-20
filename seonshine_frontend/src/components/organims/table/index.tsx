@@ -25,7 +25,6 @@ type UserTableProps<T> = {
   skeletonHeight?: number;
   pageCount?: number;
   currentPage: number;
-  page?: (page: number) => void;
   onPageChange: (page: number) => void;
   emptyText?: string;
   onClickRow?: (row: T) => void;
@@ -40,7 +39,6 @@ const Table = <T extends object>({
   pageCount,
   currentPage,
   onPageChange,
-  page,
   emptyText = 'No Data is found',
   onClickRow,
   onSortingChange,
@@ -109,7 +107,7 @@ const Table = <T extends object>({
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
-                        className="text-black-500 text-md border-0 p-2"
+                        className="text-black-500 text-md border-0 px-2 py-1"
                         sx={{ textAlign: (cell.column.columnDef as CustomColumnDef<T>).align || 'left' }}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -137,7 +135,7 @@ const Table = <T extends object>({
           </Box>
         )}
       </TableContainer>
-      {!!pageCount && page && (
+      {!!pageCount && handlePageChange && !isFetching && (
         <Pagination
           count={pageCount}
           page={currentPage}

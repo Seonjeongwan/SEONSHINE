@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import SearchBar from '@/components/molecules/searchBar';
 import ConfirmModal from '@/components/organims/confirmModal';
+import RestaurantProfileModal from '@/components/organims/restaurantProfileModal';
 import Table from '@/components/organims/table';
 
 import useTable from '@/hooks/useTable';
@@ -25,6 +26,7 @@ import { RestaurantTableHeader } from './RestaurantTableHeader';
 const ITEMS_PER_PAGE = 10;
 
 const RestaurantManagementTab = () => {
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
   const [selectedRestaurant, setSelectedRestaurant] = useState<ChangeStatusPayloadType>();
 
@@ -66,8 +68,6 @@ const RestaurantManagementTab = () => {
     setIsConfirmModalOpen(false);
   };
 
-  const handleOpenModal = () => {};
-
   const handleClickAction = (userId: string, userStatus: UserStatusEnum) => {
     console.log({ userStatus, UserStatusEnum: userStatus === UserStatusEnum.ACTIVE });
     setIsConfirmModalOpen(true);
@@ -76,6 +76,13 @@ const RestaurantManagementTab = () => {
       status: userStatus == UserStatusEnum.ACTIVE ? UserStatusEnum.DEACTIVATED : UserStatusEnum.ACTIVE,
     });
   };
+
+  const handleOpenModal = (userId: string) => {
+    setSelectedRestaurant({ user_id: userId, status: -1 });
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => setIsModalOpen(false);
 
   const columns = RestaurantTableHeader(handleOpenModal, handleClickAction);
 
@@ -99,10 +106,16 @@ const RestaurantManagementTab = () => {
         isFetching={isFetching}
         pageCount={data ? Math.ceil(data.total / pageSize) : 0}
         onSortingChange={handleSortingChange}
-        page={handlePageChange}
         currentPage={currentPage}
         onPageChange={handlePageChange}
       />
+      {isModalOpen && (
+        <RestaurantProfileModal
+          userId={selectedRestaurant?.user_id || ''}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+        />
+      )}
       <ConfirmModal
         open={isConfirmModalOpen}
         title={selectedRestaurant?.status === UserStatusEnum.ACTIVE ? activeRestaurantTitle : deactiveRestaurantTitle}
