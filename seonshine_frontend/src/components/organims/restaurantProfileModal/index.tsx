@@ -6,12 +6,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { Avatar, Box, Button, IconButton, Modal, Skeleton } from '@mui/material';
 
-import DatePicker from '@/components/molecules/datePicker/DatePicker';
-
 import { RestaurantDetailType } from '@/types/user';
 import { isValidImageFile } from '@/utils/file';
 
-import { useGetRestaurantDetailApi, useGetUserDetailApi } from '@/apis/hooks/userApi.hook';
+import { useGetRestaurantDetailApi } from '@/apis/hooks/userApi.hook';
 
 import { RestaurantInfoSchema, restaurantInfoSchema } from './schema';
 
@@ -20,6 +18,17 @@ interface UserProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+const fields = [
+  { name: 'user_id', label: 'ID', disabled: true },
+  { name: 'role_id', label: 'Type of User', disabled: true },
+  { name: 'username', label: 'Full name', disabled: false },
+  { name: 'email', label: 'Email', disabled: true },
+  { name: 'weekday', label: 'Assigned date', disabled: true },
+  { name: 'address', label: 'Address', disabled: false },
+  { name: 'phone_number', label: 'Phone Number', disabled: false },
+  { name: 'user_status', label: 'Status', disabled: true },
+];
 
 const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onClose }) => {
   const { data: restaurant, isLoading } = useGetRestaurantDetailApi({ restaurant_id: userId });
@@ -58,11 +67,6 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
     onClose();
     setIsEditing(false);
     setPreviewUrl(restaurant?.profile_picture_url || '');
-    reset({
-      username: restaurant?.username,
-      address: restaurant?.address,
-      phone_number: restaurant?.phone_number,
-    });
   };
 
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,17 +97,6 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
       }
     }
   };
-
-  const fields = [
-    { name: 'user_id', label: 'ID', disabled: true },
-    { name: 'role_id', label: 'Type of User', disabled: true },
-    { name: 'username', label: 'Full name', disabled: false },
-    { name: 'email', label: 'Email', disabled: true },
-    { name: 'weekday', label: 'Assigned date', disabled: true },
-    { name: 'address', label: 'Address', disabled: false },
-    { name: 'phone_number', label: 'Phone Number', disabled: false },
-    { name: 'user_status', label: 'Status', disabled: true },
-  ];
 
   useEffect(() => {
     reset({
@@ -154,21 +147,13 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
             {uploadError && <p className="text-red-500 text-xs m-2">{uploadError}</p>}
           </Box>
           <Box className="w-full md:w-3/4 p-4 md:p-16 relative">
-            {!isEditing ? (
-              <IconButton
-                className="absolute top-6 right-6"
-                onClick={handleEditToggle}
-              >
-                <EditOutlinedIcon />
-              </IconButton>
-            ) : (
-              <IconButton
-                className="absolute top-6 right-6"
-                onClick={handleEditToggle}
-              >
-                <EditIcon />
-              </IconButton>
-            )}
+            <IconButton
+              className="absolute top-6 right-6"
+              onClick={handleEditToggle}
+            >
+              {!isEditing ? <EditOutlinedIcon /> : <EditIcon />}
+            </IconButton>
+
             <form onSubmit={handleSubmit(handleSave)}>
               {fields.map((field) => {
                 return isLoading ? (

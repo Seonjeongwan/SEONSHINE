@@ -21,6 +21,18 @@ interface UserProfileModalProps {
   onClose: () => void;
 }
 
+const fields = [
+  { name: 'user_id', label: 'ID', disabled: true },
+  { name: 'role_id', label: 'Type of User', disabled: true },
+  { name: 'username', label: 'Full name', disabled: false },
+  { name: 'email', label: 'Email', disabled: true },
+  { name: 'branch_id', label: 'Branch', disabled: true },
+  { name: 'birth_date', label: 'Birth Date', disabled: false },
+  { name: 'address', label: 'Address', disabled: false },
+  { name: 'phone_number', label: 'Phone Number', disabled: false },
+  { name: 'user_status', label: 'Status', disabled: true },
+];
+
 const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onClose }) => {
   const { data: user, isLoading } = useGetUserDetailApi({ user_id: userId });
 
@@ -60,12 +72,6 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
     onClose();
     setIsEditing(false);
     setPreviewUrl(user?.profile_picture_url || '');
-    reset({
-      username: user?.username,
-      birth_date: user?.birth_date,
-      address: user?.address,
-      phone_number: user?.phone_number,
-    });
   };
 
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,18 +102,6 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
       }
     }
   };
-
-  const fields = [
-    { name: 'user_id', label: 'ID', disabled: true },
-    { name: 'role_id', label: 'Type of User', disabled: true },
-    { name: 'username', label: 'Full name', disabled: false },
-    { name: 'email', label: 'Email', disabled: true },
-    { name: 'branch_id', label: 'Branch', disabled: true },
-    { name: 'birth_date', label: 'Birth Date', disabled: false },
-    { name: 'address', label: 'Address', disabled: false },
-    { name: 'phone_number', label: 'Phone Number', disabled: false },
-    { name: 'user_status', label: 'Status', disabled: true },
-  ];
 
   useEffect(() => {
     reset({
@@ -159,21 +153,13 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
             {uploadError && <p className="text-red-500 text-xs m-2">{uploadError}</p>}
           </Box>
           <Box className="w-full md:w-3/4 p-4 md:p-16 relative">
-            {!isEditing ? (
-              <IconButton
-                className="absolute top-6 right-6"
-                onClick={handleEditToggle}
-              >
-                <EditOutlinedIcon />
-              </IconButton>
-            ) : (
-              <IconButton
-                className="absolute top-6 right-6"
-                onClick={handleEditToggle}
-              >
-                <EditIcon />
-              </IconButton>
-            )}
+            <IconButton
+              className="absolute top-6 right-6"
+              onClick={handleEditToggle}
+            >
+              {!isEditing ? <EditOutlinedIcon /> : <EditIcon />}
+            </IconButton>
+
             <form onSubmit={handleSubmit(handleSave)}>
               {fields.map((field) => {
                 return isLoading ? (
