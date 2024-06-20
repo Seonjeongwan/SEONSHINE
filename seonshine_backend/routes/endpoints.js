@@ -11,6 +11,7 @@ export const endpoints = {
   users: {
     list: "/list",
     detail: "/:id",
+    edit: "/:id",
     restaurantDetail: "/:id",
     changeStatus: "/change-status",
     changeAvatar: "/:id/change-avatar",
@@ -19,5 +20,6 @@ export const endpoints = {
   restaurant: {
     list: "/list",
     detail: "/:id",
+    edit: "/:id",
   },
 };
