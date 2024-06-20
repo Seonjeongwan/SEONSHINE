@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Slider from 'react-slick';
 
 import { Box, Stack } from '@mui/material';
@@ -15,7 +16,6 @@ import { ChangeStatusPayloadType } from '@/types/user';
 import { useGetOrderListApi } from '@/apis/hooks/orderListApi.hook';
 
 import { OrderListHeader } from './OrderListHeader';
-import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
   const ITEMS_PER_PAGE = 10;
@@ -26,7 +26,7 @@ const Dashboard = () => {
     centerPadding: '60px',
     slidesToShow: 5,
     swipeToSlide: true,
-    afterChange: function (index) {
+    afterChange: function (index: number) {
       console.log(`Slider Changed to: ${index + 1}, background: #222; color: #bada55`);
     },
     responsive: [
@@ -91,19 +91,19 @@ const Dashboard = () => {
   return (
     <Box className="px-4 py-2 md:px-8 md:py-4">
       <Stack className="flex flex-wrap md:flex-nowrap gap-4 md:gap-6">
-        <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-lg p-4">
+        <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
           <Stack className="flex-grow">Today's Restaurant</Stack>
           <Stack className="font-bold text-2xl">PAPA'S CHICKEN</Stack>
         </Box>
-        <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-lg p-4">
+        <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
           <Stack className="flex-grow">Ordered Users</Stack>
           <Stack className="self-end font-bold text-2xl">12</Stack>
         </Box>
-        <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-lg p-4">
+        <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
           <Stack className="flex-grow">Active Users</Stack>
           <Stack className="self-end font-bold text-2xl">32</Stack>
         </Box>
-        <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-lg p-4">
+        <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
           <Stack className="flex-grow">Waiting for Approval</Stack>
           <Stack className="self-end font-bold text-2xl">8</Stack>
         </Box>
@@ -118,12 +118,12 @@ const Dashboard = () => {
             <h2 className="text-2xl font-bold">Today's Menu</h2>
             <Link
               to="/restaurant-menu"
-              className="text-blue-500 hover:underline"
+              className="text-blue-500 !underline"
             >
-              Show more
+              View more
             </Link>
           </Stack>
-          <Box className="flex flex-col bg-white rounded-lg mt-2">
+          <Box className="flex flex-col bg-white rounded-md mt-2">
             <Slider {...settings}>
               {dishes.map((dish, index) => (
                 <Box
@@ -133,9 +133,9 @@ const Dashboard = () => {
                   <img
                     src={dish.img}
                     alt={dish.name}
-                    className="w-full h-32 md:h-40 object-cover rounded-lg"
+                    className="w-full h-32 md:h-40 object-cover rounded-md"
                   />
-                  <h3 className="text-center mt-2">{dish.name}</h3>
+                  <h3 className="text-left mt-2">{dish.name}</h3>
                 </Box>
               ))}
             </Slider>
@@ -144,18 +144,18 @@ const Dashboard = () => {
       </Stack>
       <Stack className="flex-1 mt-6">
         <Box className="w-full">
-        <Stack
+          <Stack
             direction="row"
             alignItems="center"
             justifyContent="space-between"
-            className='mb-2'
+            className="mb-2"
           >
             <h2 className="text-2xl font-bold">Order List</h2>
             <Link
               to="/order-list"
-              className="text-blue-500 hover:underline"
+              className="text-blue-500 !underline"
             >
-              Show more
+              View more
             </Link>
           </Stack>
           <Table<OrderListType>
