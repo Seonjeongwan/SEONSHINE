@@ -1,9 +1,9 @@
 import FormData from "form-data";
 import { Op, QueryTypes, Sequelize } from "sequelize";
 import httpUpload from "../config/axiosUpload.js";
-import { UserStatus } from "../constants/auth.js";
+import { UserRole, UserStatus } from "../constants/auth.js";
 import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
-import { sequelizeUserDb } from "../db/dbConfig.js";
+import { sequelizeCommonDb, sequelizeUserDb } from "../db/dbConfig.js";
 import Branch from "../models/branchModel.js";
 import { User, UserProfile } from "../models/index.js";
 import Upload from "../models/uploadModel.js";
@@ -287,3 +287,63 @@ export const changeUserAvatar = async (req, res) => {
   }
 };
 
+export const updateUser = async (req, res) => {
+  const userId = req.params.id;
+  const { username, branch_id, address, phone_number, birth_date } = req.body;
+  const transactionUserDb = await sequelizeUserDb.transaction();
+  const transactionCommonDb = await sequelizeCommonDb.transaction();
+
+  try {
+    const user = await User.findOne({
+      where: { user_id: userId, role_id: UserRole.user },
+      transaction: transactionUserDb,
+    });
+
+    if (!user) {
+      res.status(httpStatusCodes.badRequest).json({ error: "User not found" });
+    }
+
+    const userUpdates = {
+      username,
+      phone_number,
+      branch_id,
+    };
+
+    await user.update(userUpdates, { transaction: transactionUserDb });
+
+    const profileUpdates = {
+      address,
+      birth_date,
+    };
+
+    const profile = await UserProfile.findOne({
+      where: {
+        user_id: userId,
+      },
+    });
+
+    if (profile) {
+      await profile.update(profileUpdates, {
+        transaction: transactionUserDb,
+      });
+    } else {
+      const profile = {
+        ...profileUpdates,
+        user_id: userId,
+      };
+      await UserProfile.create(profile, { transaction: transactionUserDb });
+    }
+
+    await transactionUserDb.commit();
+
+    res
+      .status(httpStatusCodes.success)
+      .json({ message: "Updated successfully" });
+  } catch (error) {
+    await transactionUserDb.rollback();
+    await transactionCommonDb.rollback();
+    res
+      .status(httpStatusCodes.internalServerError)
+      .json({ error: httpStatusErrors.internalServerError });
+  }
+};
