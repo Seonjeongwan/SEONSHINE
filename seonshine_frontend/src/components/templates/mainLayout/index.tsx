@@ -21,7 +21,7 @@ const MainLayout = ({ children, role }: MainLayoutPropsType) => {
   };
 
   return (
-    <Stack className="h-screen bg-black-100">
+    <Stack className="h-screen bg-black-100 overflow-hidden">
       <Drawer
         variant="temporary"
         open={sidebarOpen}
@@ -38,8 +38,7 @@ const MainLayout = ({ children, role }: MainLayoutPropsType) => {
       </Box>
       <Stack
         direction="column"
-        gap={4}
-        className="flex-1 py-8 max-w-full"
+        className="flex-1 overflow-hidden"
       >
         <IconButton
           className="md:hidden absolute top-1/2 -left-2 -translate-y-1/2 bg-gray-200 rounded-md w-8 h-12 opacity-50 hover:opacity-100"
@@ -48,7 +47,7 @@ const MainLayout = ({ children, role }: MainLayoutPropsType) => {
           <ArrowForwardIos />
         </IconButton>
         <Header />
-        <Box className="overflow-y-auto">{children}</Box>
+        <Box className="flex-1 overflow-auto">{children}</Box>
       </Stack>
     </Stack>
   );
