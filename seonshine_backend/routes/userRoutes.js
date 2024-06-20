@@ -7,18 +7,12 @@ import {
   getUserDetail,
   getUserList,
   getUserWaitingConfirmList,
-  login,
-  signUp,
-  verifySignUp
 } from "../controllers/userController.js";
 import { authenticateToken } from "../middleware/auth.js";
 import { validateChangeStatus } from "../middleware/validation/userValidate.js";
 import { endpoints } from "./endpoints.js";
 
 const userRouter = express.Router();
-
-//TODO: Using validate user middleware
-userRouter.post(endpoints.signUp, signUp);
 
 //TODO: Validate request params with validate middleware
 userRouter.get(
@@ -36,10 +30,6 @@ userRouter.get(
 //TODO: Validate admin or current user can get detail
 userRouter.get(endpoints.users.detail, authenticateToken(), getUserDetail);
 
-userRouter.post(endpoints.login, login);
-
-userRouter.post(endpoints.signUpVerification, verifySignUp);
-
 userRouter.post(
   endpoints.users.changeStatus,
   authenticateToken({ role: UserRole.admin }),
@@ -53,5 +43,11 @@ userRouter.post(
   upload.single('file'),
   changeUserAvatar
 );
+
+// userRouter.put(
+//   endpoints.users.edit,
+//   authenticateToken(),
+//   updateUser
+// );
 
 export default userRouter;
