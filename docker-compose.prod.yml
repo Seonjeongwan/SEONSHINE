@@ -98,12 +98,12 @@ services:
     entrypoint: |
       sh -c '
       if [ ! -f /etc/letsencrypt/live/seonshine.net/fullchain.pem ]; then
-        certbot certonly --webroot -w /usr/share/nginx/html --email seonshine.vn@gmail.com -d seonshine.net -d www.seonshine.net --agree-tos --no-eff-email;
+        certbot certonly --webroot -w /etc/letsencrypt --email seonshine.vn@gmail.com -d seonshine.net -d www.seonshine.net --agree-tos --no-eff-email;
         sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
       fi;
       trap exit TERM;
       while :; do
-        certbot renew --webroot -w /usr/share/nginx/html --quiet && sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
+        certbot renew --webroot -w /etc/letsencrypt --quiet && sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
         sleep 86400;
       done
       '
