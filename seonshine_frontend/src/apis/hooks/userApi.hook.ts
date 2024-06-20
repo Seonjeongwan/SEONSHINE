@@ -9,9 +9,19 @@ import {
   GetUserDetailResponseType,
   GetUserListApiPropsType,
   GetUserListResponseType,
+  UploadImagePayloadType,
+  UploadImageResponseType,
 } from '@/types/user';
 
-import { BranchResponseType, callBranches, changeStatus, getRestaurantList, getUserDetail, getUserList } from '../user';
+import {
+  BranchResponseType,
+  callBranches,
+  changeStatus,
+  getRestaurantList,
+  getUserDetail,
+  getUserList,
+  uploadImage,
+} from '../user';
 
 interface UseGetBranchProps {
   enabled?: boolean;
@@ -60,6 +70,16 @@ export const useGetUserDetailApi = (params: GetUserDetailApiPropsType): UseQuery
     queryKey: ['getUserDetail', params],
     queryFn: async () => {
       return getUserDetail(params);
+    },
+  });
+};
+
+export const useUploadImageApi = (
+  user_id: string,
+): UseMutationResult<UploadImageResponseType, unknown, UploadImagePayloadType> => {
+  return useMutation({
+    mutationFn: async (payload) => {
+      return uploadImage(payload, user_id);
     },
   });
 };

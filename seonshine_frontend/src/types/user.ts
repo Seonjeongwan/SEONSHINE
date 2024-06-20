@@ -112,3 +112,12 @@ export type GetUserDetailResponseType = {
   profile_picture_url: string | null;
   branch_name: string;
 };
+
+export type UploadImagePayloadType = {
+  file: File;
+};
+
+export type UploadImageResponseType = {
+  message: string;
+  profile_picture_url: string;
+};

@@ -8,6 +8,8 @@ import {
   GetUserDetailResponseType,
   GetUserListApiPropsType,
   GetUserListResponseType,
+  UploadImagePayloadType,
+  UploadImageResponseType,
 } from '@/types/user';
 
 export type BranchResponseType = {
@@ -45,5 +47,14 @@ export const getRestaurantList = async (
 
 export const getUserDetail = async ({ user_id }: GetUserDetailApiPropsType): Promise<GetUserDetailResponseType> => {
   const response = await axiosInstance.get<GetUserDetailResponseType>(`/user/${user_id}`);
+  return response.data;
+};
+
+export const uploadImage = async (
+  payload: UploadImagePayloadType,
+  user_id: string,
+): Promise<UploadImageResponseType> => {
+  console.log({ payload });
+  const response = await axiosInstance.post<UploadImageResponseType>(`/user/${user_id}/change-avatar`, payload);
   return response.data;
 };

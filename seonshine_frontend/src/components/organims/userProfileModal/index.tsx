@@ -5,12 +5,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import EditIcon from '@mui/icons-material/Edit';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { Avatar, Box, Button, IconButton, Modal, Skeleton } from '@mui/material';
+import { useQueryClient } from '@tanstack/react-query';
 
 import DatePicker from '@/components/molecules/datePicker/DatePicker';
 
+import { UploadImagePayloadType } from '@/types/user';
 import { isValidImageFile } from '@/utils/file';
 
-import { useGetUserDetailApi } from '@/apis/hooks/userApi.hook';
+import { useGetUserDetailApi, useUploadImageApi } from '@/apis/hooks/userApi.hook';
 
 import { userType } from '../sideBar';
 import { UserInfoSchema, userInfoSchema } from './schema';
@@ -23,10 +25,12 @@ interface UserProfileModalProps {
 
 const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onClose }) => {
   const { data: user, isLoading } = useGetUserDetailApi({ user_id: userId });
+  const { mutate: uploadImage } = useUploadImageApi(userId);
 
   const [isEditing, setIsEditing] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(user?.profile_picture_url || '');
+  const [selectedImage, setSelectedImage] = useState<UploadImagePayloadType>();
 
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -37,7 +41,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
     },
     resolver: zodResolver(userInfoSchema),
   });
-
+  const queryClient = useQueryClient();
   const handleEditToggle = () => setIsEditing(!isEditing);
 
   const handleSave = (data: any) => {
@@ -76,19 +80,24 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
       if (!validationResult.isValid) {
         setUploadError(validationResult.messageError || null);
         return;
-      } else {
-        setUploadError(null);
       }
+
+      const imagePayload: UploadImagePayloadType = { file };
+      setSelectedImage(imagePayload);
+      setUploadError(null);
 
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewUrl(reader.result as string);
       };
       reader.readAsDataURL(file);
+
       try {
-        // will call api upload photo later
-        // const uploadedImageUrl = await uploadToServer(file);
-        // setPreviewUrl(uploadedImageUrl);
+        console.log({ imagePayload });
+        uploadImage(imagePayload, {
+          onSuccess: () => queryClient.invalidateQueries({ queryKey: ['getUserDetail'] }),
+          onError: () => setUploadError('Cannot upload image.'),
+        });
         console.log('upload image api');
       } catch (error) {
         console.error('Error uploading image:', error);
