@@ -16,6 +16,8 @@ import {
   UpdateRestaurantResponseType,
   UpdateUserPayloadType,
   UpdateUserResponseType,
+  UploadImagePayloadType,
+  UploadImageResponseType,
 } from '@/types/user';
 
 export type BranchResponseType = {
@@ -53,6 +55,20 @@ export const getRestaurantList = async (
 
 export const getUserDetail = async ({ user_id }: GetUserDetailApiPropsType): Promise<GetUserDetailResponseType> => {
   const response = await axiosInstance.get<GetUserDetailResponseType>(`/user/${user_id}`);
+  return response.data;
+};
+
+export const changeUserAvatar = async (
+  payload: UploadImagePayloadType,
+  user_id: string,
+): Promise<UploadImageResponseType> => {
+  const formData = new FormData();
+  formData.append('file', payload.file);
+  const response = await axiosInstance.post<UploadImageResponseType>(`/user/${user_id}/change-avatar`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return response.data;
 };
 

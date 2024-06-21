@@ -17,12 +17,15 @@ import {
   UpdateRestaurantResponseType,
   UpdateUserPayloadType,
   UpdateUserResponseType,
+  UploadImagePayloadType,
+  UploadImageResponseType,
 } from '@/types/user';
 
 import {
   BranchResponseType,
   callBranches,
   changeStatus,
+  changeUserAvatar,
   getRestaurantDetail,
   getRestaurantList,
   getUserDetail,
@@ -79,6 +82,16 @@ export const useGetUserDetailApi = (params: GetUserDetailApiPropsType): UseQuery
     queryKey: ['getUserDetail', params],
     queryFn: async () => {
       return getUserDetail(params);
+    },
+  });
+};
+
+export const useChangeUserAvatarApi = (
+  user_id: string,
+): UseMutationResult<UploadImageResponseType, unknown, UploadImagePayloadType> => {
+  return useMutation({
+    mutationFn: async (payload) => {
+      return changeUserAvatar(payload, user_id);
     },
   });
 };
