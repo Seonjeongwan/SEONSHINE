@@ -15,4 +15,4 @@ export const restaurantInfoSchema = zod.object({
     }),
 });
 
-export type RestaurantInfoSchema = zod.infer<typeof restaurantInfoSchema>;
+export type RestaurantInfoSchemaType = zod.infer<typeof restaurantInfoSchema>;

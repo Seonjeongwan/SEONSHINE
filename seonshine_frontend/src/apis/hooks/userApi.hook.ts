@@ -13,6 +13,10 @@ import {
   GetUserListResponseType,
   GetWaitingUserListApiPropsType,
   GetWaitingUserListResponseType,
+  UpdateRestaurantPayloadType,
+  UpdateRestaurantResponseType,
+  UpdateUserPayloadType,
+  UpdateUserResponseType,
   UploadImagePayloadType,
   UploadImageResponseType,
 } from '@/types/user';
@@ -21,12 +25,14 @@ import {
   BranchResponseType,
   callBranches,
   changeStatus,
+  changeUserAvatar,
   getRestaurantDetail,
   getRestaurantList,
   getUserDetail,
   getUserList,
   getWaitingUserList,
-  changeUserAvatar,
+  updateRestaurant,
+  updateUser,
 } from '../user';
 
 interface UseGetBranchProps {
@@ -108,6 +114,30 @@ export const useWaitingUserListApi = (
     queryKey: ['getWaitingUserList', params],
     queryFn: async () => {
       return getWaitingUserList(params);
+    },
+  });
+};
+
+export const useUpdateUserApi = ({
+  userId,
+}: {
+  userId: string;
+}): UseMutationResult<UpdateUserResponseType, unknown, UpdateUserPayloadType> => {
+  return useMutation({
+    mutationFn: async (payload) => {
+      return updateUser(payload, userId);
+    },
+  });
+};
+
+export const useUpdateRestaurantApi = ({
+  userId,
+}: {
+  userId: string;
+}): UseMutationResult<UpdateRestaurantResponseType, unknown, UpdateRestaurantPayloadType> => {
+  return useMutation({
+    mutationFn: async (payload) => {
+      return updateRestaurant(payload, userId);
     },
   });
 };

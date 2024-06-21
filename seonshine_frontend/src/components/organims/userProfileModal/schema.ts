@@ -1,4 +1,4 @@
-import { isValid, parse } from 'date-fns';
+import { isValid, parseISO } from 'date-fns';
 import * as zod from 'zod';
 
 import { errorMessages } from '@/constants/errorMessages';
@@ -11,13 +11,14 @@ export const userInfoSchema = zod.object({
     .min(1, { message: errorMessages.require })
     .refine(
       (value) => {
-        const date = parse(value, 'dd/MM/yyyy', new Date());
+        const date = parseISO(value);
         return isValid(date);
       },
       {
         message: 'Invalid date format',
       },
     ),
+  branch_id: zod.number(),
   address: zod.string().min(1, { message: errorMessages.require }),
   phone_number: zod
     .string()
@@ -27,4 +28,4 @@ export const userInfoSchema = zod.object({
     }),
 });
 
-export type UserInfoSchema = zod.infer<typeof userInfoSchema>;
+export type UserInfoSchemaType = zod.infer<typeof userInfoSchema>;

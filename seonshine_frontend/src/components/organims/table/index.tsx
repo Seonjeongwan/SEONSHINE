@@ -29,6 +29,7 @@ type UserTableProps<T> = {
   emptyText?: string;
   onClickRow?: (row: T) => void;
   onSortingChange?: (sorting: SortingState) => void;
+  size?: 'small' | 'normal';
 };
 
 const Table = <T extends object>({
@@ -42,6 +43,7 @@ const Table = <T extends object>({
   emptyText = 'No Data is found',
   onClickRow,
   onSortingChange,
+  size = 'normal',
 }: UserTableProps<T>) => {
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -81,7 +83,7 @@ const Table = <T extends object>({
                   {headerGroup.headers.map((header) => (
                     <TableCell
                       key={header.id}
-                      className="font-bold text-md border-black-300 px-2 py-5 whitespace-nowrap"
+                      className={`font-bold text-md border-black-300 px-2 ${size === 'normal' ? 'py-5' : 'py-3'} whitespace-nowrap`}
                       sx={{ textAlign: (header.column.columnDef as CustomColumnDef<T>).align || 'left' }}
                       onClick={() => header.column.getCanSort() && header.column.toggleSorting()}
                     >
@@ -107,7 +109,7 @@ const Table = <T extends object>({
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
-                        className="text-black-500 text-md border-0 px-2 py-1"
+                        className={`text-black-500 text-md border-0 px-2 ${size === 'normal' ? 'py-1' : 'py-0'}`}
                         sx={{ textAlign: (cell.column.columnDef as CustomColumnDef<T>).align || 'left' }}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}

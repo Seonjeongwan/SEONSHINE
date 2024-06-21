@@ -129,7 +129,8 @@ export type UploadImagePayloadType = {
 
 export type UploadImageResponseType = {
   message: string;
-  profile_picture_url: string;};
+  profile_picture_url: string;
+};
 
 export type UserDetailType = GetUserDetailResponseType;
 
@@ -169,4 +170,26 @@ export type GetWaitingUserListApiPropsType = {
   sort_key?: string;
   sort_type?: 'asc' | 'desc';
   searchField?: string;
-}
+};
+
+export type UpdateUserPayloadType = {
+  username: string;
+  branch_id: number;
+  address: string;
+  phone_number: string;
+  birth_date: string;
+};
+
+export type UpdateUserResponseType = {
+  message: string;
+};
+
+export type UpdateRestaurantPayloadType = {
+  username: string;
+  address: string;
+  phone_number: string;
+};
+
+export type UpdateRestaurantResponseType = {
+  message: string;
+};
