@@ -12,7 +12,8 @@ services:
       - ./seonshine_frontend/default.conf:/etc/nginx/conf.d/default.conf
       - ./seonshine_frontend/default.ssl.conf:/etc/nginx/conf.d/default.ssl.conf
       - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/usr/share/nginx/html
+      - ./certbot/www:/var/www/certbot
+      - ./myweb:/usr/share/nginx/html
     depends_on:
       - backend
       - fileserver
@@ -91,6 +92,8 @@ services:
   certbot:
     image: certbot/certbot
     volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
       - ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
       - ./seonshine_frontend/default.ssl.conf:/etc/nginx/conf.d/default.ssl.conf
