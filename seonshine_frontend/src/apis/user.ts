@@ -54,7 +54,7 @@ export const getUserDetail = async ({ user_id }: GetUserDetailApiPropsType): Pro
   return response.data;
 };
 
-export const uploadImage = async (
+export const changeUserAvatar = async (
   payload: UploadImagePayloadType,
   user_id: string,
 ): Promise<UploadImageResponseType> => {

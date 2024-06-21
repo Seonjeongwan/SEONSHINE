@@ -10,17 +10,23 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import DatePicker from '@/components/molecules/datePicker/DatePicker';
 
-import { approvalImageDelete, approvalImageDeleteDescription, approvalUserDescription, approvalUserTitle } from '@/pages/userManagement/components/ApprovalTab/constants';
+import {
+  approvalImageDelete,
+  approvalImageDeleteDescription,
+  approvalUserDescription,
+  approvalUserTitle,
+} from '@/pages/userManagement/components/ApprovalTab/constants';
 
+import { avatarBaseURL } from '@/constants/image';
 import { UploadImagePayloadType } from '@/types/user';
 import { UserDetailType } from '@/types/user';
 import { isValidImageFile } from '@/utils/file';
 
-import { useGetUserDetailApi, useUploadImageApi } from '@/apis/hooks/userApi.hook';
+import { useChangeUserAvatarApi, useGetUserDetailApi } from '@/apis/hooks/userApi.hook';
 
-import { avatarBaseURL } from '../../../constants/image';
 import ConfirmModal from '../confirmModal';
 import { UserInfoSchema, userInfoSchema } from './schema';
+import { toast } from 'react-toastify';
 
 interface UserProfileModalProps {
   userId: string;
@@ -42,7 +48,7 @@ const fields = [
 
 const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onClose }) => {
   const { data: user, isLoading } = useGetUserDetailApi({ user_id: userId });
-  const { mutate: uploadImage } = useUploadImageApi(userId);
+  const { mutate: changeUserAvatar } = useChangeUserAvatarApi(userId);
 
   const [isEditing, setIsEditing] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -104,12 +110,14 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
         reader.readAsDataURL(file);
 
         try {
-          uploadImage(imagePayload, {
-            onSuccess: () => queryClient.invalidateQueries({ queryKey: ['getUserDetail'] }),
+          changeUserAvatar(imagePayload, {
+            onSuccess: () => {
+              queryClient.invalidateQueries({ queryKey: ['getUserDetail'] });
+              toast.success('Your profile image has been updated.');
+            },
             onError: () => setUploadError('Cannot upload image.'),
           });
         } catch (error) {
-          console.error('Error uploading image:', error);
           setUploadError('Error uploading image. Please try again.');
         }
       }
@@ -120,7 +128,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
     setIsAvatarDeleted(true);
     setPreviewUrl('');
     const emptyFilePayload: UploadImagePayloadType = { file: new File([], '') };
-    uploadImage(emptyFilePayload, {
+    changeUserAvatar(emptyFilePayload, {
       onSuccess: () => queryClient.invalidateQueries({ queryKey: ['getUserDetail'] }),
       onError: () => setUploadError('Cannot delete avatar.'),
     });
@@ -129,17 +137,6 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
   const handleClickAction = () => {
     setIsConfirmModalOpen(true);
   };
-  const fields = [
-    { name: 'user_id', label: 'ID', disabled: true },
-    { name: 'role_id', label: 'Type of User', disabled: true },
-    { name: 'username', label: 'Full name', disabled: false },
-    { name: 'email', label: 'Email', disabled: true },
-    { name: 'branch_id', label: 'Branch', disabled: true },
-    { name: 'birth_date', label: 'Birth Date', disabled: false },
-    { name: 'address', label: 'Address', disabled: false },
-    { name: 'phone_number', label: 'Phone Number', disabled: false },
-    { name: 'user_status', label: 'Status', disabled: true },
-  ];
 
   useEffect(() => {
     reset({
