@@ -12,7 +12,7 @@ services:
       - ./seonshine_frontend/default.conf:/etc/nginx/conf.d/default.conf
       - ./seonshine_frontend/default.ssl.conf:/etc/nginx/conf.d/default.ssl.conf
       - ./certbot/conf:/etc/letsencrypt
-      - ./myweb:/usr/share/nginx/html
+      - ./certbot/www:/usr/share/nginx/html
     depends_on:
       - backend
       - fileserver
@@ -91,8 +91,8 @@ services:
   certbot:
     image: certbot/certbot
     volumes:
-      - certbot-etc:/etc/letsencrypt
-      - ./myweb:/etc/letsencrypt
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
       - ./seonshine_frontend/default.ssl.conf:/etc/nginx/conf.d/default.ssl.conf
       - ./seonshine_frontend/renewal-hooks/deploy:/etc/letsencrypt/renewal-hooks/deploy
     entrypoint: |
@@ -114,5 +114,5 @@ services:
 volumes:
   mysql-data:
   portainer_data:
-  certbot-etc:
+  # certbot-etc:
   # certbot-www:
