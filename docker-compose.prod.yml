@@ -90,7 +90,9 @@ services:
       - "6379:6379"
 
   certbot:
-    image: certbot/certbot
+    build:
+      context: .
+      dockerfile: Dockerfile.certbot
     volumes:
       - certbot-etc:/etc/letsencrypt
       - certbot-www:/var/www/certbot
