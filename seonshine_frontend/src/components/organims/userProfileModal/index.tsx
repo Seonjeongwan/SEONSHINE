@@ -76,8 +76,6 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
 
   const [isEditing, setIsEditing] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string>(user?.profile_picture_url || '');
-  const [selectedImage, setSelectedImage] = useState<UploadImagePayloadType>();
   const [isAvatarDeleted, setIsAvatarDeleted] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
 
@@ -121,7 +119,6 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
 
   const handleCancel = () => {
     setIsEditing(false);
-    setPreviewUrl(user?.profile_picture_url || '');
     reset({
       ...(user as UserInfoSchemaType),
     });
@@ -130,7 +127,6 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
   const handleClose = () => {
     onClose();
     setIsEditing(false);
-    setPreviewUrl(user?.profile_picture_url || '');
   };
 
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -143,13 +139,9 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
         return;
       } else {
         const imagePayload: UploadImagePayloadType = { file };
-        setSelectedImage(imagePayload);
         setUploadError(null);
 
         const reader = new FileReader();
-        reader.onloadend = () => {
-          setPreviewUrl(reader.result as string);
-        };
         reader.readAsDataURL(file);
 
         try {
@@ -169,7 +161,6 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
 
   const handleAvatarDelete = () => {
     setIsAvatarDeleted(true);
-    setPreviewUrl('');
     const emptyFilePayload: UploadImagePayloadType = { file: new File([], '') };
     changeUserAvatar(emptyFilePayload, {
       onSuccess: () => queryClient.invalidateQueries({ queryKey: ['getUserDetail'] }),
@@ -177,6 +168,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
     });
     setIsConfirmModalOpen(false);
   };
+
   const handleClickAction = () => {
     setIsConfirmModalOpen(true);
   };
@@ -208,7 +200,6 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
                 />
               ) : (
                 <Avatar
-                  alt={user?.username}
                   src={isAvatarDeleted ? '' : `${avatarBaseURL}${user?.profile_picture_url}`}
                   className="w-24 h-24 mt-4 md:mt-12"
                 />
