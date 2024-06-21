@@ -11,7 +11,6 @@ services:
       - ./seonshine_frontend/nginx.conf:/etc/nginx/nginx.conf
       - ./seonshine_frontend/default.conf:/etc/nginx/conf.d/default.conf
       - ./seonshine_frontend/default.ssl.conf:/etc/nginx/conf.d/default.ssl.conf
-      - ./seonshine_frontend/renewal-hooks/deploy/reload-nginx.sh:/etc/nginx/renewal-hooks/deploy/reload-nginx.sh
       - certbot-etc:/etc/letsencrypt
       - certbot-www:/var/www/certbot
       - ./myweb:/usr/share/nginx/html
@@ -97,15 +96,16 @@ services:
       - certbot-www:/var/www/certbot
       - ./seonshine_frontend/default.ssl.conf:/etc/nginx/conf.d/default.ssl.conf
       - ./seonshine_frontend/renewal-hooks/deploy:/etc/letsencrypt/renewal-hooks/deploy
+      - /var/run/docker.sock:/var/run/docker.sock # Add Docker socket volume
     entrypoint: |
       sh -c '
       if [ ! -f /etc/letsencrypt/live/seonshine.net/fullchain.pem ]; then
         certbot certonly --webroot -w /var/www/certbot --email seonshine.vn@gmail.com -d seonshine.net -d www.seonshine.net --agree-tos --no-eff-email;
-        sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
+        docker exec $(docker ps -qf "name=frontend") sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
       fi;
       trap exit TERM;
       while :; do
-        certbot renew --webroot -w /var/www/certbot --quiet && sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
+        certbot renew --webroot -w /var/www/certbot --quiet && docker exec $(docker ps -qf "name=frontend") sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
         sleep 86400;
       done
       '
