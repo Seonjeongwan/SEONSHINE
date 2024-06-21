@@ -56,6 +56,8 @@ const DatePicker: React.FC<DatePickerProps> = ({ name, control, disabled = false
               }`}
               placeholderText="Select date"
               dateFormat="yyyy-MM-dd"
+              showMonthDropdown
+              showYearDropdown
             />
             <CalendarMonthIcon
               className="ml-2 text-gray-600 cursor-pointer"

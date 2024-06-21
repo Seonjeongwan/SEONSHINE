@@ -28,4 +28,4 @@ export const userInfoSchema = zod.object({
     }),
 });
 
-export type UserInfoSchema = zod.infer<typeof userInfoSchema>;
+export type UserInfoSchemaType = zod.infer<typeof userInfoSchema>;

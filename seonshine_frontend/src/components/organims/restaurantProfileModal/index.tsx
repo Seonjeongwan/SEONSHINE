@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import EditIcon from '@mui/icons-material/Edit';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { Avatar, Box, Button, IconButton, Modal, Skeleton } from '@mui/material';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { RestaurantDetailType } from '@/types/user';
+import { IPlainObject } from '@/types/common';
+import { labelRoleById, labelUserStatus, RestaurantDetailType, RoleEnum, UserStatusEnum } from '@/types/user';
 import { isValidImageFile } from '@/utils/file';
 
-import { useGetRestaurantDetailApi } from '@/apis/hooks/userApi.hook';
+import { useGetRestaurantDetailApi, useUpdateRestaurantApi } from '@/apis/hooks/userApi.hook';
 
-import { RestaurantInfoSchema, restaurantInfoSchema } from './schema';
+import { restaurantInfoSchema, RestaurantInfoSchemaType } from './schema';
 
 interface UserProfileModalProps {
   userId: string;
@@ -21,45 +24,73 @@ interface UserProfileModalProps {
 
 const fields = [
   { name: 'user_id', label: 'ID', disabled: true },
-  { name: 'role_id', label: 'Type of User', disabled: true },
+  {
+    name: 'role_id',
+    label: 'Type of User',
+    disabled: true,
+    useLabel: (id: string) => labelRoleById[id as RoleEnum],
+  },
   { name: 'username', label: 'Full name', disabled: false },
   { name: 'email', label: 'Email', disabled: true },
   { name: 'weekday', label: 'Assigned date', disabled: true },
   { name: 'address', label: 'Address', disabled: false },
   { name: 'phone_number', label: 'Phone Number', disabled: false },
-  { name: 'user_status', label: 'Status', disabled: true },
+  {
+    name: 'user_status',
+    label: 'Status',
+    disabled: true,
+    useLabel: (id: string) => labelUserStatus[Number(id) as UserStatusEnum],
+  },
 ];
 
 const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onClose }) => {
   const { data: restaurant, isLoading } = useGetRestaurantDetailApi({ restaurant_id: userId });
 
+  const { mutate: updateRestaurant, isPending } = useUpdateRestaurantApi({ userId });
+
   const [isEditing, setIsEditing] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(restaurant?.profile_picture_url || '');
 
-  const { control, handleSubmit, reset } = useForm({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isDirty },
+  } = useForm({
     defaultValues: {
-      username: restaurant?.username,
-      address: restaurant?.address,
-      phone_number: restaurant?.phone_number,
+      username: restaurant?.username || '',
+      address: restaurant?.address || '',
+      phone_number: restaurant?.phone_number || '',
     },
     resolver: zodResolver(restaurantInfoSchema),
   });
 
+  const queryClient = useQueryClient();
+
   const handleEditToggle = () => setIsEditing(!isEditing);
 
-  const handleSave = (data: any) => {
-    // onSave({ ...user, ...data, profilePicture: previewUrl });
-    setIsEditing(false);
+  const handleSave = (data: RestaurantInfoSchemaType) => {
+    updateRestaurant(
+      { ...data },
+      {
+        onSuccess: (res) => {
+          queryClient.invalidateQueries({ queryKey: ['getRestaurantDetail'] });
+          toast.success(res.message);
+          setIsEditing(false);
+        },
+        onError: () => {
+          toast.error('Update restaurant failed!');
+        },
+      },
+    );
   };
 
   const handleCancel = () => {
     setIsEditing(false);
     setPreviewUrl(restaurant?.profile_picture_url || '');
     reset({
-      username: restaurant?.username,
-      address: restaurant?.address,
-      phone_number: restaurant?.phone_number,
+      ...(restaurant as RestaurantInfoSchemaType),
     });
   };
 
@@ -99,11 +130,10 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
   };
 
   useEffect(() => {
-    reset({
-      username: restaurant?.username,
-      address: restaurant?.address,
-      phone_number: restaurant?.phone_number,
-    });
+    restaurant &&
+      reset({
+        ...(restaurant as RestaurantInfoSchemaType),
+      });
   }, [restaurant]);
 
   return (
@@ -156,7 +186,7 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
 
             <form onSubmit={handleSubmit(handleSave)}>
               {fields.map((field) => {
-                return isLoading ? (
+                return isLoading || isPending ? (
                   <Skeleton height={30} />
                 ) : (
                   <Box
@@ -167,7 +197,7 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
                     <div className="w-1/2">
                       {isEditing && !field.disabled ? (
                         <Controller
-                          name={field.name as keyof RestaurantInfoSchema}
+                          name={field.name as keyof RestaurantInfoSchemaType}
                           control={control}
                           render={({ field, fieldState: { error } }) => (
                             <>
@@ -184,6 +214,8 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
                             </>
                           )}
                         />
+                      ) : !!field.useLabel ? (
+                        <span>{field.useLabel(restaurant?.[field.name as keyof RestaurantDetailType] as string)}</span>
                       ) : (
                         <span>{restaurant?.[field.name as keyof RestaurantDetailType]}</span>
                       )}
@@ -198,6 +230,7 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
                       type="submit"
                       variant="contained"
                       color="primary"
+                      disabled={!isDirty}
                     >
                       Save
                     </Button>
