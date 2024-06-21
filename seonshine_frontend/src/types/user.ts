@@ -123,6 +123,14 @@ export type GetUserDetailResponseType = {
   branch_name: string;
 };
 
+export type UploadImagePayloadType = {
+  file: File;
+};
+
+export type UploadImageResponseType = {
+  message: string;
+  profile_picture_url: string;};
+
 export type UserDetailType = GetUserDetailResponseType;
 
 export type GetRestaurantDetailResponseType = {
@@ -161,4 +169,4 @@ export type GetWaitingUserListApiPropsType = {
   sort_key?: string;
   sort_type?: 'asc' | 'desc';
   searchField?: string;
-};
+}

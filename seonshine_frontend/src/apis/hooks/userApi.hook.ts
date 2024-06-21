@@ -13,6 +13,8 @@ import {
   GetUserListResponseType,
   GetWaitingUserListApiPropsType,
   GetWaitingUserListResponseType,
+  UploadImagePayloadType,
+  UploadImageResponseType,
 } from '@/types/user';
 
 import {
@@ -24,6 +26,7 @@ import {
   getUserDetail,
   getUserList,
   getWaitingUserList,
+  changeUserAvatar,
 } from '../user';
 
 interface UseGetBranchProps {
@@ -73,6 +76,16 @@ export const useGetUserDetailApi = (params: GetUserDetailApiPropsType): UseQuery
     queryKey: ['getUserDetail', params],
     queryFn: async () => {
       return getUserDetail(params);
+    },
+  });
+};
+
+export const useChangeUserAvatarApi = (
+  user_id: string,
+): UseMutationResult<UploadImageResponseType, unknown, UploadImagePayloadType> => {
+  return useMutation({
+    mutationFn: async (payload) => {
+      return changeUserAvatar(payload, user_id);
     },
   });
 };

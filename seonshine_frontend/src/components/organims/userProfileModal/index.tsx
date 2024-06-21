@@ -2,18 +2,31 @@ import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from '@mui/icons-material/Edit';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { Avatar, Box, Button, IconButton, Modal, Skeleton } from '@mui/material';
+import { useQueryClient } from '@tanstack/react-query';
 
 import DatePicker from '@/components/molecules/datePicker/DatePicker';
 
+import {
+  approvalImageDelete,
+  approvalImageDeleteDescription,
+  approvalUserDescription,
+  approvalUserTitle,
+} from '@/pages/userManagement/components/ApprovalTab/constants';
+
+import { avatarBaseURL } from '@/constants/image';
+import { UploadImagePayloadType } from '@/types/user';
 import { UserDetailType } from '@/types/user';
 import { isValidImageFile } from '@/utils/file';
 
-import { useGetUserDetailApi } from '@/apis/hooks/userApi.hook';
+import { useChangeUserAvatarApi, useGetUserDetailApi } from '@/apis/hooks/userApi.hook';
 
+import ConfirmModal from '../confirmModal';
 import { UserInfoSchema, userInfoSchema } from './schema';
+import { toast } from 'react-toastify';
 
 interface UserProfileModalProps {
   userId: string;
@@ -35,10 +48,14 @@ const fields = [
 
 const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onClose }) => {
   const { data: user, isLoading } = useGetUserDetailApi({ user_id: userId });
+  const { mutate: changeUserAvatar } = useChangeUserAvatarApi(userId);
 
   const [isEditing, setIsEditing] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(user?.profile_picture_url || '');
+  const [selectedImage, setSelectedImage] = useState<UploadImagePayloadType>();
+  const [isAvatarDeleted, setIsAvatarDeleted] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
 
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -49,11 +66,10 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
     },
     resolver: zodResolver(userInfoSchema),
   });
-
+  const queryClient = useQueryClient();
   const handleEditToggle = () => setIsEditing(!isEditing);
 
   const handleSave = (data: any) => {
-    // onSave({ ...user, ...data, profilePicture: previewUrl });
     setIsEditing(false);
   };
 
@@ -83,24 +99,43 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
         setUploadError(validationResult.messageError || null);
         return;
       } else {
+        const imagePayload: UploadImagePayloadType = { file };
+        setSelectedImage(imagePayload);
         setUploadError(null);
-      }
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-      try {
-        // will call api upload photo later
-        // const uploadedImageUrl = await uploadToServer(file);
-        // setPreviewUrl(uploadedImageUrl);
-        console.log('upload image api');
-      } catch (error) {
-        console.error('Error uploading image:', error);
-        setUploadError('Error uploading image. Please try again.');
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviewUrl(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+
+        try {
+          changeUserAvatar(imagePayload, {
+            onSuccess: () => {
+              queryClient.invalidateQueries({ queryKey: ['getUserDetail'] });
+              toast.success('Your profile image has been updated.');
+            },
+            onError: () => setUploadError('Cannot upload image.'),
+          });
+        } catch (error) {
+          setUploadError('Error uploading image. Please try again.');
+        }
       }
     }
+  };
+
+  const handleAvatarDelete = () => {
+    setIsAvatarDeleted(true);
+    setPreviewUrl('');
+    const emptyFilePayload: UploadImagePayloadType = { file: new File([], '') };
+    changeUserAvatar(emptyFilePayload, {
+      onSuccess: () => queryClient.invalidateQueries({ queryKey: ['getUserDetail'] }),
+      onError: () => setUploadError('Cannot delete avatar.'),
+    });
+    setIsConfirmModalOpen(false);
+  };
+  const handleClickAction = () => {
+    setIsConfirmModalOpen(true);
   };
 
   useEffect(() => {
@@ -110,6 +145,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
       address: user?.address,
       phone_number: user?.phone_number,
     });
+    setIsAvatarDeleted(false);
   }, [user]);
 
   return (
@@ -121,20 +157,30 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
     >
       <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full md:w-2/3 lg:w-2/5 bg-white shadow-xl rounded-lg">
         <Box className="flex flex-col md:flex-row">
-          <Box className="w-full md:w-1/4 bg-gray-100 flex flex-col items-center rounded-lg p-4 md:p-0">
-            {isLoading ? (
-              <Skeleton
-                height={84}
-                width={84}
-                className="mt-4 md:mt-12"
-              />
-            ) : (
-              <Avatar
-                alt={user?.username}
-                src={previewUrl}
-                className="w-24 h-24 mt-4 md:mt-12"
-              />
-            )}
+          <Box className="w-full md:w-1/4 bg-gray-100 flex flex-col items-center rounded-lg p-4 md:p-0 relative">
+            <div className="relative">
+              {isLoading ? (
+                <Skeleton
+                  height={84}
+                  width={84}
+                  className="mt-4 md:mt-12"
+                />
+              ) : (
+                <Avatar
+                  alt={user?.username}
+                  src={isAvatarDeleted ? '' : `${avatarBaseURL}${user?.profile_picture_url}`}
+                  className="w-24 h-24 mt-4 md:mt-12"
+                />
+              )}
+              {isEditing && user?.profile_picture_url && (
+                <IconButton
+                  className="absolute top-7 md:top-14 right-0 bg-red-500 text-white p-0.5 hover:bg-red-500"
+                  onClick={handleClickAction}
+                >
+                  <CloseIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              )}
+            </div>
             <input
               accept="image/*"
               className="hidden"
@@ -228,6 +274,13 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
               </Box>
             </form>
           </Box>
+          <ConfirmModal
+            open={isConfirmModalOpen}
+            title={approvalImageDelete}
+            description={approvalImageDeleteDescription}
+            handleClose={() => setIsConfirmModalOpen(false)}
+            handleConfirm={handleAvatarDelete}
+          />
         </Box>
       </Box>
     </Modal>
