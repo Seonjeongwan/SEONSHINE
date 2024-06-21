@@ -101,11 +101,11 @@ services:
       sh -c '
       if [ ! -f /etc/letsencrypt/live/seonshine.net/fullchain.pem ]; then
         certbot certonly --webroot -w /var/www/certbot --email seonshine.vn@gmail.com -d seonshine.net -d www.seonshine.net --agree-tos --no-eff-email;
-        docker exec $(docker ps -qf "name=frontend") sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
+        sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
       fi;
       trap exit TERM;
       while :; do
-        certbot renew --webroot -w /var/www/certbot --quiet && docker exec $(docker ps -qf "name=frontend") sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
+        certbot renew --webroot -w /var/www/certbot --quiet && sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
         sleep 86400;
       done
       '
