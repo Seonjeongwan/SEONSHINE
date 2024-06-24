@@ -96,3 +96,60 @@ export const deleteMenuItem = async (req, res) => {
       .send(httpStatusErrors.internalServerError);
   }
 };
+
+export const updateMenuItem = async (req, res) => {
+  try {
+    const file = req.file;
+    const { id } = req.params;
+    const { name } = req.body;
+
+    const menuItem = await MenuItem.findByPk(id);
+
+    if (!menuItem) {
+      return res.status(httpStatusCodes.notFound).json({
+        message: "Menu item not found",
+      });
+    }
+
+    let itemImagePath = null;
+
+    if (file) {
+      const fileResponse = await requestUploadFile(file);
+
+      if (fileResponse) {
+        const { originalname, mimetype, filename, path, size } = fileResponse;
+        const upload = {
+          original_name: originalname,
+          type: mimetype,
+          filename,
+          full_path: path,
+          size,
+        };
+
+        await Upload.create(upload);
+
+        itemImagePath = path;
+      }
+    }
+
+    const menuUpdated = {
+      name,
+    };
+
+    if (itemImagePath) {
+      menuUpdated.image_url = itemImagePath;
+    }
+
+    const itemResponse = await menuItem.update(menuUpdated);
+
+    return res.status(httpStatusCodes.success).json({
+      message: "Update successfully",
+      item: itemResponse,
+    });
+  } catch (error) {
+    console.log("error :>> ", error);
+    res
+      .status(httpStatusCodes.internalServerError)
+      .send(httpStatusErrors.internalServerError);
+  }
+};

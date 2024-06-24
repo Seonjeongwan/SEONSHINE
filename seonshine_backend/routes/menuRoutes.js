@@ -4,6 +4,7 @@ import {
   createMenuItem,
   deleteMenuItem,
   getMenuList,
+  updateMenuItem,
 } from "../controllers/menuController.js";
 import { authenticateToken } from "../middleware/auth.js";
 import { endpoints } from "./endpoints.js";
@@ -16,6 +17,13 @@ menuRoutes.post(
   authenticateToken(),
   upload.single("file"),
   createMenuItem
+);
+
+menuRoutes.put(
+  endpoints.menu.edit,
+  authenticateToken(),
+  upload.single("file"),
+  updateMenuItem
 );
 
 menuRoutes.delete(endpoints.menu.delete, authenticateToken(), deleteMenuItem);
