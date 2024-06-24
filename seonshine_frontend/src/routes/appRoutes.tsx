@@ -3,6 +3,7 @@ import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-d
 import Dashboard from '@/pages/dashboard';
 import ForgotPasswordPage from '@/pages/forgotPassword';
 import LoginPage from '@/pages/login';
+import OrderManagement from '@/pages/orderManagement';
 import PageNotFound from '@/pages/pageNotFound';
 import SignUpPage from '@/pages/signUp';
 import UserManagement from '@/pages/userManagement';
@@ -47,7 +48,6 @@ const AppRoutes = () => {
           path={paths.pageNotFound}
           element={<PageNotFound />}
         />
-
         <Route
           path={'*'}
           element={
@@ -91,6 +91,15 @@ const AppRoutes = () => {
           <Route
             index
             element={<RestaurantManagement />}
+          />
+        </Route>
+        <Route
+          path={paths.order.index}
+          element={<ProtectedLayout allowedRoles={[RoleEnum.ADMIN]} />}
+        >
+          <Route
+            index
+            element={<OrderManagement />}
           />
         </Route>
       </Routes>
