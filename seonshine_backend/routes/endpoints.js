@@ -23,4 +23,10 @@ export const endpoints = {
     edit: "/:id",
     all: "/all",
   },
+  menu: {
+    list: "/list",
+    detail: "/:id",
+    edit: "/:id",
+    delete: "/:id",
+  }
 };

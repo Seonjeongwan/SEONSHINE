@@ -14,6 +14,7 @@ import express from "express";
 // import "./db/sync.js";
 import authRoutes from "./routes/authRoutes.js";
 import commonRouter from "./routes/commonRoutes.js";
+import menuRoutes from "./routes/menuRoutes.js";
 import restaurantRouter from "./routes/restaurantRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 //const orderRoutes = require("./routes/orderRoutes");
@@ -36,6 +37,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/user", userRouter);
 app.use("/api/restaurant", restaurantRouter);
 app.use("/api/common", commonRouter);
+app.use("/api/menu", menuRoutes);
 // app.use("/order", orderRoutes);
 
 // Initialize the database
