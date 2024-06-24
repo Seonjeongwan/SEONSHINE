@@ -380,6 +380,10 @@ jobs:
             if [ "${{ needs.check-changed-files.outputs.fileserver }}" == 'true' ]; then
               services_to_restart+=('fileserver')
             fi
+            services_to_restart+=('portainer')
+            fi
+            services_to_restart+=('certbot')
+            fi
             docker-compose -f docker-compose.dev.yml up -d "${services_to_restart[@]}"
 
             # Remove unused images

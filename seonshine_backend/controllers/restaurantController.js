@@ -67,6 +67,23 @@ export const getRestaurantList = async (req, res) => {
   }
 };
 
+export const getAllRestaurant = async (req, res) => {
+  try {
+    const restaurants = await User.findAll({
+      attributes: ["user_id", "username"],
+      where: {
+        role_id: 2,
+        user_status: 1,
+      }
+    });
+    res.status(httpStatusCodes.success).send(restaurants);
+  } catch (error) {
+    res
+      .status(httpStatusCodes.internalServerError)
+      .json({ error: httpStatusErrors.internalServerError });
+  }
+};
+
 export const getRestaurantDetail = async (req, res) => {
   try {
     const id = req.params.id;

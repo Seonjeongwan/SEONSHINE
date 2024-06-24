@@ -21,5 +21,13 @@ export const endpoints = {
     list: "/list",
     detail: "/:id",
     edit: "/:id",
+    all: "/all",
+  },
+  menu: {
+    list: "/list",
+    createItem: "/item",
+    detail: "/item/:id",
+    edit: "/item/:id",
+    delete: "/item/:id",
   },
 };
