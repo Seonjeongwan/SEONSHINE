@@ -21,5 +21,6 @@ export const endpoints = {
     list: "/list",
     detail: "/:id",
     edit: "/:id",
+    all: "/all",
   },
 };
