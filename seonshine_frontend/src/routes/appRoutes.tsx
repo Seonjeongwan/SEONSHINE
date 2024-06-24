@@ -4,6 +4,7 @@ import Dashboard from '@/pages/dashboard';
 import ForgotPasswordPage from '@/pages/forgotPassword';
 import LoginPage from '@/pages/login';
 import PageNotFound from '@/pages/pageNotFound';
+import RestaurantAssignment from '@/pages/restaurantAssignment';
 import SignUpPage from '@/pages/signUp';
 import UserManagement from '@/pages/userManagement';
 
@@ -11,7 +12,6 @@ import { RoleEnum } from '@/types/user';
 
 import useAuthStore from '@/store/auth.store';
 
-import RestaurantManagement from './../pages/restaurantManagement/index';
 import AuthenticateLayout from './guards/AuthenticateLayout';
 import ProtectedLayout from './guards/ProtectedLayout';
 import { paths } from './paths';
@@ -85,12 +85,12 @@ const AppRoutes = () => {
           />
         </Route>
         <Route
-          path={paths.restaurant.index}
+          path={paths.restaurantAssignment.index}
           element={<ProtectedLayout allowedRoles={[RoleEnum.ADMIN]} />}
         >
           <Route
             index
-            element={<RestaurantManagement />}
+            element={<RestaurantAssignment />}
           />
         </Route>
       </Routes>
