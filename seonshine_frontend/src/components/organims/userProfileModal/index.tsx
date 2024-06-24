@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'react-toastify';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import CloseIcon from '@mui/icons-material/Close';
@@ -18,15 +19,19 @@ import {
 } from '@/pages/userManagement/components/ApprovalTab/constants';
 
 import { avatarBaseURL } from '@/constants/image';
-import { UploadImagePayloadType } from '@/types/user';
+import { labelRoleById, labelUserStatus, RoleEnum, UploadImagePayloadType, UserStatusEnum } from '@/types/user';
 import { UserDetailType } from '@/types/user';
 import { isValidImageFile } from '@/utils/file';
 
-import { useChangeUserAvatarApi, useGetUserDetailApi } from '@/apis/hooks/userApi.hook';
+import {
+  useChangeUserAvatarApi,
+  useGetBranches,
+  useGetUserDetailApi,
+  useUpdateUserApi,
+} from '@/apis/hooks/userApi.hook';
 
 import ConfirmModal from '../confirmModal';
-import { UserInfoSchema, userInfoSchema } from './schema';
-import { toast } from 'react-toastify';
+import { userInfoSchema, UserInfoSchemaType } from './schema';
 
 interface UserProfileModalProps {
   userId: string;
@@ -34,60 +39,94 @@ interface UserProfileModalProps {
   onClose: () => void;
 }
 
-const fields = [
+const fields: Array<{
+  name: keyof UserDetailType;
+  label: string;
+  disabled: boolean;
+  useLabel?: (id: string) => string;
+}> = [
   { name: 'user_id', label: 'ID', disabled: true },
-  { name: 'role_id', label: 'Type of User', disabled: true },
+  {
+    name: 'role_id',
+    label: 'Type of User',
+    disabled: true,
+    useLabel: (id: string) => labelRoleById[id as RoleEnum],
+  },
   { name: 'username', label: 'Full name', disabled: false },
   { name: 'email', label: 'Email', disabled: true },
-  { name: 'branch_id', label: 'Branch', disabled: true },
+  { name: 'branch_name', label: 'Branch', disabled: false },
   { name: 'birth_date', label: 'Birth Date', disabled: false },
   { name: 'address', label: 'Address', disabled: false },
   { name: 'phone_number', label: 'Phone Number', disabled: false },
-  { name: 'user_status', label: 'Status', disabled: true },
+  {
+    name: 'user_status',
+    label: 'Status',
+    disabled: true,
+    useLabel: (id: string) => labelUserStatus[Number(id) as UserStatusEnum],
+  },
 ];
 
 const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onClose }) => {
   const { data: user, isLoading } = useGetUserDetailApi({ user_id: userId });
   const { mutate: changeUserAvatar } = useChangeUserAvatarApi(userId);
 
+  const { data: branchData } = useGetBranches({ enabled: true });
+
+  const { mutate: updateUser, isPending } = useUpdateUserApi({ userId });
+
   const [isEditing, setIsEditing] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string>(user?.profile_picture_url || '');
-  const [selectedImage, setSelectedImage] = useState<UploadImagePayloadType>();
   const [isAvatarDeleted, setIsAvatarDeleted] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
 
-  const { control, handleSubmit, reset } = useForm({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isDirty },
+  } = useForm({
     defaultValues: {
-      username: user?.username,
-      birth_date: user?.birth_date,
-      address: user?.address,
-      phone_number: user?.phone_number,
+      username: user?.username || '',
+      birth_date: user?.birth_date || '',
+      branch_id: user?.branch_id as number,
+      address: user?.address || '',
+      phone_number: user?.phone_number || '',
     },
     resolver: zodResolver(userInfoSchema),
   });
+
   const queryClient = useQueryClient();
+
   const handleEditToggle = () => setIsEditing(!isEditing);
 
-  const handleSave = (data: any) => {
-    setIsEditing(false);
+  const handleSave = (data: UserInfoSchemaType) => {
+    updateUser(
+      {
+        ...data,
+      },
+      {
+        onSuccess: (res) => {
+          queryClient.invalidateQueries({ queryKey: ['getUserDetail'] });
+          toast.success(res.message);
+          setIsEditing(false);
+        },
+        onError: () => {
+          toast.error('Update user failed!');
+        },
+      },
+    );
   };
 
   const handleCancel = () => {
     setIsEditing(false);
-    setPreviewUrl(user?.profile_picture_url || '');
     reset({
-      username: user?.username,
-      birth_date: user?.birth_date,
-      address: user?.address,
-      phone_number: user?.phone_number,
+      ...(user as UserInfoSchemaType),
     });
   };
 
   const handleClose = () => {
     onClose();
     setIsEditing(false);
-    setPreviewUrl(user?.profile_picture_url || '');
   };
 
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,13 +139,9 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
         return;
       } else {
         const imagePayload: UploadImagePayloadType = { file };
-        setSelectedImage(imagePayload);
         setUploadError(null);
 
         const reader = new FileReader();
-        reader.onloadend = () => {
-          setPreviewUrl(reader.result as string);
-        };
         reader.readAsDataURL(file);
 
         try {
@@ -126,7 +161,6 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
 
   const handleAvatarDelete = () => {
     setIsAvatarDeleted(true);
-    setPreviewUrl('');
     const emptyFilePayload: UploadImagePayloadType = { file: new File([], '') };
     changeUserAvatar(emptyFilePayload, {
       onSuccess: () => queryClient.invalidateQueries({ queryKey: ['getUserDetail'] }),
@@ -134,17 +168,16 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
     });
     setIsConfirmModalOpen(false);
   };
+
   const handleClickAction = () => {
     setIsConfirmModalOpen(true);
   };
 
   useEffect(() => {
-    reset({
-      username: user?.username,
-      birth_date: user?.birth_date,
-      address: user?.address,
-      phone_number: user?.phone_number,
-    });
+    user &&
+      reset({
+        ...(user as UserInfoSchemaType),
+      });
     setIsAvatarDeleted(false);
   }, [user]);
 
@@ -167,7 +200,6 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
                 />
               ) : (
                 <Avatar
-                  alt={user?.username}
                   src={isAvatarDeleted ? '' : `${avatarBaseURL}${user?.profile_picture_url}`}
                   className="w-24 h-24 mt-4 md:mt-12"
                 />
@@ -208,8 +240,11 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
 
             <form onSubmit={handleSubmit(handleSave)}>
               {fields.map((field) => {
-                return isLoading ? (
-                  <Skeleton height={30} />
+                return isLoading || isPending ? (
+                  <Skeleton
+                    height={30}
+                    key={field.name}
+                  />
                 ) : (
                   <Box
                     key={field.name}
@@ -223,9 +258,36 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
                           control={control}
                           disabled={field.disabled}
                         />
+                      ) : isEditing && field.name === 'branch_name' && !field.disabled ? (
+                        <Controller
+                          name="branch_id"
+                          control={control}
+                          render={({ field, fieldState: { error } }) => (
+                            <>
+                              <select
+                                {...field}
+                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                className={`bg-white w-full outline-none border-b-2 border-black ${
+                                  !!error ? 'border-red-500' : 'border-black'
+                                }`}
+                              >
+                                {Array.isArray(branchData) &&
+                                  branchData.map((branch) => (
+                                    <option
+                                      key={branch.branch_id}
+                                      value={branch.branch_id}
+                                    >
+                                      {branch.branch_name}
+                                    </option>
+                                  ))}
+                              </select>
+                              {error && <p className="text-red-500 text-xs">{error.message}</p>}
+                            </>
+                          )}
+                        />
                       ) : isEditing && !field.disabled ? (
                         <Controller
-                          name={field.name as keyof UserInfoSchema}
+                          name={field.name as keyof UserInfoSchemaType}
                           control={control}
                           render={({ field, fieldState: { error } }) => (
                             <>
@@ -242,6 +304,8 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
                             </>
                           )}
                         />
+                      ) : !!field.useLabel ? (
+                        <span>{field.useLabel(user?.[field.name] as string)}</span>
                       ) : (
                         <span>{user?.[field.name as keyof UserDetailType]}</span>
                       )}
@@ -256,6 +320,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
                       type="submit"
                       variant="contained"
                       color="primary"
+                      disabled={!isDirty}
                     >
                       Save
                     </Button>

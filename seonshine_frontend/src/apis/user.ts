@@ -12,6 +12,10 @@ import {
   GetUserListResponseType,
   GetWaitingUserListApiPropsType,
   GetWaitingUserListResponseType,
+  UpdateRestaurantPayloadType,
+  UpdateRestaurantResponseType,
+  UpdateUserPayloadType,
+  UpdateUserResponseType,
   UploadImagePayloadType,
   UploadImageResponseType,
 } from '@/types/user';
@@ -81,5 +85,18 @@ export const getWaitingUserList = async (
   const response = await axiosInstance.get<GetWaitingUserListResponseType>('/user/waiting-confirm', {
     params: params,
   });
+  return response.data;
+};
+
+export const updateUser = async (payload: UpdateUserPayloadType, userId: string): Promise<UpdateUserResponseType> => {
+  const response = await axiosInstance.put<UpdateUserResponseType>(`/user/${userId}`, payload);
+  return response.data;
+};
+
+export const updateRestaurant = async (
+  payload: UpdateRestaurantPayloadType,
+  userId: string,
+): Promise<UpdateRestaurantResponseType> => {
+  const response = await axiosInstance.put<UpdateRestaurantResponseType>(`/restaurant/${userId}`, payload);
   return response.data;
 };

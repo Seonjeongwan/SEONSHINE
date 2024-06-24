@@ -38,7 +38,8 @@ const MainLayout = ({ children, role }: MainLayoutPropsType) => {
       </Box>
       <Stack
         direction="column"
-        className="flex-1 overflow-hidden"
+        gap={4}
+        className="flex-1 overflow-hidden py-8"
       >
         <IconButton
           className="md:hidden absolute top-1/2 -left-2 -translate-y-1/2 bg-gray-200 rounded-md w-8 h-12 opacity-50 hover:opacity-100"

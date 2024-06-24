@@ -69,7 +69,6 @@ const RestaurantManagementTab = () => {
   };
 
   const handleClickAction = (userId: string, userStatus: UserStatusEnum) => {
-    console.log({ userStatus, UserStatusEnum: userStatus === UserStatusEnum.ACTIVE });
     setIsConfirmModalOpen(true);
     setSelectedRestaurant({
       user_id: userId,
