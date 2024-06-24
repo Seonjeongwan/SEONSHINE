@@ -7,7 +7,7 @@ export const getMenuList = async (req, res) => {
   try {
     const { restaurant_id } = req.query;
     const menuItems = await MenuItem.findAll({
-      attributes: ["item_id", "name", "description", "price"],
+      attributes: ["item_id", "name", "description", "price", "image_url"],
       where: {
         restaurant_id,
       },
@@ -19,6 +19,8 @@ export const getMenuList = async (req, res) => {
       .send(httpStatusErrors.internalServerError);
   }
 };
+
+//TODO: Check restaurant cannot create menu for other restaurant. Admin can add for all but current restaurant just for this.
 
 export const createMenuItem = async (req, res) => {
   try {
@@ -43,6 +45,7 @@ export const createMenuItem = async (req, res) => {
         await Upload.create(upload);
 
         itemImagePath = path;
+        console.log("path :>> ", path);
       }
     }
 
@@ -57,6 +60,34 @@ export const createMenuItem = async (req, res) => {
     return res.status(httpStatusCodes.success).json({
       message: "Create successfully",
       item: itemCreated,
+    });
+  } catch (error) {
+    console.log("error :>> ", error);
+    res
+      .status(httpStatusCodes.internalServerError)
+      .send(httpStatusErrors.internalServerError);
+  }
+};
+
+export const deleteMenuItem = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const menuItem = await MenuItem.findOne({
+      where: {
+        item_id: id,
+      },
+    });
+
+    if (!menuItem) {
+      return res.status(httpStatusCodes.notFound).json({
+        message: "Menu item not found",
+      });
+    }
+
+    await menuItem.destroy();
+
+    return res.status(httpStatusCodes.success).json({
+      message: "Delete successfully",
     });
   } catch (error) {
     console.log("error :>> ", error);

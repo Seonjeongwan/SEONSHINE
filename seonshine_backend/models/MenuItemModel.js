@@ -32,6 +32,9 @@ MenuItem.init(
     price: {
       type: DataTypes.INTEGER,
     },
+    image_url: {
+      type: DataTypes.STRING,
+    },
   },
   {
     sequelize: sequelizeRestaurantDb,

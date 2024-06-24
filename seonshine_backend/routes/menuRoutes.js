@@ -1,6 +1,10 @@
 import express from "express";
 import { upload } from "../config/storage.js";
-import { createMenuItem, getMenuList } from "../controllers/menuController.js";
+import {
+  createMenuItem,
+  deleteMenuItem,
+  getMenuList,
+} from "../controllers/menuController.js";
 import { authenticateToken } from "../middleware/auth.js";
 import { endpoints } from "./endpoints.js";
 
@@ -13,5 +17,7 @@ menuRoutes.post(
   upload.single("file"),
   createMenuItem
 );
+
+menuRoutes.delete(endpoints.menu.delete, authenticateToken(), deleteMenuItem);
 
 export default menuRoutes;
