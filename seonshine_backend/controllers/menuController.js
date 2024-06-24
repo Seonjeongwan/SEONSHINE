@@ -1,5 +1,7 @@
 import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
 import MenuItem from "../models/MenuItemModel.js";
+import Upload from "../models/uploadModel.js";
+import { requestUploadFile } from "../utils/file.js";
 
 export const getMenuList = async (req, res) => {
   try {
@@ -12,6 +14,52 @@ export const getMenuList = async (req, res) => {
     });
     res.status(httpStatusCodes.success).send(menuItems);
   } catch (error) {
+    res
+      .status(httpStatusCodes.internalServerError)
+      .send(httpStatusErrors.internalServerError);
+  }
+};
+
+export const createMenuItem = async (req, res) => {
+  try {
+    const file = req.file;
+    const { name, restaurant_id } = req.body;
+
+    let itemImagePath = null;
+
+    if (file) {
+      const fileResponse = await requestUploadFile(file);
+
+      if (fileResponse) {
+        const { originalname, mimetype, filename, path, size } = fileResponse;
+        const upload = {
+          original_name: originalname,
+          type: mimetype,
+          filename,
+          full_path: path,
+          size,
+        };
+
+        await Upload.create(upload);
+
+        itemImagePath = path;
+      }
+    }
+
+    const menuItem = {
+      restaurant_id,
+      name,
+      image_url: itemImagePath,
+    };
+
+    const itemCreated = await MenuItem.create(menuItem);
+
+    return res.status(httpStatusCodes.success).json({
+      message: "Create successfully",
+      item: itemCreated,
+    });
+  } catch (error) {
+    console.log("error :>> ", error);
     res
       .status(httpStatusCodes.internalServerError)
       .send(httpStatusErrors.internalServerError);

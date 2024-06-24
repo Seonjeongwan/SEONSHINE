@@ -25,8 +25,9 @@ export const endpoints = {
   },
   menu: {
     list: "/list",
-    detail: "/:id",
-    edit: "/:id",
-    delete: "/:id",
-  }
+    createItem: "/item",
+    detail: "/item/:id",
+    edit: "/item/:id",
+    delete: "/item/:id",
+  },
 };
