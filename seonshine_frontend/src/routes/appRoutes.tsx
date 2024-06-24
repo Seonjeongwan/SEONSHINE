@@ -15,6 +15,7 @@ import RestaurantManagement from './../pages/restaurantManagement/index';
 import AuthenticateLayout from './guards/AuthenticateLayout';
 import ProtectedLayout from './guards/ProtectedLayout';
 import { paths } from './paths';
+import MenuManagement from '@/pages/menuManagement';
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuthStore();
@@ -91,6 +92,15 @@ const AppRoutes = () => {
           <Route
             index
             element={<RestaurantManagement />}
+          />
+        </Route>
+        <Route
+          path={paths.restaurant.menu}
+          element={<ProtectedLayout allowedRoles={[RoleEnum.ADMIN, RoleEnum.RESTAURANT]} />}
+        >
+          <Route
+            index
+            element={<MenuManagement />}
           />
         </Route>
       </Routes>

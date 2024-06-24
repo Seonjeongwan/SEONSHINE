@@ -193,3 +193,19 @@ export type UpdateRestaurantPayloadType = {
 export type UpdateRestaurantResponseType = {
   message: string;
 };
+
+export type GetAllRestaurantResponseType = {
+  user_id: string;
+  username: string;
+};
+
+export type GetMenuListApiPropsType = {
+  restaurant_id: string;
+};
+
+export type GetMenuListResponseType = {
+  name: string;
+  description: string | null;
+  price: string | null;
+  image_url: string | null;
+};

@@ -17,9 +17,10 @@ interface SearchBarProps {
   options: { value: string; label: string }[];
   optionDefault: string;
   valueDefault?: string;
+  searchPlaceHolder?: string;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onSearch, options, optionDefault, valueDefault }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch, options, optionDefault, valueDefault, searchPlaceHolder }) => {
   const [field, setField] = useState<string>(optionDefault);
   const [query, setQuery] = useState<string>(valueDefault || '');
 

@@ -91,6 +91,7 @@ const UserManagementTab = () => {
         onSearch={handleSearch}
         options={searchUserOptions}
         optionDefault={defaultOption}
+        searchPlaceHolder={'Search For User'}
       />
       <Typography
         variant="heading4"

@@ -8,7 +8,6 @@ export const paths = {
   admin: '/admin',
   dashboard: '/dashboard',
   user: { index: 'user', detail: ':id', register: 'register', edit: ':id/edit' },
-  restaurant: { index: 'restaurant' },
-  menu: { index: 'menu' },
+  restaurant: { index: 'restaurant', menu: 'menu' },
   order: { index: 'order' },
 };

@@ -2,6 +2,9 @@ import axiosInstance from '@/configs/axios';
 import {
   ChangeStatusPayloadType,
   ChangeStatusResponseType,
+  GetAllRestaurantResponseType,
+  GetMenuListApiPropsType,
+  GetMenuListResponseType,
   GetRestaurantDetailApiPropsType,
   GetRestaurantDetailResponseType,
   GetRestaurantListApiPropsType,
@@ -98,5 +101,17 @@ export const updateRestaurant = async (
   userId: string,
 ): Promise<UpdateRestaurantResponseType> => {
   const response = await axiosInstance.put<UpdateRestaurantResponseType>(`/restaurant/${userId}`, payload);
+  return response.data;
+};
+
+export const getAllRestaurants = async (): Promise<GetAllRestaurantResponseType[]> => {
+  const response = await axiosInstance.get<GetAllRestaurantResponseType[]>('/restaurant/all');
+  return response.data;
+};
+
+export const getMenuList = async ({
+  restaurant_id,
+}: GetMenuListApiPropsType): Promise<GetMenuListResponseType> => {
+  const response = await axiosInstance.get<GetMenuListResponseType>(`/menu/list?restaurant_id=${restaurant_id}`);
   return response.data;
 };

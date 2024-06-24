@@ -3,6 +3,9 @@ import { useMutation, UseMutationResult, useQuery, UseQueryResult } from '@tanst
 import {
   ChangeStatusPayloadType,
   ChangeStatusResponseType,
+  GetAllRestaurantResponseType,
+  GetMenuListApiPropsType,
+  GetMenuListResponseType,
   GetRestaurantDetailApiPropsType,
   GetRestaurantDetailResponseType,
   GetRestaurantListApiPropsType,
@@ -26,6 +29,8 @@ import {
   callBranches,
   changeStatus,
   changeUserAvatar,
+  getAllRestaurants,
+  getMenuList,
   getRestaurantDetail,
   getRestaurantList,
   getUserDetail,
@@ -36,6 +41,10 @@ import {
 } from '../user';
 
 interface UseGetBranchProps {
+  enabled?: boolean;
+}
+
+interface UseGetRestaurantsProps {
   enabled?: boolean;
 }
 
@@ -138,6 +147,29 @@ export const useUpdateRestaurantApi = ({
   return useMutation({
     mutationFn: async (payload) => {
       return updateRestaurant(payload, userId);
+    },
+  });
+};
+
+export const useGetAllRestaurants = ({
+  enabled = true,
+}: UseGetRestaurantsProps): UseQueryResult<GetAllRestaurantResponseType[]> => {
+  return useQuery({
+    queryKey: ['restaurantList'],
+    queryFn: async () => {
+      return getAllRestaurants();
+    },
+    enabled,
+  });
+};
+
+export const useGetMenuListlApi = (
+  params: GetMenuListApiPropsType,
+): UseQueryResult<GetMenuListResponseType> => {
+  return useQuery({
+    queryKey: ['getMenuList', params],
+    queryFn: async () => {
+      return getMenuList(params);
     },
   });
 };
