@@ -7,9 +7,12 @@ RestaurantAssigned.init(
   {
     weekday: {
       type: DataTypes.INTEGER,
+      primaryKey: true,
+      allowNull: false,
     },
     restaurant_id: {
       type: DataTypes.INTEGER,
+      allowNull: false,
     },
   },
   {

@@ -9,12 +9,11 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    const tableInfo = await queryInterface.describeTable('verification');
+    const tableInfo = await queryInterface.describeTable("restaurant_assigned");
 
-    if (!tableInfo.type) {
-      await queryInterface.addColumn('verification', "type", {
-        type: Sequelize.STRING(50),
-        allowNull: false,
+    if (tableInfo.weekday) {
+      await queryInterface.changeColumn("restaurant_assigned", "weekday", {
+        type: Sequelize.INTEGER,
       });
     }
   },
@@ -26,10 +25,12 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    const tableInfo = await queryInterface.describeTable('verification');
+    const tableInfo = await queryInterface.describeTable("restaurant_assigned");
 
-    if (tableInfo.type) {
-      await queryInterface.removeColumn('verification', "type");
+    if (tableInfo.weekday) {
+      await queryInterface.changeColumn("restaurant_assigned", "weekday", {
+        type: Sequelize.STRING(25),
+      });
     }
   },
 };

@@ -12,7 +12,7 @@ import {
   TableHead,
   TableRow,
 } from '@mui/material';
-import { Cell, flexRender, getCoreRowModel, Row, SortingState, Updater, useReactTable } from '@tanstack/react-table';
+import { flexRender, getCoreRowModel, SortingState, Updater, useReactTable } from '@tanstack/react-table';
 
 import { CustomColumnDef } from '@/types/table';
 
@@ -25,7 +25,7 @@ type UserTableProps<T> = {
   skeletonHeight?: number;
   pageCount?: number;
   currentPage: number;
-  onPageChange: (page: number) => void;
+  onPageChange?: (page: number) => void;
   emptyText?: string;
   onClickRow?: (row: T) => void;
   onSortingChange?: (sorting: SortingState) => void;
@@ -69,7 +69,7 @@ const Table = <T extends object>({
   const noDataFound = !isFetching && (!memoizedData || memoizedData.length === 0);
 
   const handlePageChange = (event: ChangeEvent<unknown>, newPage: number) => {
-    onPageChange(newPage);
+    onPageChange?.(newPage);
   };
 
   return (

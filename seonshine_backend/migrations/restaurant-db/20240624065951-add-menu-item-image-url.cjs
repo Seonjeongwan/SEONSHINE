@@ -9,12 +9,11 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    const tableInfo = await queryInterface.describeTable('verification');
+    const tableInfo = await queryInterface.describeTable("menu_items");
 
-    if (!tableInfo.type) {
-      await queryInterface.addColumn('verification', "type", {
-        type: Sequelize.STRING(50),
-        allowNull: false,
+    if (!tableInfo.image_url) {
+      await queryInterface.addColumn("menu_items", "image_url", {
+        type: Sequelize.STRING(255),
       });
     }
   },
@@ -26,10 +25,10 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    const tableInfo = await queryInterface.describeTable('verification');
+    const tableInfo = await queryInterface.describeTable("menu_items");
 
-    if (tableInfo.type) {
-      await queryInterface.removeColumn('verification', "type");
+    if (tableInfo.image_url) {
+      await queryInterface.removeColumn("menu_items", "image_url");
     }
   },
 };

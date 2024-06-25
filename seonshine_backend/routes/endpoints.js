@@ -21,5 +21,21 @@ export const endpoints = {
     list: "/list",
     detail: "/:id",
     edit: "/:id",
+    all: "/all",
+    assignList: "/assign-list",
+    assignDate: "/assign-date",
   },
+  menu: {
+    list: "/list",
+    createItem: "/item",
+    detail: "/item/:id",
+    edit: "/item/:id",
+    delete: "/item/:id",
+    currentDayList: "/current-day-list"
+  },
+  order: {
+    orderItemCurrentDay: "/order-menu-item",
+    discardCurrentOrder: "/discard-current-order",
+    getOrderPeriod: "/valid-period"
+  }
 };
