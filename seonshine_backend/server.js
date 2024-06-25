@@ -7,17 +7,14 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
 
-// Import route handlers
-// const authRoutes = require("./routes/authRoutes");
-// const userRoutes = require("./routes/userRoutes");
-// import commonRouter from "./routes/commonRoutes";
 // import "./db/sync.js";
+// Import route handlers
 import authRoutes from "./routes/authRoutes.js";
 import commonRouter from "./routes/commonRoutes.js";
 import menuRoutes from "./routes/menuRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 import restaurantRouter from "./routes/restaurantRoutes.js";
 import userRouter from "./routes/userRoutes.js";
-//const orderRoutes = require("./routes/orderRoutes");
 
 // Import database initialization function
 // const initializeDb = require("./db/initialize");
@@ -38,7 +35,7 @@ app.use("/api/user", userRouter);
 app.use("/api/restaurant", restaurantRouter);
 app.use("/api/common", commonRouter);
 app.use("/api/menu", menuRoutes);
-// app.use("/order", orderRoutes);
+app.use("/api/order", orderRoutes);
 
 // Initialize the database
 async function startServer() {
@@ -58,5 +55,3 @@ async function startServer() {
 
 // Start the server
 startServer();
-
-//test deploy4

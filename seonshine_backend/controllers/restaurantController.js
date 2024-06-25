@@ -210,7 +210,6 @@ export const updateRestaurant = async (req, res) => {
 
 export const getRestaurantAssignList = async (req, res) => {
   try {
-    console.log('access')
     const assignedList = await RestaurantAssigned.findAll({
       attributes: ["weekday", "restaurant_id"],
     });
@@ -231,9 +230,13 @@ export const assignRestaurantDate = async (req, res) => {
     });
 
     if (restaurantByDate) {
-      await restaurantByDate.update({
-        restaurant_id,
-      });
+      if (restaurant_id) {
+        await restaurantByDate.update({
+          restaurant_id,
+        });
+      } else {
+        await restaurantByDate.destroy();
+      }
     } else {
       await RestaurantAssigned.create({
         weekday,
