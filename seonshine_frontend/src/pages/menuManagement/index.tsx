@@ -1,34 +1,27 @@
 import React, { useEffect, useState } from 'react';
 
+import { RestaurantRounded } from '@mui/icons-material';
 import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
 import SearchIcon from '@mui/icons-material/Search';
-import {
-  Box,
-  Button,
-  FormControl,
-  InputAdornment,
-  MenuItem,
-  Modal,
-  Select,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
-
-import { PageLoading } from '@/components/molecules/pageLoading';
+import { Box, FormControl, InputAdornment, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 
 import { avatarBaseURL } from '@/constants/image';
+import { GetMenuListResponseType } from '@/types/user';
 
-import { useGetAllRestaurants, useGetMenuListlApi } from '@/apis/hooks/userApi.hook';
+import { useGetAllRestaurants, useGetMenuListlApi, useUpdateMenuItemApi } from '@/apis/hooks/userApi.hook';
+
+import ModalMenuItem from './components/ModalMenuItem';
 
 const MenuManagement = () => {
   const [query, setQuery] = useState('');
   const [restaurantQuery, setRestaurantQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateModelOpen, setIsCreateModelOpen] = useState(false);
   const { data: allRestaurants = [] } = useGetAllRestaurants({ enabled: true });
+  const [selectedItem, setSelectedItem] = useState<GetMenuListResponseType | null>(null);
 
   const {
-    data: menuList = [],
+    data: menuList,
     isLoading,
     isError,
   } = useGetMenuListlApi({
@@ -49,15 +42,14 @@ const MenuManagement = () => {
     console.log('Add new dish');
   };
 
-  const handleOpenModal = () => {
+  const handleOpenModal = (item: GetMenuListResponseType) => {
+    setSelectedItem(item);
     setIsModalOpen(true);
   };
-
-  const handleCloseModal = () => setIsModalOpen(false);
-
-  if (isError) {
-    return <div>Error loading menu list</div>;
-  }
+  console.log(restaurantQuery);
+  const handleOpenCreateModal = () => {
+    setIsCreateModelOpen(true);
+  };
 
   return (
     <Box className="px-4 md:px-8">
@@ -66,10 +58,9 @@ const MenuManagement = () => {
           <Stack className="h-full">
             <FormControl
               variant="outlined"
-              className="w-1/3 rounded-xl mr-4"
+              className="w-1/4 rounded-xl mr-4"
             >
               <Select
-                defaultValue=""
                 displayEmpty
                 inputProps={{ 'aria-label': 'Without label' }}
                 value={restaurantQuery}
@@ -92,15 +83,14 @@ const MenuManagement = () => {
                 >
                   Select Restaurant
                 </MenuItem>
-                {Array.isArray(allRestaurants) &&
-                  allRestaurants.map((restaurant) => (
-                    <MenuItem
-                      key={restaurant.user_id}
-                      value={restaurant.user_id}
-                    >
-                      {restaurant.username}
-                    </MenuItem>
-                  ))}
+                {allRestaurants.map((restaurant) => (
+                  <MenuItem
+                    key={restaurant.user_id}
+                    value={restaurant.user_id}
+                  >
+                    {restaurant.username}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
             <TextField
@@ -137,19 +127,29 @@ const MenuManagement = () => {
           </Typography>
         </Box>
         <Stack className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filteredDishes.map((dish) => (
+          {filteredDishes?.map((dish, index) => (
             <Stack
-              className="rounded-md p-6 m-2 box-border cursor-pointer bg-white transition-transform transform hover:scale-105 hover:shadow-lg "
+              key={dish.name + index}
+              className="rounded-md p-6 m-2 box-border cursor-pointer bg-white transition-transform transform hover:scale-105 hover:shadow-lg"
               direction="column"
               gap={2}
-              onClick={handleOpenModal}
+              onClick={() => handleOpenModal(dish)}
             >
               <Box className="w-full h-48 md:h-64 bg-gray-200 flex items-center justify-center overflow-hidden rounded-md">
-                <img
-                  src={dish.image_url ? `${avatarBaseURL}${dish.image_url}` : 'https://via.placeholder.com/150'}
-                  alt={dish.name}
-                  className="h-full w-full object-cover"
-                />
+                {dish.image_url ? (
+                  <img
+                    src={`${avatarBaseURL}${dish.image_url}`}
+                    className="h-full w-full object-cover"
+                    alt={dish.name}
+                  />
+                ) : (
+                  <Stack className="w-full h-full items-center ">
+                    <RestaurantRounded
+                      className="w-full h-1/2 opacity-30"
+                      fontSize="large"
+                    />
+                  </Stack>
+                )}
               </Box>
               <Typography className="font-bold">{dish.name}</Typography>
             </Stack>
@@ -162,7 +162,10 @@ const MenuManagement = () => {
             gap={2}
             onClick={handleAddItem}
           >
-            <Box className="w-full h-48 md:h-64 flex items-center justify-center overflow-hidden rounded-md ">
+            <Box
+              className="w-full h-48 md:h-64 flex items-center justify-center overflow-hidden rounded-md"
+              onClick={handleOpenCreateModal}
+            >
               <AddCircleRoundedIcon
                 className="w-1/2 h-1/2 opacity-30"
                 fontSize="large"
@@ -171,46 +174,24 @@ const MenuManagement = () => {
           </Stack>
         </Stack>
       </Stack>
-      {isModalOpen && (
-        <Modal
-          open={isModalOpen}
-          onClose={handleCloseModal}
-        >
-          <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3/5 md:w-1/3 lg:w-1/5 bg-white shadow-xl rounded-lg outline-none">
-            <Box className="flex flex-col">
-              <Stack
-                className="rounded-md p-8 box-border cursor-pointer bg-gray-100 flex flex-col items-center"
-                direction="column"
-                gap={2}
-              >
-                <Box className="w-full h-48 md:h-64 bg-gray-200 flex items-center justify-center overflow-hidden rounded-md">
-                  <img
-                    src="https://vietnamnomad.com/wp-content/uploads/2023/05/What-is-bun-dau-mam-tom.jpg"
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                </Box>
-                <input
-                  accept="image/*"
-                  className="hidden"
-                  id="upload-photo"
-                  type="file"
-                />
-                <label htmlFor="upload-photo">
-                  <Button
-                    component="span"
-                    className="hover:bg-green-300 hover:text-white hover:outline-green-300 bg-white text-green-200 font-bold outline outline-2 outline-green-200 mx-4 mt-2 md:mt-4 rounded-xl"
-                  >
-                    Upload Photo
-                  </Button>
-                </label>
-              </Stack>
-              <Stack className="font-bold flex flex-col items-center">
-                <Typography>asdasd</Typography>
-              </Stack>
-            </Box>
-          </Box>
-        </Modal>
+      {isModalOpen && selectedItem && (
+        <ModalMenuItem
+          isOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+          selectedItem={selectedItem}
+          setSelectedItem={setSelectedItem}
+          isCreateModal={false}
+          item_id={selectedItem.item_id}
+        />
+      )}
+      {isCreateModelOpen && (
+        <ModalMenuItem
+          isOpen={isCreateModelOpen}
+          setIsModalOpen={setIsCreateModelOpen}
+          setSelectedItem={setSelectedItem}
+          isCreateModal={true}
+          restaurant_id={restaurantQuery}
+        />
       )}
     </Box>
   );

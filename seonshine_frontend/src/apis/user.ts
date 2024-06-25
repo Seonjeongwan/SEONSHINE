@@ -2,6 +2,8 @@ import axiosInstance from '@/configs/axios';
 import {
   ChangeStatusPayloadType,
   ChangeStatusResponseType,
+  CreateMenuItemPayloadType,
+  CreateMenuItemResponseType,
   GetAllRestaurantResponseType,
   GetMenuListApiPropsType,
   GetMenuListResponseType,
@@ -15,6 +17,8 @@ import {
   GetUserListResponseType,
   GetWaitingUserListApiPropsType,
   GetWaitingUserListResponseType,
+  UpdateMenuItemPayloadType,
+  UpdateMenuItemResponseType,
   UpdateRestaurantPayloadType,
   UpdateRestaurantResponseType,
   UpdateUserPayloadType,
@@ -109,9 +113,45 @@ export const getAllRestaurants = async (): Promise<GetAllRestaurantResponseType[
   return response.data;
 };
 
-export const getMenuList = async ({
-  restaurant_id,
-}: GetMenuListApiPropsType): Promise<GetMenuListResponseType> => {
-  const response = await axiosInstance.get<GetMenuListResponseType>(`/menu/list?restaurant_id=${restaurant_id}`);
+export const getMenuList = async ({ restaurant_id }: GetMenuListApiPropsType): Promise<GetMenuListResponseType[]> => {
+  const response = await axiosInstance.get<GetMenuListResponseType[]>(`/menu/list?restaurant_id=${restaurant_id}`);
+  return response.data;
+};
+
+export const updateMenuItem = async (
+  payload: UpdateMenuItemPayloadType,
+  item_id: string,
+): Promise<UpdateMenuItemResponseType> => {
+  const formData = new FormData();
+  formData.append('name', payload.name);
+  if (payload.file) {
+    formData.append('file', payload.file);
+  }
+  const response = await axiosInstance.put<UpdateMenuItemResponseType>(`/menu/item/${item_id}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
+export const deleteMenuItem = async (item_id: string): Promise<{ message: string }> => {
+  const response = await axiosInstance.delete<{ message: string }>(`/menu/item/${item_id}`);
+  return response.data;
+};
+export const createMenuItem = async (payload: CreateMenuItemPayloadType): Promise<CreateMenuItemResponseType> => {
+  const formData = new FormData();
+  formData.append('name', payload.name);
+  formData.append('restaurant_id', payload.restaurant_id);
+  if (payload.file) {
+    formData.append('file', payload.file);
+  }
+
+  const response = await axiosInstance.post<{ message: string }>('/menu/item', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
   return response.data;
 };

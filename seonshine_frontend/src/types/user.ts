@@ -204,8 +204,28 @@ export type GetMenuListApiPropsType = {
 };
 
 export type GetMenuListResponseType = {
+  item_id: string;
   name: string;
   description: string | null;
   price: string | null;
   image_url: string | null;
+};
+
+export type UpdateMenuItemPayloadType = {
+  name: string;
+  file: File | null;
+};
+
+export type UpdateMenuItemResponseType = {
+  message: string;
+};
+
+export type CreateMenuItemPayloadType = {
+  name: string;
+  restaurant_id: string;
+  file: File | null;
+};
+
+export type CreateMenuItemResponseType = {
+  message: string;
 };
