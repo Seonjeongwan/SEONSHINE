@@ -31,5 +31,11 @@ export const endpoints = {
     detail: "/item/:id",
     edit: "/item/:id",
     delete: "/item/:id",
+    currentDayList: "/current-day-list"
   },
+  order: {
+    orderItemCurrentDay: "/order-menu-item",
+    discardCurrentOrder: "/discard-current-order",
+    getOrderPeriod: "/valid-period"
+  }
 };

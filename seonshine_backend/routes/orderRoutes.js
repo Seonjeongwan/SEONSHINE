@@ -1,8 +1,31 @@
-const express = require("express");
-const router = express.Router();
-const orderController = require("../controllers/orderController");
+import express from "express";
+import {
+  discardCurrentOrderItem,
+  getOrderPeriod,
+  orderItemCurrentDay,
+} from "../controllers/orderController.js";
+import { authenticateToken } from "../middleware/auth.js";
+import { endpoints } from "./endpoints.js";
 
-router.post("/order_history", orderController.orderHistory);
-router.post("/order_menu", orderController.orderMenu);
+const orderRoute = express.Router();
 
-module.exports = router;
+orderRoute.post(
+  endpoints.order.orderItemCurrentDay,
+  // authenticateToken({ role: UserRole.user }),
+  authenticateToken(),
+  orderItemCurrentDay
+);
+
+orderRoute.post(
+  endpoints.order.discardCurrentOrder,
+  authenticateToken(),
+  discardCurrentOrderItem
+);
+
+orderRoute.get(
+  endpoints.order.getOrderPeriod,
+  authenticateToken(),
+  getOrderPeriod
+);
+
+export default orderRoute;
