@@ -1,5 +1,9 @@
 import express from "express";
-import { getOrderPeriod, orderItemCurrentDay } from "../controllers/orderController.js";
+import {
+  discardCurrentOrderItem,
+  getOrderPeriod,
+  orderItemCurrentDay,
+} from "../controllers/orderController.js";
 import { authenticateToken } from "../middleware/auth.js";
 import { endpoints } from "./endpoints.js";
 
@@ -10,6 +14,12 @@ orderRoute.post(
   // authenticateToken({ role: UserRole.user }),
   authenticateToken(),
   orderItemCurrentDay
+);
+
+orderRoute.post(
+  endpoints.order.discardCurrentOrder,
+  authenticateToken(),
+  discardCurrentOrderItem
 );
 
 orderRoute.get(
