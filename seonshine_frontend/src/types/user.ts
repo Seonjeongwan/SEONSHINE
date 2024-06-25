@@ -16,6 +16,22 @@ export const labelRoleById: { [key in RoleEnum]: string } = {
   [RoleEnum.RESTAURANT]: 'Restaurant',
 };
 
+export enum DayEnum {
+  MONDAY = 1,
+  TUESDAY = 2,
+  WEDNESDAY = 3,
+  THURSDAY = 4,
+  FRIDAY = 5,
+}
+
+export const dayByWeekday: { [key in DayEnum]: string } = {
+  [DayEnum.MONDAY]: 'Monday',
+  [DayEnum.TUESDAY]: 'Tuesday',
+  [DayEnum.WEDNESDAY]: 'Wednesday',
+  [DayEnum.THURSDAY]: 'Thursday',
+  [DayEnum.FRIDAY]: 'Friday',
+};
+
 export type CurrentUserType = {
   user_id: string;
   role_id: RoleEnum;
@@ -191,5 +207,22 @@ export type UpdateRestaurantPayloadType = {
 };
 
 export type UpdateRestaurantResponseType = {
+  message: string;
+};
+
+export type GetAllRestaurantResponseType = {
+  user_id: string;
+  username: string;
+  address: string;
+};
+
+export type AllRestaurantType = GetAllRestaurantResponseType;
+
+export type RestaurantAssignedType = {
+  weekday: number;
+  restaurant_id: string;
+};
+
+export type RestaurantAssignResponseType = {
   message: string;
 };

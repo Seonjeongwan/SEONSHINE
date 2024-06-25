@@ -200,7 +200,9 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
                 />
               ) : (
                 <Avatar
-                  src={isAvatarDeleted ? '' : `${avatarBaseURL}${user?.profile_picture_url}`}
+                  src={
+                    isAvatarDeleted || !user?.profile_picture_url ? '' : `${avatarBaseURL}${user?.profile_picture_url}`
+                  }
                   className="w-24 h-24 mt-4 md:mt-12"
                 />
               )}
