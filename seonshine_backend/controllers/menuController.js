@@ -1,5 +1,5 @@
 import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
-import MenuItem from "../models/MenuItemModel.js";
+import MenuItem from "../models/menuItemModel.js";
 import Upload from "../models/uploadModel.js";
 import { requestUploadFile } from "../utils/file.js";
 
