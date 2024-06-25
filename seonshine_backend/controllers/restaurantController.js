@@ -74,9 +74,25 @@ export const getAllRestaurant = async (req, res) => {
       where: {
         role_id: 2,
         user_status: 1,
-      }
+      },
+      include: {
+        model: UserProfile,
+        as: "profile",
+        attributes: ["address"],
+      },
+      raw: true,
+      nest: true,
     });
-    res.status(httpStatusCodes.success).send(restaurants);
+
+    const restaurantsResponse = (restaurants || []).map((restaurant) => {
+      const restaurantData = {
+        ...restaurant,
+        ...restaurant.profile,
+      };
+      delete restaurantData.profile;
+      return restaurantData;
+    });
+    res.status(httpStatusCodes.success).send(restaurantsResponse);
   } catch (error) {
     res
       .status(httpStatusCodes.internalServerError)
@@ -124,6 +140,7 @@ export const getRestaurantDetail = async (req, res) => {
       raw: true,
     });
 
+    //TODO: Check cannot get weekday
     restaurantData.weekday = restaurantAssigned?.weekday || null;
 
     res.status(httpStatusCodes.success).json(restaurantData);
@@ -185,6 +202,50 @@ export const updateRestaurant = async (req, res) => {
       .json({ message: "Updated successfully" });
   } catch (error) {
     await transactionUserDb.rollback();
+    res
+      .status(httpStatusCodes.internalServerError)
+      .json({ error: httpStatusErrors.internalServerError });
+  }
+};
+
+export const getRestaurantAssignList = async (req, res) => {
+  try {
+    console.log('access')
+    const assignedList = await RestaurantAssigned.findAll({
+      attributes: ["weekday", "restaurant_id"],
+    });
+    res.status(httpStatusCodes.success).json(assignedList);
+  } catch (error) {
+    res
+      .status(httpStatusCodes.internalServerError)
+      .json({ error: httpStatusErrors.internalServerError });
+  }
+};
+
+export const assignRestaurantDate = async (req, res) => {
+  const { weekday, restaurant_id } = req.body;
+  try {
+    const restaurantByDate = await RestaurantAssigned.findOne({
+      attributes: ["weekday"],
+      where: { weekday: weekday },
+    });
+
+    if (restaurantByDate) {
+      await restaurantByDate.update({
+        restaurant_id,
+      });
+    } else {
+      await RestaurantAssigned.create({
+        weekday,
+        restaurant_id,
+      });
+    }
+
+    res
+      .status(httpStatusCodes.success)
+      .json({ message: "Updated successfully" });
+  } catch (error) {
+    console.log("error :>> ", error);
     res
       .status(httpStatusCodes.internalServerError)
       .json({ error: httpStatusErrors.internalServerError });

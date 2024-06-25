@@ -22,6 +22,8 @@ export const endpoints = {
     detail: "/:id",
     edit: "/:id",
     all: "/all",
+    assignList: "/assign-list",
+    assignDate: "/assign-date",
   },
   menu: {
     list: "/list",
