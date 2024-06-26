@@ -1,3 +1,4 @@
+import { RoleEnum } from '@/types/user';
 import { SignUpSchemaType, SignUpVerifySchemaType } from './components/ProfileRegistration/schema';
 
 export type SignUpStepsType = 'select_user_type' | 'enter_user_information' | 'verify_otp' | 'pending_approval';
@@ -8,7 +9,7 @@ export type EnterUserTypePropsType = {
 
 export type EnterUserInformationPropsType = {
   handleSubmitInformation: (user_information: SignUpSchemaType) => void;
-  userType: string;
+  userType: RoleEnum;
 };
 
 export type AccountVerificationPageProps = {
