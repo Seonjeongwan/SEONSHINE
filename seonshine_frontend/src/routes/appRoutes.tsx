@@ -9,6 +9,7 @@ import PageNotFound from '@/pages/pageNotFound';
 import RestaurantAssignment from '@/pages/restaurantAssignment';
 import SignUpPage from '@/pages/signUp';
 import UserManagement from '@/pages/userManagement';
+import WaitingConfirm from '@/pages/waitingConfirm';
 
 import { RoleEnum } from '@/types/user';
 
@@ -48,6 +49,10 @@ const AppRoutes = () => {
         <Route
           path={paths.pageNotFound}
           element={<PageNotFound />}
+        />
+        <Route
+          path={paths.waiting}
+          element={<WaitingConfirm />}
         />
         <Route
           path={'*'}

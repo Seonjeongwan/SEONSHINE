@@ -3,7 +3,7 @@ export const paths = {
   login: '/login',
   forgotPassword: '/forgot-password',
   signUp: '/sign-up',
-  test: '/test',
+  waiting: '/waiting',
   pageNotFound: '/404',
   admin: '/admin',
   dashboard: '/dashboard',

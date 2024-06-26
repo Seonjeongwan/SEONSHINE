@@ -14,6 +14,7 @@ import loginBanner from '@/assets/images/login-banner.png';
 import logo from '@/assets/images/logo.png';
 import { useAuth } from '@/hooks/useAuth';
 import { paths } from '@/routes/paths';
+import { UserStatusEnum } from '@/types/user';
 
 import { useLoginApi } from '@/apis/hooks/authApi.hook';
 import { useLoadingStore } from '@/store/loading.store';
@@ -49,8 +50,18 @@ const LoginPage = () => {
     exeLogin(data, {
       onSuccess: (data) => {
         setLoading(false);
-        handleLoginSuccess(data.user, data.user.token, !!rememberCheckboxRef.current?.checked);
-        navigate(paths.index);
+        if (!data) return;
+
+        const { user_status, user } = data;
+
+        if (Number(user_status) === UserStatusEnum.WAITING_CONFIRM) {
+          navigate(paths.waiting);
+        }
+
+        if (user) {
+          handleLoginSuccess(user, user.token, !!rememberCheckboxRef.current?.checked);
+          navigate(paths.index);
+        }
       },
       onError: () => {
         toast.error('Login failed!');
