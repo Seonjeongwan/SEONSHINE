@@ -13,7 +13,6 @@ services:
       - ./seonshine_frontend/default.ssl.conf:/etc/nginx/conf.d/default.ssl.conf
       - certbot-etc:/etc/letsencrypt
       - certbot-www:/var/www/certbot
-      - ./myweb:/usr/share/nginx/html
     depends_on:
       - backend
       - fileserver
@@ -111,7 +110,7 @@ services:
       trap exit TERM;
       while :; do
         certbot renew --webroot -w /var/www/certbot --quiet && sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
-        sleep 604800;  # 86400 seconds = 1 week
+        sleep 86400;  # 86400 = 1 day 604800 seconds = 1 week
       done
       '
     depends_on:
