@@ -1,5 +1,11 @@
 import axiosInstance from '@/configs/axios';
-import { GetOrderListApiPropsType, GetOrderListResponseType, GetOrderPeriodResponseType } from '@/types/order';
+import {
+  GetOrderListApiPropsType,
+  GetOrderListByDateApiPropsType,
+  GetOrderListByDateResponseType,
+  GetOrderListResponseType,
+  GetOrderPeriodResponseType,
+} from '@/types/order';
 
 export const getOrderList = async (params: GetOrderListApiPropsType): Promise<GetOrderListResponseType> => {
   const response = await axiosInstance.get<GetOrderListResponseType>('/order/list', {
@@ -10,5 +16,14 @@ export const getOrderList = async (params: GetOrderListApiPropsType): Promise<Ge
 
 export const getOrderPeriod = async (): Promise<GetOrderPeriodResponseType> => {
   const response = await axiosInstance.get<GetOrderPeriodResponseType>('/order/valid-period');
+  return response.data;
+};
+
+export const getOrderListByDate = async (
+  params: GetOrderListByDateApiPropsType,
+): Promise<GetOrderListByDateResponseType> => {
+  const response = await axiosInstance.get<GetOrderListByDateResponseType>('/order/list', {
+    params: params,
+  });
   return response.data;
 };

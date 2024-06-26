@@ -11,39 +11,72 @@ import Table from '@/components/organims/table';
 
 import useTable from '@/hooks/useTable';
 import { OrderListType } from '@/types/order';
+import { RoleEnum } from '@/types/user';
 
+import { useGetOrderListByDateApi } from '@/apis/hooks/orderListApi.hook';
+import useAuthStore from '@/store/auth.store';
+
+import { OrderListRestaurantTableHeader } from './OrderListRestaurantTableHeader';
 import { OrderListTableHeader } from './OrderListTableHeader';
 import { DateSchema, DateSchemaType } from './schema';
 
 const ITEMS_PER_PAGE = 10;
 
+const today = format(new Date(), 'yyyy-MM-dd');
+
 const OrderListTab = () => {
+  const { currentUser } = useAuthStore();
+
+  const restaurantId = currentUser?.role_id === RoleEnum.RESTAURANT ? currentUser.user_id : '';
+
   const {
-    handleSubmit,
     control,
-    getValues,
+    watch,
     formState: { errors },
   } = useForm<DateSchemaType>({
     resolver: zodResolver(DateSchema),
-    defaultValues: { date: '2024-06-24' },
+    defaultValues: { date: today },
   });
 
-  const {
-    currentPage,
-    sortKey,
-    sortType,
-    pageSize,
-    handlePageChange,
-    handleSortingChange,
-    searchField,
-    searchQuery,
-    handleSearchChange,
-  } = useTable({ initPageSize: ITEMS_PER_PAGE, initSortKey: 'date' });
+  const { currentPage, sortKey, sortType, pageSize, handlePageChange, handleSortingChange } = useTable({
+    initPageSize: ITEMS_PER_PAGE,
+    initSortKey: 'item_name',
+  });
 
-  const onSubmit = (data: DateSchemaType) => {};
+  const watchedDate = watch('date');
+
+  const { data: orderList, isFetching } = useGetOrderListByDateApi({
+    date: watchedDate,
+    restaurant_id: 'shinhanuser10',
+    page_size: pageSize,
+    page_number: currentPage,
+    sort_key: sortKey,
+    sort_type: sortType,
+  });
+
+  const columns = !!restaurantId ? OrderListRestaurantTableHeader : OrderListTableHeader;
+
+  const data: OrderListType[] = orderList
+    ? orderList.data.map((order) => ({
+        ordered_items: order.item_name,
+        amount: order.quantity,
+      }))
+    : [];
 
   return (
-    <Stack direction="column">
+    <Stack
+      direction="column"
+      className="w-full lg:w-240"
+    >
+      {!!restaurantId && (
+        <Typography
+          variant="heading4"
+          component="h3"
+          className="mb-8 text-3xl font-bold"
+        >
+          {currentUser?.username}
+        </Typography>
+      )}
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <Controller
           name={'date'}
@@ -72,7 +105,6 @@ const OrderListTab = () => {
                 onChange={(date) => {
                   const formattedDate = date ? format(date, 'yyyy-MM-dd') : '';
                   onChange(formattedDate);
-                  handleSubmit(onSubmit)();
                 }}
                 format="yyyy-MM-dd"
                 sx={(theme) => ({
@@ -99,23 +131,25 @@ const OrderListTab = () => {
         />
         {errors.date && <Typography color="error">{errors.date.message}</Typography>}
       </LocalizationProvider>
-      <Typography
-        variant="heading4"
-        component="h3"
+
+      <Stack
         className="my-8"
+        justifyContent="space-between"
       >
-        {`Order of ${getValues('date')}`}
-      </Typography>
+        <Typography
+          component="h4"
+          className="text-2xl font-bold"
+        >{`Order of ${watchedDate}`}</Typography>
+        <Typography className="text-lg font-normal">{`Order amount: ${orderList?.total}`}</Typography>
+      </Stack>
+
       <Table<OrderListType>
-        // data={data?.data || []}
-        data={[]}
-        columns={OrderListTableHeader}
-        isFetching={false}
-        // pageCount={data ? Math.ceil(data.total / pageSize) : 0}
+        data={data}
+        columns={columns}
+        isFetching={isFetching}
         onSortingChange={handleSortingChange}
         currentPage={currentPage}
         onPageChange={handlePageChange}
-        pageCount={0}
       />
     </Stack>
   );
