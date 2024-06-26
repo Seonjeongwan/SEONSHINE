@@ -101,13 +101,16 @@ services:
     entrypoint: |
       sh -c '
       if [ ! -f /etc/letsencrypt/live/seonshine.net/fullchain.pem ]; then
-        certbot certonly --webroot -w /var/www/certbot --email seonshine.vn@gmail.com -d seonshine.net -d www.seonshine.net --agree-tos --no-eff-email;
+        certbot certonly --webroot -w /var/www/certbot --email seonshine.vn@gmail.com -d seonshine.net -d www.seonshine.net --agree-tos --no-eff-email ;
+        while [ ! -f /etc/letsencrypt/live/seonshine.net/fullchain.pem ]; do
+          sleep 5;
+        done;
         sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
       fi;
       trap exit TERM;
       while :; do
         certbot renew --webroot -w /var/www/certbot --quiet && sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
-        sleep 86400;
+        sleep 86400;  # 86400 = 1 day 604800 seconds = 1 week
       done
       '
     depends_on:
