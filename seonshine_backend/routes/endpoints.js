@@ -36,6 +36,7 @@ export const endpoints = {
   order: {
     orderItemCurrentDay: "/order-menu-item",
     discardCurrentOrder: "/discard-current-order",
-    getOrderPeriod: "/valid-period"
+    getOrderPeriod: "/valid-period",
+    getOrderList: "/list"
   }
 };

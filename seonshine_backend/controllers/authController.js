@@ -5,7 +5,7 @@ import { errorCodes } from "../constants/errorCode.js";
 import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
 import { messageErrors, statusWithMessageLogin } from "../constants/message.js";
 import { verificationTypes } from "../constants/verification.js";
-import { User } from "../models/index.js";
+import { User, UserProfile } from "../models/index.js";
 import Verification from "../models/verificationModel.js";
 import { sendVerificationCode } from "../utils/emailUtil.js";
 import { getResponseErrors } from "../utils/responseParser.js";
@@ -75,6 +75,10 @@ export const verifySignUp = async (req, res) => {
           user_status: UserStatus.waitingConfirm,
         };
         const userResponse = await User.create(user);
+        await UserProfile.create({
+          user_id: userResponse.user_id,
+          address: "",
+        });
         await deleteFromTemporaryDb(`signup-user-${email}`);
         //Delete all verification code sign up by email
         await Verification.destroy({
