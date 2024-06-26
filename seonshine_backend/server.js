@@ -9,6 +9,7 @@ import express from "express";
 
 // import "./db/sync.js";
 // Import route handlers
+import "./config/timezone.js";
 import authRoutes from "./routes/authRoutes.js";
 import commonRouter from "./routes/commonRoutes.js";
 import menuRoutes from "./routes/menuRoutes.js";

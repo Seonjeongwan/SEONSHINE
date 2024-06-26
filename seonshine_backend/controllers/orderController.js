@@ -178,8 +178,50 @@ export const discardCurrentOrderItem = async (req, res) => {
   }
 };
 
-//TODO: Get order list by current date
-export const getOrderListByDate = async (req, res) => {
+//TODO: Get order list by date
+export const getOrderList = async (req, res) => {
+
+  const {
+    page_size = 25,
+    page_number = 1,
+    sort_key = "updated_at",
+    sort_type = "asc",
+    date = "",
+    restaurant_id = ""
+  } = req.query;
+  const offset = (page_number - 1) * page_size;
+
+  try {
+    //TODO: Check current role is user or restaurant for specific attributes can get
+    const { count, rows } = await OrderItem.findAndCountAll({
+      where: {
+        restaurant_id,
+        order_date: date,
+      },
+      order: [[sort_key, sort_type.toUpperCase()]],
+      offset: Number(offset),
+      limit: Number(page_size),
+    });
+
+    res.status(httpStatusCodes.success).send({
+      data: rows,
+      date,
+      page_number,
+      page_size,
+      sort_key,
+      sort_type,
+      total: count,
+    });
+  } catch (error) {
+    console.log("error :>> ", error);
+    res
+      .status(httpStatusCodes.internalServerError)
+      .send(httpStatusErrors.internalServerError);
+  }
+};
+
+//TODO: Get Order History
+export const getOrderHistory = async (req, res) => {
   try {
     const { date } = req.query;
     const list = [];

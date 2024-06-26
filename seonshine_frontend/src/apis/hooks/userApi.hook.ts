@@ -25,6 +25,7 @@ import {
   UpdateUserResponseType,
   UploadImagePayloadType,
   UploadImageResponseType,
+  UseGetRestaurantsPropsType,
 } from '@/types/user';
 
 import {
@@ -34,8 +35,8 @@ import {
   changeUserAvatar,
   createMenuItem,
   deleteMenuItem,
-  getAllRestaurants,
   getMenuList,
+  getAllRestaurants,
   getRestaurantDetail,
   getRestaurantList,
   getUserDetail,
@@ -47,10 +48,6 @@ import {
 } from '../user';
 
 interface UseGetBranchProps {
-  enabled?: boolean;
-}
-
-interface UseGetRestaurantsProps {
   enabled?: boolean;
 }
 
@@ -157,9 +154,9 @@ export const useUpdateRestaurantApi = ({
   });
 };
 
-export const useGetAllRestaurants = ({
+export const useGetAllRestaurantsApi = ({
   enabled = true,
-}: UseGetRestaurantsProps): UseQueryResult<GetAllRestaurantResponseType[]> => {
+}: UseGetRestaurantsPropsType): UseQueryResult<GetAllRestaurantResponseType[]> => {
   return useQuery({
     queryKey: ['restaurantList'],
     queryFn: async () => {
