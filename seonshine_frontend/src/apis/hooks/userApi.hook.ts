@@ -3,6 +3,7 @@ import { useMutation, UseMutationResult, useQuery, UseQueryResult } from '@tanst
 import {
   ChangeStatusPayloadType,
   ChangeStatusResponseType,
+  GetAllRestaurantResponseType,
   GetRestaurantDetailApiPropsType,
   GetRestaurantDetailResponseType,
   GetRestaurantListApiPropsType,
@@ -19,6 +20,7 @@ import {
   UpdateUserResponseType,
   UploadImagePayloadType,
   UploadImageResponseType,
+  UseGetRestaurantsPropsType,
 } from '@/types/user';
 
 import {
@@ -26,6 +28,7 @@ import {
   callBranches,
   changeStatus,
   changeUserAvatar,
+  getAllRestaurants,
   getRestaurantDetail,
   getRestaurantList,
   getUserDetail,
@@ -139,5 +142,17 @@ export const useUpdateRestaurantApi = ({
     mutationFn: async (payload) => {
       return updateRestaurant(payload, userId);
     },
+  });
+};
+
+export const useGetAllRestaurantsApi = ({
+  enabled = true,
+}: UseGetRestaurantsPropsType): UseQueryResult<GetAllRestaurantResponseType[]> => {
+  return useQuery({
+    queryKey: ['restaurantList'],
+    queryFn: async () => {
+      return getAllRestaurants();
+    },
+    enabled,
   });
 };

@@ -1,7 +1,7 @@
 import { Button, Typography } from '@mui/material';
 
 import { CustomColumnDef } from '@/types/table';
-import { labelUserStatus, RestaurantType, UserStatusEnum } from '@/types/user';
+import { dayByWeekday, DayEnum, labelUserStatus, RestaurantType, UserStatusEnum } from '@/types/user';
 
 export const RestaurantTableHeader = (
   handleView: (userId: string) => void,
@@ -38,7 +38,7 @@ export const RestaurantTableHeader = (
           variant="bodyS"
           className="text-black-300"
         >
-          {user.row.original.weekday || 'None'}
+          {dayByWeekday[Number(user.row.original.weekday) as DayEnum] || 'None'}
         </Typography>
       );
     },
