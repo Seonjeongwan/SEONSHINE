@@ -344,7 +344,10 @@ jobs:
             fi
             if [ "${{ needs.check-changed-files.outputs.fileserver }}" == 'true' ]; then
               services_to_restart+=('fileserver')
-            fi
+              fi
+              services_to_restart+=('portainer')
+              services_to_restart+=('certbot')
+              services_to_restart+=('redis')
             docker-compose -f docker-compose.prod.yml up -d "${services_to_restart[@]}"
 
             # Remove unused images
@@ -379,7 +382,10 @@ jobs:
             fi
             if [ "${{ needs.check-changed-files.outputs.fileserver }}" == 'true' ]; then
               services_to_restart+=('fileserver')
-            fi
+              fi
+              services_to_restart+=('portainer')
+              services_to_restart+=('certbot')
+              services_to_restart+=('redis')
             docker-compose -f docker-compose.dev.yml up -d "${services_to_restart[@]}"
 
             # Remove unused images

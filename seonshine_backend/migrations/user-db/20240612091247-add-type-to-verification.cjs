@@ -28,7 +28,7 @@ module.exports = {
      */
     const tableInfo = await queryInterface.describeTable('verification');
 
-    if (!tableInfo.type) {
+    if (tableInfo.type) {
       await queryInterface.removeColumn('verification', "type");
     }
   },

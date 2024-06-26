@@ -3,7 +3,10 @@ import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-d
 import Dashboard from '@/pages/dashboard';
 import ForgotPasswordPage from '@/pages/forgotPassword';
 import LoginPage from '@/pages/login';
+import MenuManagement from '@/pages/menuManagement';
+import OrderManagement from '@/pages/orderManagement';
 import PageNotFound from '@/pages/pageNotFound';
+import RestaurantAssignment from '@/pages/restaurantAssignment';
 import SignUpPage from '@/pages/signUp';
 import UserManagement from '@/pages/userManagement';
 
@@ -11,11 +14,9 @@ import { RoleEnum } from '@/types/user';
 
 import useAuthStore from '@/store/auth.store';
 
-import RestaurantManagement from './../pages/restaurantManagement/index';
 import AuthenticateLayout from './guards/AuthenticateLayout';
 import ProtectedLayout from './guards/ProtectedLayout';
 import { paths } from './paths';
-import MenuManagement from '@/pages/menuManagement';
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuthStore();
@@ -48,7 +49,6 @@ const AppRoutes = () => {
           path={paths.pageNotFound}
           element={<PageNotFound />}
         />
-
         <Route
           path={'*'}
           element={
@@ -86,12 +86,12 @@ const AppRoutes = () => {
           />
         </Route>
         <Route
-          path={paths.restaurant.index}
+          path={paths.restaurantAssignment.index}
           element={<ProtectedLayout allowedRoles={[RoleEnum.ADMIN]} />}
         >
           <Route
             index
-            element={<RestaurantManagement />}
+            element={<RestaurantAssignment />}
           />
         </Route>
         <Route
@@ -101,6 +101,15 @@ const AppRoutes = () => {
           <Route
             index
             element={<MenuManagement />}
+          />
+        </Route>
+        <Route
+          path={paths.order.index}
+          element={<ProtectedLayout allowedRoles={[RoleEnum.ADMIN]} />}
+        >
+          <Route
+            index
+            element={<OrderManagement />}
           />
         </Route>
       </Routes>

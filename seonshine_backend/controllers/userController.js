@@ -345,3 +345,5 @@ export const updateUser = async (req, res) => {
       .json({ error: httpStatusErrors.internalServerError });
   }
 };
+
+//TODO: Define Update user admin information API. Using token for check current user

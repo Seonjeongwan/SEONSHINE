@@ -7,6 +7,8 @@ import { Edit, EditOutlined, LinkedCamera, RestaurantRounded } from '@mui/icons-
 import { Box, Button, IconButton, Modal, Stack, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 
+import ConfirmModal from '@/components/organims/confirmModal';
+
 import { avatarBaseURL } from '@/constants/image';
 import { CreateMenuItemPayloadType, GetMenuListResponseType, UpdateMenuItemPayloadType } from '@/types/user';
 import { isValidImageFile } from '@/utils/file';
@@ -14,61 +16,54 @@ import { isValidImageFile } from '@/utils/file';
 import { useCreateMenuItemApi, useDeleteMenuItemApi, useUpdateMenuItemApi } from '@/apis/hooks/userApi.hook';
 
 import { menuListInfoSchema, MenuListInfoSchemaType } from '../schema';
+import { approvalItemDelete, approvalItemleteDescription } from './constant';
 
 type ModalMenuItemPropsType = {
-  isOpen: boolean;
-  selectedItem?: GetMenuListResponseType;
-  setSelectedItem: (selectedItem: GetMenuListResponseType | null) => void;
-  setIsModalOpen: (isOpen: boolean) => void;
-  isCreateModal?: boolean;
+  selectedItem?: GetMenuListResponseType | null;
+  onClose: () => void;
   item_id?: string;
   restaurant_id?: string;
 };
-const ModalMenuItem = ({
-  isOpen,
-  selectedItem,
-  setSelectedItem,
-  setIsModalOpen,
-  isCreateModal = false,
-  item_id = '',
-  restaurant_id = '',
-}: ModalMenuItemPropsType) => {
+const ModalMenuItem = ({ selectedItem, onClose, item_id = '', restaurant_id = '' }: ModalMenuItemPropsType) => {
   const {
     control,
     handleSubmit,
     reset,
+    setValue,
+    getValues,
     formState: { isDirty, errors },
   } = useForm({
     defaultValues: {
       name: selectedItem?.name || '',
+      file: null as unknown as File,
     },
     resolver: zodResolver(menuListInfoSchema),
+    mode: 'onChange',
   });
 
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  console.log({ getValues: getValues('file') });
+
+  const [imageUrl, setImageUrl] = useState<string | null>(
+    selectedItem?.image_url ? `${avatarBaseURL}${selectedItem?.image_url}` : '',
+  );
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
 
-  const { mutate: updateMenuItem } = useUpdateMenuItemApi({ item_id });
-  const { mutate: deleteMenuItem } = useDeleteMenuItemApi(item_id);
-  const { mutate: createMenuItem } = useCreateMenuItemApi();
+  const { mutate: updateMenuItem, isPending: isLoadingUpdate } = useUpdateMenuItemApi({ item_id });
+  const { mutate: deleteMenuItem, isPending: isLoadingDelete } = useDeleteMenuItemApi(item_id);
+  const { mutate: createMenuItem, isPending: isLoadingCreate } = useCreateMenuItemApi();
 
   const queryClient = useQueryClient();
 
-  const handleSave = (data: { name: string }) => {
-    const payload: UpdateMenuItemPayloadType = {
-      ...data,
-      file: imageFile,
-    };
-
-    updateMenuItem(payload, {
+  const handleSave = (data: MenuListInfoSchemaType) => {
+    updateMenuItem(data, {
       onSuccess: (res) => {
         console.log({ res });
         queryClient.invalidateQueries({ queryKey: ['getMenuList'] });
         toast.success(res.message);
         setIsEditing(false);
-        handleCloseModal();
+        onClose();
       },
       onError: () => {
         toast.error('Update restaurant failed!');
@@ -78,15 +73,18 @@ const ModalMenuItem = ({
 
   const handleCancel = () => {
     setIsEditing(false);
-    reset({
-      name: selectedItem?.name || '',
-    });
+    reset();
+  };
+
+  const handleClickAction = () => {
+    setIsConfirmModalOpen(true);
   };
 
   const handleDeleteItem = () => {
     deleteMenuItem(undefined, {
       onSuccess: (data) => {
         toast.success(data.message);
+        onClose();
         queryClient.invalidateQueries({ queryKey: ['getMenuList'] });
       },
       onError: () => {
@@ -95,16 +93,9 @@ const ModalMenuItem = ({
     });
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setIsEditing(false);
-    reset();
-  };
-
-  const handleCreate = (data: { name: string }) => {
+  const handleCreate = (data: MenuListInfoSchemaType) => {
     const payload: CreateMenuItemPayloadType = {
       ...data,
-      file: imageFile,
       restaurant_id: restaurant_id,
     };
 
@@ -113,7 +104,7 @@ const ModalMenuItem = ({
         toast.success(response.message);
         queryClient.invalidateQueries({ queryKey: ['getMenuList'] });
         reset();
-        setImageFile(null);
+        onClose();
       },
       onError: () => {
         toast.error('Create menu item failed!');
@@ -135,7 +126,7 @@ const ModalMenuItem = ({
         return;
       }
 
-      setImageFile(file);
+      setValue('file', file, { shouldDirty: true });
 
       const reader = new FileReader();
       reader.onload = () => {
@@ -147,79 +138,75 @@ const ModalMenuItem = ({
 
   useEffect(() => {
     if (selectedItem) {
-      reset({
-        name: selectedItem.name,
-      });
+      reset();
     }
   }, [selectedItem]);
 
   return (
     <Modal
-      open={isOpen}
-      onClose={handleCloseModal}
+      open={true}
+      onClose={onClose}
     >
       <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3/5 md:w-1/3 lg:w-1/5 bg-white shadow-xl rounded-lg outline-none">
         <Box className="h-full flex flex-col justify-between">
-          <Stack
-            className="rounded-md p-8 box-border cursor-pointer bg-gray-100 flex flex-col items-center"
-            direction="column"
-            gap={2}
+          <form
+            onSubmit={!selectedItem ? handleSubmit(handleCreate) : handleSubmit(handleSave)}
+            className="h-full"
           >
-            <Box className="w-full h-48 md:h-64 bg-gray-200 flex items-center justify-center overflow-hidden rounded-md">
-              {isCreateModal && !imageUrl ? (
-                <Stack className="w-full h-full items-center">
-                  <LinkedCamera
-                    className="w-full h-1/2 opacity-30"
-                    fontSize="large"
-                  />
-                </Stack>
-              ) : imageUrl ? (
-                <img
-                  src={imageUrl}
-                  className="h-full w-full object-cover"
-                  alt={selectedItem?.name}
-                />
-              ) : selectedItem?.image_url ? (
-                <img
-                  src={`${avatarBaseURL}${selectedItem.image_url}`}
-                  className="h-full w-full object-cover"
-                  alt={selectedItem.name}
-                />
-              ) : (
-                <Stack className="w-full h-full items-center">
-                  <RestaurantRounded
-                    className="w-full h-1/2 opacity-30"
-                    fontSize="large"
-                  />
-                </Stack>
-              )}
-            </Box>
-            <input
-              accept="image/*"
-              id="upload-photo"
-              type="file"
-              className="hidden"
-              onChange={handleImageChange}
-            />
-            <label htmlFor="upload-photo">
-              {isEditing || isCreateModal ? (
-                <Button
-                  component="span"
-                  className="hover:bg-green-300 hover:text-white hover:outline-green-300 bg-white text-green-200 font-bold outline outline-2 outline-green-200 mx-4 mt-2 md:mt-4 rounded-xl"
-                >
-                  Upload Photo
-                </Button>
-              ) : null}
-            </label>
-            {uploadError && <p className="text-red-500 text-xs m-2">{uploadError}</p>}
-          </Stack>
-          <Box className="font-bold flex flex-col text-center">
-            <form
-              onSubmit={isCreateModal ? handleSubmit(handleCreate) : handleSubmit(handleSave)}
-              className="h-full"
+            <Stack
+              className="rounded-md p-8 box-border cursor-pointer bg-gray-100 flex flex-col items-center"
+              direction="column"
+              gap={2}
             >
+              <Box className="w-full h-48 md:h-64 bg-gray-200 flex items-center justify-center overflow-hidden rounded-md">
+                {imageUrl ? (
+                  <img
+                    src={imageUrl}
+                    className="h-full w-full object-cover"
+                    alt={selectedItem?.name}
+                  />
+                ) : (
+                  <Stack className="w-full h-full items-center">
+                    <LinkedCamera
+                      className="w-full h-1/2 opacity-30"
+                      fontSize="large"
+                    />
+                  </Stack>
+                )}
+              </Box>
+              <Controller
+                name="file"
+                control={control}
+                render={({ field, fieldState: { error } }) => (
+                  <>
+                    <input
+                      name="file"
+                      accept="image/*"
+                      id="upload-photo"
+                      type="file"
+                      className="hidden"
+                      onChange={handleImageChange}
+                    />
+                    {error && <p className="text-red-500 text-xs">{error.message}</p>}
+                  </>
+                )}
+              />
+
+              <label htmlFor="upload-photo">
+                {isEditing || !selectedItem ? (
+                  <Button
+                    component="span"
+                    className="hover:bg-green-300 hover:text-white hover:outline-green-300 bg-white text-green-200 font-bold outline outline-2 outline-green-200 mx-4 mt-2 md:mt-4 rounded-xl"
+                  >
+                    Upload Photo
+                  </Button>
+                ) : null}
+              </label>
+              {uploadError && <p className="text-red-500 text-xs m-2">{uploadError}</p>}
+            </Stack>
+            <Box className="font-bold flex flex-col text-center">
               <div className="h-full flex flex-col justify-between">
-                {!isCreateModal && (
+                {selectedItem && (
                   <IconButton
                     className="absolute right-4"
                     onClick={handleEditToggle}
@@ -227,7 +214,7 @@ const ModalMenuItem = ({
                     {isEditing ? <Edit /> : <EditOutlined />}
                   </IconButton>
                 )}
-                {isEditing || isCreateModal ? (
+                {isEditing || !selectedItem ? (
                   <Controller
                     name="name"
                     control={control}
@@ -254,11 +241,12 @@ const ModalMenuItem = ({
                   </Typography>
                 )}
                 <Box className="flex self-end m-4">
-                  {isCreateModal ? (
+                  {!selectedItem ? (
                     <Button
                       type="submit"
                       variant="contained"
                       color="primary"
+                      disabled={isLoadingCreate}
                     >
                       Create
                     </Button>
@@ -268,7 +256,7 @@ const ModalMenuItem = ({
                         type="submit"
                         variant="contained"
                         color="primary"
-                        disabled={!isDirty && !imageFile}
+                        disabled={!isDirty || isLoadingUpdate}
                       >
                         Save
                       </Button>
@@ -284,7 +272,7 @@ const ModalMenuItem = ({
                   ) : (
                     <>
                       <Button
-                        onClick={handleCloseModal}
+                        onClick={onClose}
                         className="font-bold"
                       >
                         OK
@@ -292,8 +280,9 @@ const ModalMenuItem = ({
                       <Button
                         variant="contained"
                         color="error"
-                        onClick={handleDeleteItem}
+                        onClick={handleClickAction}
                         className="ml-2"
+                        disabled={isLoadingDelete}
                       >
                         Delete
                       </Button>
@@ -301,9 +290,16 @@ const ModalMenuItem = ({
                   )}
                 </Box>
               </div>
-            </form>
-          </Box>
+            </Box>
+          </form>
         </Box>
+        <ConfirmModal
+          open={isConfirmModalOpen}
+          title={approvalItemDelete}
+          description={approvalItemleteDescription}
+          handleClose={() => setIsConfirmModalOpen(false)}
+          handleConfirm={handleDeleteItem}
+        />
       </Box>
     </Modal>
   );
