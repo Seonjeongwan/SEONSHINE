@@ -34,6 +34,18 @@ export const menuItems: MenuItemType[] = [
     name: 'Order Management',
     icon: 'orderIcon',
     path: '/order',
-    permission: [RoleEnum.ADMIN, RoleEnum.RESTAURANT, RoleEnum.USER],
+    permission: [RoleEnum.ADMIN, RoleEnum.RESTAURANT],
+  },
+  {
+    name: 'Order',
+    icon: 'orderIcon',
+    path: '/order',
+    permission: [RoleEnum.USER],
+  },
+  {
+    name: 'Profile Management',
+    icon: 'profileIcon',
+    path: '/profile',
+    permission: [RoleEnum.RESTAURANT, RoleEnum.USER],
   },
 ];
