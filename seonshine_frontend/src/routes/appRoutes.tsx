@@ -3,6 +3,7 @@ import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-d
 import Dashboard from '@/pages/dashboard';
 import ForgotPasswordPage from '@/pages/forgotPassword';
 import LoginPage from '@/pages/login';
+import MenuManagement from '@/pages/menuManagement';
 import OrderManagement from '@/pages/orderManagement';
 import PageNotFound from '@/pages/pageNotFound';
 import RestaurantAssignment from '@/pages/restaurantAssignment';
@@ -91,6 +92,15 @@ const AppRoutes = () => {
           <Route
             index
             element={<RestaurantAssignment />}
+          />
+        </Route>
+        <Route
+          path={paths.restaurant.menu}
+          element={<ProtectedLayout allowedRoles={[RoleEnum.ADMIN, RoleEnum.RESTAURANT]} />}
+        >
+          <Route
+            index
+            element={<MenuManagement />}
           />
         </Route>
         <Route

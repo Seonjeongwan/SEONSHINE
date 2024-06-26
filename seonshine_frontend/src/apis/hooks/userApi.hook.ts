@@ -3,7 +3,10 @@ import { useMutation, UseMutationResult, useQuery, UseQueryResult } from '@tanst
 import {
   ChangeStatusPayloadType,
   ChangeStatusResponseType,
+  CreateMenuItemPayloadType,
   GetAllRestaurantResponseType,
+  GetMenuListApiPropsType,
+  GetMenuListResponseType,
   GetRestaurantDetailApiPropsType,
   GetRestaurantDetailResponseType,
   GetRestaurantListApiPropsType,
@@ -14,6 +17,8 @@ import {
   GetUserListResponseType,
   GetWaitingUserListApiPropsType,
   GetWaitingUserListResponseType,
+  UpdateMenuItemPayloadType,
+  UpdateMenuItemResponseType,
   UpdateRestaurantPayloadType,
   UpdateRestaurantResponseType,
   UpdateUserPayloadType,
@@ -28,12 +33,16 @@ import {
   callBranches,
   changeStatus,
   changeUserAvatar,
+  createMenuItem,
+  deleteMenuItem,
+  getMenuList,
   getAllRestaurants,
   getRestaurantDetail,
   getRestaurantList,
   getUserDetail,
   getUserList,
   getWaitingUserList,
+  updateMenuItem,
   updateRestaurant,
   updateUser,
 } from '../user';
@@ -154,5 +163,44 @@ export const useGetAllRestaurantsApi = ({
       return getAllRestaurants();
     },
     enabled,
+  });
+};
+
+export const useGetMenuListlApi = (
+  params: GetMenuListApiPropsType,
+): UseQueryResult<GetMenuListResponseType[]> => {
+  return useQuery({
+    queryKey: ['getMenuList', params],
+    queryFn: async () => {
+      return getMenuList(params);
+    },
+  });
+};
+
+export const useUpdateMenuItemApi = ({
+  item_id,
+}: {
+  item_id: string;
+}): UseMutationResult<UpdateMenuItemResponseType, unknown, UpdateMenuItemPayloadType> => {
+  return useMutation({
+    mutationFn: async (payload) => {
+      return updateMenuItem(payload, item_id);
+    },
+  });
+};
+
+export const useDeleteMenuItemApi = (item_id: string): UseMutationResult<{ message: string }, unknown, void> => {
+  return useMutation({
+    mutationFn: async () => {
+      return deleteMenuItem(item_id);
+    },
+  });
+};
+
+export const useCreateMenuItemApi = (): UseMutationResult<{ message: string }, unknown, CreateMenuItemPayloadType> => {
+  return useMutation({
+    mutationFn: async (payload) => {
+      return createMenuItem(payload);
+    },
   });
 };
