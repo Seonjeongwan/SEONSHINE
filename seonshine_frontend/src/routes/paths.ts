@@ -11,5 +11,5 @@ export const paths = {
   restaurant: { index: 'restaurant', menu: 'menu' },
   restaurantAssignment: { index: 'restaurant-assign' },
   menu: { index: 'menu' },
-  order: { index: 'order' },
+  order: { index: 'order', menu: 'order-menu' },
 };
