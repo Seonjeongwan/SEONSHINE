@@ -7,6 +7,10 @@ import { Edit, EditOutlined, LinkedCamera, RestaurantRounded } from '@mui/icons-
 import { Box, Button, IconButton, Modal, Stack, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 
+import ConfirmModal from '@/components/organims/confirmModal';
+
+import { approvalImageDeleteDescription } from '@/pages/userManagement/components/ApprovalTab/constants';
+
 import { avatarBaseURL } from '@/constants/image';
 import { CreateMenuItemPayloadType, GetMenuListResponseType, UpdateMenuItemPayloadType } from '@/types/user';
 import { isValidImageFile } from '@/utils/file';
@@ -14,6 +18,7 @@ import { isValidImageFile } from '@/utils/file';
 import { useCreateMenuItemApi, useDeleteMenuItemApi, useUpdateMenuItemApi } from '@/apis/hooks/userApi.hook';
 
 import { menuListInfoSchema, MenuListInfoSchemaType } from '../schema';
+import { approvalItemDelete } from './constant';
 
 type ModalMenuItemPropsType = {
   isOpen: boolean;
@@ -49,6 +54,7 @@ const ModalMenuItem = ({
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
 
   const { mutate: updateMenuItem } = useUpdateMenuItemApi({ item_id });
   const { mutate: deleteMenuItem } = useDeleteMenuItemApi(item_id);
@@ -83,10 +89,15 @@ const ModalMenuItem = ({
     });
   };
 
+  const handleClickAction = () => {
+    setIsConfirmModalOpen(true);
+  };
+
   const handleDeleteItem = () => {
     deleteMenuItem(undefined, {
       onSuccess: (data) => {
         toast.success(data.message);
+        setIsModalOpen(false);
         queryClient.invalidateQueries({ queryKey: ['getMenuList'] });
       },
       onError: () => {
@@ -114,6 +125,7 @@ const ModalMenuItem = ({
         queryClient.invalidateQueries({ queryKey: ['getMenuList'] });
         reset();
         setImageFile(null);
+        setIsModalOpen(false);
       },
       onError: () => {
         toast.error('Create menu item failed!');
@@ -292,7 +304,7 @@ const ModalMenuItem = ({
                       <Button
                         variant="contained"
                         color="error"
-                        onClick={handleDeleteItem}
+                        onClick={handleClickAction}
                         className="ml-2"
                       >
                         Delete
@@ -304,6 +316,13 @@ const ModalMenuItem = ({
             </form>
           </Box>
         </Box>
+        <ConfirmModal
+          open={isConfirmModalOpen}
+          title={approvalItemDelete}
+          description={approvalImageDeleteDescription}
+          handleClose={() => setIsConfirmModalOpen(false)}
+          handleConfirm={handleDeleteItem}
+        />
       </Box>
     </Modal>
   );
