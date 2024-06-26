@@ -86,7 +86,10 @@ const LoginPage = () => {
       className="w-full h-screen"
     >
       {isWaiting ? (
-        <PendingApprovalPage className="items-center" />
+        <PendingApprovalPage
+          className="items-center"
+          handleGotoLogin={() => setIsWaiting(false)}
+        />
       ) : (
         <Stack className="w-full h-full bg-white shadow-md md:rounded-md shadow-black-100 md:w-280 md:h-200">
           <Box className="grid w-full h-full grid-cols-1 md:grid-cols-2">

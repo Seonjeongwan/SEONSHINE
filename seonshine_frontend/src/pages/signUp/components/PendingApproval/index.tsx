@@ -11,8 +11,9 @@ const description =
 
 type PendingApprovalPagePropsType = {
   className?: string;
+  handleGotoLogin?: () => void;
 };
-const PendingApprovalPage = ({ className }: PendingApprovalPagePropsType) => {
+const PendingApprovalPage = ({ className, handleGotoLogin }: PendingApprovalPagePropsType) => {
   const navigate = useNavigate();
 
   const renderDescription = description?.split('. ').map((text, index, array) => (
@@ -24,6 +25,7 @@ const PendingApprovalPage = ({ className }: PendingApprovalPagePropsType) => {
 
   const handleClickGoToLogin = () => {
     navigate(paths.login);
+    handleGotoLogin?.();
   };
   return (
     <Stack
