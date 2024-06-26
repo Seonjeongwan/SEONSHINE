@@ -17,6 +17,8 @@ import {
   GetUserListResponseType,
   GetWaitingUserListApiPropsType,
   GetWaitingUserListResponseType,
+  RestaurantAssignedType,
+  RestaurantAssignResponseType,
   UpdateMenuItemPayloadType,
   UpdateMenuItemResponseType,
   UpdateRestaurantPayloadType,
@@ -152,6 +154,15 @@ export const createMenuItem = async (payload: CreateMenuItemPayloadType): Promis
       'Content-Type': 'multipart/form-data',
     },
   });
+  return response.data;
+};
 
+export const getRestaurantAssignList = async (): Promise<RestaurantAssignedType[]> => {
+  const response = await axiosInstance.get<RestaurantAssignedType[]>('/restaurant/assign-list');
+  return response.data;
+};
+
+export const asssignRestaurant = async (payload: RestaurantAssignedType): Promise<RestaurantAssignResponseType> => {
+  const response = await axiosInstance.post<RestaurantAssignResponseType>(`/restaurant/assign-date`, payload);
   return response.data;
 };

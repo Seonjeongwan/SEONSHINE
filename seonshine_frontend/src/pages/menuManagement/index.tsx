@@ -6,18 +6,21 @@ import SearchIcon from '@mui/icons-material/Search';
 import { Box, FormControl, InputAdornment, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 
 import { avatarBaseURL } from '@/constants/image';
-import { GetMenuListResponseType } from '@/types/user';
+import { GetMenuListResponseType, RoleEnum } from '@/types/user';
 
-import { useGetAllRestaurants, useGetMenuListlApi, useUpdateMenuItemApi } from '@/apis/hooks/userApi.hook';
+import { useGetAllRestaurantsApi, useGetMenuListlApi, useUpdateMenuItemApi } from '@/apis/hooks/userApi.hook';
+import useAuthStore from '@/store/auth.store';
 
 import ModalMenuItem from './components/ModalMenuItem';
 
 const MenuManagement = () => {
   const [query, setQuery] = useState('');
-  const [restaurantQuery, setRestaurantQuery] = useState('');
+  const { currentUser } = useAuthStore();
+  const [restaurantQuery, setRestaurantQuery] = useState(
+    currentUser?.role_id == RoleEnum.ADMIN ? '' : (currentUser?.user_id as string),
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isCreateModelOpen, setIsCreateModelOpen] = useState(false);
-  const { data: allRestaurants = [] } = useGetAllRestaurants({ enabled: true });
+  const { data: allRestaurants = [] } = useGetAllRestaurantsApi({ enabled: true });
   const [selectedItem, setSelectedItem] = useState<GetMenuListResponseType | null>(null);
 
   const {
@@ -30,6 +33,7 @@ const MenuManagement = () => {
 
   const [filteredDishes, setFilteredDishes] = useState(menuList);
 
+  console.log(currentUser);
   useEffect(() => {
     if (query === '') {
       setFilteredDishes(menuList);
@@ -38,17 +42,19 @@ const MenuManagement = () => {
     }
   }, [query, menuList]);
 
-  const handleAddItem = () => {
-    console.log('Add new dish');
-  };
-
   const handleOpenModal = (item: GetMenuListResponseType) => {
     setSelectedItem(item);
     setIsModalOpen(true);
   };
-  console.log(restaurantQuery);
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedItem(null);
+  };
+
   const handleOpenCreateModal = () => {
-    setIsCreateModelOpen(true);
+    setSelectedItem(null);
+    setIsModalOpen(true);
   };
 
   return (
@@ -56,43 +62,45 @@ const MenuManagement = () => {
       <Stack direction="column">
         <Box className="sticky top-0 z-10 h-full w-full bg-gray-100 py-4">
           <Stack className="h-full">
-            <FormControl
-              variant="outlined"
-              className="w-1/4 rounded-xl mr-4"
-            >
-              <Select
-                displayEmpty
-                inputProps={{ 'aria-label': 'Without label' }}
-                value={restaurantQuery}
-                onChange={(e) => setRestaurantQuery(e.target.value)}
-                size="small"
-                className="rounded-xl bg-white font-bold h-full"
-                sx={{
-                  '& .MuiSelect-select': {
-                    display: 'flex',
-                    alignItems: 'center',
-                  },
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    border: 'none',
-                  },
-                }}
+            {currentUser?.role_id == RoleEnum.ADMIN && (
+              <FormControl
+                variant="outlined"
+                className="w-1/4 rounded-xl mr-4"
               >
-                <MenuItem
-                  value=""
-                  disabled
+                <Select
+                  displayEmpty
+                  inputProps={{ 'aria-label': 'Without label' }}
+                  value={restaurantQuery}
+                  onChange={(e) => setRestaurantQuery(e.target.value)}
+                  size="small"
+                  className="rounded-xl bg-white font-bold h-full"
+                  sx={{
+                    '& .MuiSelect-select': {
+                      display: 'flex',
+                      alignItems: 'center',
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      border: 'none',
+                    },
+                  }}
                 >
-                  Select Restaurant
-                </MenuItem>
-                {allRestaurants.map((restaurant) => (
                   <MenuItem
-                    key={restaurant.user_id}
-                    value={restaurant.user_id}
+                    value=""
+                    disabled
                   >
-                    {restaurant.username}
+                    Select Restaurant
                   </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                  {allRestaurants.map((restaurant) => (
+                    <MenuItem
+                      key={restaurant.user_id}
+                      value={restaurant.user_id}
+                    >
+                      {restaurant.username}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
             <TextField
               value={query}
               placeholder="Search For Menu Item"
@@ -160,12 +168,9 @@ const MenuManagement = () => {
             justifyContent="center"
             alignItems="center"
             gap={2}
-            onClick={handleAddItem}
+            onClick={handleOpenCreateModal}
           >
-            <Box
-              className="w-full h-48 md:h-64 flex items-center justify-center overflow-hidden rounded-md"
-              onClick={handleOpenCreateModal}
-            >
+            <Box className="w-full h-48 md:h-64 flex items-center justify-center overflow-hidden rounded-md">
               <AddCircleRoundedIcon
                 className="w-1/2 h-1/2 opacity-30"
                 fontSize="large"
@@ -174,23 +179,12 @@ const MenuManagement = () => {
           </Stack>
         </Stack>
       </Stack>
-      {isModalOpen && selectedItem && (
+      {isModalOpen && (
         <ModalMenuItem
-          isOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
           selectedItem={selectedItem}
-          setSelectedItem={setSelectedItem}
-          isCreateModal={false}
-          item_id={selectedItem.item_id}
-        />
-      )}
-      {isCreateModelOpen && (
-        <ModalMenuItem
-          isOpen={isCreateModelOpen}
-          setIsModalOpen={setIsCreateModelOpen}
-          setSelectedItem={setSelectedItem}
-          isCreateModal={true}
+          item_id={selectedItem?.item_id}
           restaurant_id={restaurantQuery}
+          onClose={handleCloseModal}
         />
       )}
     </Box>

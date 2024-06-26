@@ -17,6 +17,8 @@ import {
 import { avatarBaseURL } from '@/constants/image';
 import { IPlainObject } from '@/types/common';
 import {
+  dayByWeekday,
+  DayEnum,
   labelRoleById,
   labelUserStatus,
   RestaurantDetailType,
@@ -47,7 +49,12 @@ const fields = [
   },
   { name: 'username', label: 'Full name', disabled: false },
   { name: 'email', label: 'Email', disabled: true },
-  { name: 'weekday', label: 'Assigned date', disabled: true },
+  {
+    name: 'weekday',
+    label: 'Assigned date',
+    disabled: true,
+    useLabel: (weekday: string) => dayByWeekday[Number(weekday) as DayEnum] || 'None',
+  },
   { name: 'address', label: 'Address', disabled: false },
   { name: 'phone_number', label: 'Phone Number', disabled: false },
   {
@@ -67,7 +74,6 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
 
   const [isEditing, setIsEditing] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string>(restaurant?.profile_picture_url || '');
   const [isAvatarDeleted, setIsAvatarDeleted] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
 
@@ -107,7 +113,6 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
 
   const handleCancel = () => {
     setIsEditing(false);
-    setPreviewUrl(restaurant?.profile_picture_url || '');
     reset({
       ...(restaurant as RestaurantInfoSchemaType),
     });
@@ -116,7 +121,6 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
   const handleClose = () => {
     onClose();
     setIsEditing(false);
-    setPreviewUrl(restaurant?.profile_picture_url || '');
   };
 
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -189,7 +193,11 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
                 />
               ) : (
                 <Avatar
-                  src={isAvatarDeleted ? '' : `${avatarBaseURL}${restaurant?.profile_picture_url}`}
+                  src={
+                    isAvatarDeleted || !restaurant?.profile_picture_url
+                      ? ''
+                      : `${avatarBaseURL}${restaurant?.profile_picture_url}`
+                  }
                   className="w-24 h-24 mt-4 md:mt-12"
                 />
               )}
