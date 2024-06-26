@@ -16,7 +16,6 @@ const MenuManagement = () => {
   const [query, setQuery] = useState('');
   const [restaurantQuery, setRestaurantQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isCreateModelOpen, setIsCreateModelOpen] = useState(false);
   const { data: allRestaurants = [] } = useGetAllRestaurants({ enabled: true });
   const [selectedItem, setSelectedItem] = useState<GetMenuListResponseType | null>(null);
 
@@ -38,17 +37,19 @@ const MenuManagement = () => {
     }
   }, [query, menuList]);
 
-  const handleAddItem = () => {
-    console.log('Add new dish');
-  };
-
   const handleOpenModal = (item: GetMenuListResponseType) => {
     setSelectedItem(item);
     setIsModalOpen(true);
   };
-  console.log(restaurantQuery);
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedItem(null);
+  };
+
   const handleOpenCreateModal = () => {
-    setIsCreateModelOpen(true);
+    setSelectedItem(null);
+    setIsModalOpen(true);
   };
 
   return (
@@ -160,12 +161,9 @@ const MenuManagement = () => {
             justifyContent="center"
             alignItems="center"
             gap={2}
-            onClick={handleAddItem}
+            onClick={handleOpenCreateModal}
           >
-            <Box
-              className="w-full h-48 md:h-64 flex items-center justify-center overflow-hidden rounded-md"
-              onClick={handleOpenCreateModal}
-            >
+            <Box className="w-full h-48 md:h-64 flex items-center justify-center overflow-hidden rounded-md">
               <AddCircleRoundedIcon
                 className="w-1/2 h-1/2 opacity-30"
                 fontSize="large"
@@ -174,23 +172,12 @@ const MenuManagement = () => {
           </Stack>
         </Stack>
       </Stack>
-      {isModalOpen && selectedItem && (
+      {isModalOpen && (
         <ModalMenuItem
-          isOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
           selectedItem={selectedItem}
-          setSelectedItem={setSelectedItem}
-          isCreateModal={false}
-          item_id={selectedItem.item_id}
-        />
-      )}
-      {isCreateModelOpen && (
-        <ModalMenuItem
-          isOpen={isCreateModelOpen}
-          setIsModalOpen={setIsCreateModelOpen}
-          setSelectedItem={setSelectedItem}
-          isCreateModal={true}
+          item_id={selectedItem?.item_id}
           restaurant_id={restaurantQuery}
+          onClose={handleCloseModal}
         />
       )}
     </Box>
