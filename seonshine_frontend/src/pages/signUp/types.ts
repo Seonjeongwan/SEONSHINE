@@ -4,7 +4,7 @@ import { SignUpSchemaType, SignUpVerifySchemaType } from './components/ProfileRe
 export type SignUpStepsType = 'select_user_type' | 'enter_user_information' | 'verify_otp' | 'pending_approval';
 
 export type EnterUserTypePropsType = {
-  handleSubmitUserType: (user_type: string) => void;
+  handleSubmitUserType: (user_type: RoleEnum) => void;
 };
 
 export type EnterUserInformationPropsType = {
