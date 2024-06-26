@@ -30,15 +30,18 @@ const ModalMenuItem = ({ selectedItem, onClose, item_id = '', restaurant_id = ''
     handleSubmit,
     reset,
     setValue,
+    getValues,
     formState: { isDirty, errors },
   } = useForm({
     defaultValues: {
       name: selectedItem?.name || '',
-      file: new File([], 'empty.txt'),
+      file: null as unknown as File,
     },
     resolver: zodResolver(menuListInfoSchema),
     mode: 'onChange',
   });
+
+  console.log({ getValues: getValues('file') });
 
   const [imageUrl, setImageUrl] = useState<string | null>(
     selectedItem?.image_url ? `${avatarBaseURL}${selectedItem?.image_url}` : '',
@@ -47,9 +50,9 @@ const ModalMenuItem = ({ selectedItem, onClose, item_id = '', restaurant_id = ''
   const [isEditing, setIsEditing] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
 
-  const { mutate: updateMenuItem } = useUpdateMenuItemApi({ item_id });
-  const { mutate: deleteMenuItem } = useDeleteMenuItemApi(item_id);
-  const { mutate: createMenuItem } = useCreateMenuItemApi();
+  const { mutate: updateMenuItem, isPending: isLoadingUpdate } = useUpdateMenuItemApi({ item_id });
+  const { mutate: deleteMenuItem, isPending: isLoadingDelete } = useDeleteMenuItemApi(item_id);
+  const { mutate: createMenuItem, isPending: isLoadingCreate } = useCreateMenuItemApi();
 
   const queryClient = useQueryClient();
 
@@ -70,9 +73,7 @@ const ModalMenuItem = ({ selectedItem, onClose, item_id = '', restaurant_id = ''
 
   const handleCancel = () => {
     setIsEditing(false);
-    reset({
-      name: selectedItem?.name || '',
-    });
+    reset();
   };
 
   const handleClickAction = () => {
@@ -137,9 +138,7 @@ const ModalMenuItem = ({ selectedItem, onClose, item_id = '', restaurant_id = ''
 
   useEffect(() => {
     if (selectedItem) {
-      reset({
-        name: selectedItem.name,
-      });
+      reset();
     }
   }, [selectedItem]);
 
@@ -247,6 +246,7 @@ const ModalMenuItem = ({ selectedItem, onClose, item_id = '', restaurant_id = ''
                       type="submit"
                       variant="contained"
                       color="primary"
+                      disabled={isLoadingCreate}
                     >
                       Create
                     </Button>
@@ -256,7 +256,7 @@ const ModalMenuItem = ({ selectedItem, onClose, item_id = '', restaurant_id = ''
                         type="submit"
                         variant="contained"
                         color="primary"
-                        disabled={!isDirty}
+                        disabled={!isDirty || isLoadingUpdate}
                       >
                         Save
                       </Button>
@@ -282,6 +282,7 @@ const ModalMenuItem = ({ selectedItem, onClose, item_id = '', restaurant_id = ''
                         color="error"
                         onClick={handleClickAction}
                         className="ml-2"
+                        disabled={isLoadingDelete}
                       >
                         Delete
                       </Button>
