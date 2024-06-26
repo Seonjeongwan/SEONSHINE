@@ -1,6 +1,7 @@
 import { Box, FormControl, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material';
 
 import { CustomColumnDef } from '@/types/table';
+import { dayByWeekday, DayEnum } from '@/types/user';
 
 import { AssignTableType } from '../types';
 
@@ -8,8 +9,6 @@ type AssignTableHeaderPropsType = {
   handleSelectChange: (id: number, userId: string) => void;
   isSelectDisabled: (id: number) => boolean;
 };
-
-const currentDayIndex = new Date().getDay();
 
 export const AssignTableHeader = ({
   handleSelectChange,
@@ -21,7 +20,7 @@ export const AssignTableHeader = ({
     cell: (info) => (
       <Box className="flex items-center justify-end bg-gradient-to-r from-gray-200 to-gray-500 h-full min-w-40 w-3/4 my-1">
         <Typography className="font-extrabold italic text-3xl text-black-100">
-          {info.row.original.assigned_date.date || '...'}
+          {dayByWeekday[info.row.original.assigned_date as DayEnum]}
         </Typography>
       </Box>
     ),
@@ -39,7 +38,7 @@ export const AssignTableHeader = ({
           displayEmpty
           inputProps={{ 'aria-label': 'Without label' }}
           value={info.row.original.selectedRestaurantId || ''}
-          onChange={(e: SelectChangeEvent) => handleSelectChange(info.row.original.assigned_date.id, e.target.value)}
+          onChange={(e: SelectChangeEvent) => handleSelectChange(info.row.original.assigned_date, e.target.value)}
           size="small"
           className="bg-white font-bold min-w-52 rounded-xl h-10"
           sx={{
@@ -48,7 +47,7 @@ export const AssignTableHeader = ({
               paddingBottom: '14px',
             },
           }}
-          disabled={isSelectDisabled(info.row.original.assigned_date.id)}
+          disabled={isSelectDisabled(info.row.original.assigned_date)}
         >
           <MenuItem value="">None</MenuItem>
           {info.row.original.restaurants.map((option) => (

@@ -7,21 +7,16 @@ import { useQueryClient } from '@tanstack/react-query';
 import Table from '@/components/organims/table';
 
 import { useGetOrderPeriodApi } from '@/apis/hooks/orderListApi.hook';
-import {
-  useGetAllRestaurantApi,
-  useGetRestaurantAssignListApi,
-  useRestaurantAssignApi,
-} from '@/apis/hooks/restaurantAssignApi.hook';
+import { useGetRestaurantAssignListApi, useRestaurantAssignApi } from '@/apis/hooks/restaurantAssignApi.hook';
+import { useGetAllRestaurantsApi } from '@/apis/hooks/userApi.hook';
 
 import { AssignTableHeader } from './components/AssignTableHeader';
 import { AssignTableType, SelectionsType } from './types';
 
-const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-
 const RestaurantAssignment = () => {
   const [selections, setSelections] = useState<SelectionsType>({});
 
-  const { data: allRestaurants, isFetching: isAllRestaurantsFetching } = useGetAllRestaurantApi();
+  const { data: allRestaurants, isFetching: isAllRestaurantsFetching } = useGetAllRestaurantsApi({ enabled: true });
   const { data: assignedRestaurantList, isFetching: isAssignedListFetching } = useGetRestaurantAssignListApi();
   const { mutate: assignRestaurant } = useRestaurantAssignApi();
   const { data: orderPeriod } = useGetOrderPeriodApi();
@@ -30,11 +25,8 @@ const RestaurantAssignment = () => {
 
   const getDataAssignTable: AssignTableType[] = useMemo(
     () =>
-      daysOfWeek.map((day, index) => ({
-        assigned_date: {
-          id: index + 1,
-          date: day,
-        },
+      Array.from({ length: 5 }).map((_, index) => ({
+        assigned_date: index + 1,
         restaurants: allRestaurants || [],
         address: selections[index + 1]?.address || '',
         selectedRestaurantId: selections[index + 1]?.userId,
@@ -93,7 +85,7 @@ const RestaurantAssignment = () => {
   }, [assignedRestaurantList, allRestaurants]);
 
   return (
-    <Box className="px-4 md:px-8 mt-8 w-full lg:w-280">
+    <Box className="px-4 md:px-8 mt-8 w-full lg:w-280 min-w-max">
       <Table<AssignTableType>
         data={!assignedRestaurantList ? [] : getDataAssignTable}
         columns={columns}

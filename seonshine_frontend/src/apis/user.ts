@@ -104,7 +104,7 @@ export const updateRestaurant = async (
   return response.data;
 };
 
-export const getAllRestaurant = async (): Promise<GetAllRestaurantResponseType[]> => {
+export const getAllRestaurants = async (): Promise<GetAllRestaurantResponseType[]> => {
   const response = await axiosInstance.get<GetAllRestaurantResponseType[]>('/restaurant/all');
   return response.data;
 };

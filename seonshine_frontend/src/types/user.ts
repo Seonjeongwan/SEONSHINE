@@ -210,6 +210,10 @@ export type UpdateRestaurantResponseType = {
   message: string;
 };
 
+export type UseGetRestaurantsPropsType = {
+  enabled?: boolean;
+};
+
 export type GetAllRestaurantResponseType = {
   user_id: string;
   username: string;
