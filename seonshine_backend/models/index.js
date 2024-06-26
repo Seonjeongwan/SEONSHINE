@@ -1,3 +1,5 @@
+import OrderHistory from "./orderHistoryModel.js";
+import OrderItem from "./orderItemModel.js";
 import User from "./userModel.js";
 import UserProfile from "./userProfileModel.js";
 
@@ -11,5 +13,15 @@ UserProfile.belongsTo(User, {
   as: "user",
 });
 
-export { User, UserProfile };
+OrderHistory.hasMany(OrderItem, {
+  foreignKey: "order_id",
+  as: "orderItem",
+});
+
+OrderItem.belongsTo(OrderHistory, {
+  foreignKey: "order_id",
+  as: "orderHistory",
+});
+
+export { OrderHistory, OrderItem, User, UserProfile };
 

@@ -16,7 +16,7 @@ const componentsConfig: Components = {
   MuiInputBase: {
     styleOverrides: {
       input: {
-        paddingTop: '15px !important',
+        paddingTop: '14px !important',
         fontSize: '16px',
       },
     },

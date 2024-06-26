@@ -1,6 +1,9 @@
+import dayjs from "dayjs";
 import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
-import MenuItem from "../models/MenuItemModel.js";
+import MenuItem from "../models/menuItemModel.js";
+import RestaurantAssigned from "../models/restaurantAssignedModel.js";
 import Upload from "../models/uploadModel.js";
+import User from "../models/userModel.js";
 import { requestUploadFile } from "../utils/file.js";
 
 export const getMenuList = async (req, res) => {
@@ -148,6 +151,51 @@ export const updateMenuItem = async (req, res) => {
     });
   } catch (error) {
     console.log("error :>> ", error);
+    res
+      .status(httpStatusCodes.internalServerError)
+      .send(httpStatusErrors.internalServerError);
+  }
+};
+
+export const getMenuListByCurrentDay = async (req, res) => {
+  try {
+    const currentWeekDay = dayjs().day();
+    const restaurantAssign = await RestaurantAssigned.findOne({
+      attributes: ["restaurant_id"],
+      where: {
+        weekday: currentWeekDay,
+      },
+      raw: true,
+    });
+
+    console.log("restaurantAssign :>> ", restaurantAssign);
+
+    const response = {
+      restaurant_name: "",
+      current_day: dayjs().format("YYYY-MM-DD"),
+      menu_list: [],
+    };
+
+    if (!restaurantAssign) {
+      return res.status(httpStatusCodes.success).json(response);
+    }
+
+    const menuItems = await MenuItem.findAll({
+      where: {
+        restaurant_id: restaurantAssign.restaurant_id,
+      },
+      raw: true,
+    });
+
+    const restaurant = await User.findByPk(restaurantAssign.restaurant_id, {
+      raw: true,
+    });
+
+    response.menu_list = menuItems || [];
+    response.restaurant_name = restaurant.username || "";
+
+    return res.status(httpStatusCodes.success).json(response);
+  } catch (error) {
     res
       .status(httpStatusCodes.internalServerError)
       .send(httpStatusErrors.internalServerError);

@@ -1,1 +1,1 @@
-export const Weekday = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+export const Weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
