@@ -19,9 +19,9 @@ export const menuItems: MenuItemType[] = [
     ],
   },
   {
-    name: 'Restaurant Management',
+    name: 'Restaurant Assignment',
     icon: 'restaurantIcon',
-    path: '/restaurant',
+    path: '/restaurant-assign',
     permission: [RoleEnum.ADMIN],
   },
   {

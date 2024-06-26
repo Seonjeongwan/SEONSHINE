@@ -11,3 +11,10 @@ export type GetOrderListResponseType = {
   data: OrderListType[];
   total: number;
 };
+
+export type GetOrderPeriodResponseType = {
+  startHour: number;
+  startMinute: number;
+  endHour: number;
+  endMinute: number;
+};
