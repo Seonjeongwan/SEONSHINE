@@ -4,8 +4,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Stack, Typography } from '@mui/material';
 import { format } from 'date-fns';
 
+import DatePicker from '@/components/molecules/datePicker';
 import Table from '@/components/organims/table';
 
+import { dateFormat } from '@/constants/date';
 import useTable from '@/hooks/useTable';
 import { OrderListType } from '@/types/order';
 import { RoleEnum } from '@/types/user';
@@ -13,14 +15,13 @@ import { RoleEnum } from '@/types/user';
 import { useGetOrderListSumaryApi } from '@/apis/hooks/orderListApi.hook';
 import useAuthStore from '@/store/auth.store';
 
-import DatePickerMUI from '../../../../components/molecules/datePickerMUI';
 import { OrderListRestaurantTableHeader } from './OrderListRestaurantTableHeader';
 import { OrderListTableHeader } from './OrderListTableHeader';
 import { DateSchema, DateSchemaType } from './schema';
 
 const ITEMS_PER_PAGE = 20;
 
-const today = format(new Date(), 'yyyy-MM-dd');
+const today = format(new Date(), dateFormat);
 
 const OrderListTab = () => {
   const { currentUser } = useAuthStore();
@@ -66,7 +67,7 @@ const OrderListTab = () => {
           {currentUser?.username}
         </Typography>
       )}
-      <DatePickerMUI<DateSchemaType>
+      <DatePicker<DateSchemaType>
         name="date"
         control={control}
       />

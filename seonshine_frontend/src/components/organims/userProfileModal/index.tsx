@@ -9,7 +9,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { Avatar, Box, Button, IconButton, Modal, Skeleton } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 
-import DatePicker from '@/components/molecules/datePicker/DatePicker';
+import DatePicker from '@/components/molecules/datePicker';
 
 import {
   approvalImageDelete,
@@ -259,6 +259,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
                           name={field.name}
                           control={control}
                           disabled={field.disabled}
+                          varirant="small"
                         />
                       ) : isEditing && field.name === 'branch_name' && !field.disabled ? (
                         <Controller
