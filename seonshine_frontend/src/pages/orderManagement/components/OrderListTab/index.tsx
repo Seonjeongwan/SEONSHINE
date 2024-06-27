@@ -96,7 +96,7 @@ const OrderListTab = () => {
               return true;
             },
           }}
-          render={({ field: { onChange, value }, fieldState: { error } }) => {
+          render={({ field: { onChange, value } }) => {
             const dateValue = value ? (typeof value === 'string' ? parseISO(value) : value) : null;
 
             return (
