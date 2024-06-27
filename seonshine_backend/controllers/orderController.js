@@ -317,6 +317,9 @@ export const getCurrentOrder = async (req, res) => {
       where: {
         user_id: currentUser.user_id,
         order_date: currentDate,
+        cancel_yn: {
+          [Op.not]: orderItemCancelStatus.cancel
+        }
       },
       raw: true,
     });
