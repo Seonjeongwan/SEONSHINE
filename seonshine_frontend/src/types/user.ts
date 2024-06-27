@@ -215,7 +215,7 @@ export type GetMenuListApiPropsType = {
 };
 
 export type GetMenuListResponseType = {
-  item_id: string;
+  item_id: number;
   name: string;
   description: string | null;
   price: string | null;
@@ -260,4 +260,42 @@ export type RestaurantAssignedType = {
 
 export type RestaurantAssignResponseType = {
   message: string;
+};
+
+export type UseGetTodayMenuListPropsType = {
+  enabled?: boolean;
+};
+
+export type GetTodayMenuListResponseType = {
+  restaurant_name: string;
+  current_day: string;
+  menu_list: GetMenuListResponseType[];
+};
+
+export type OrderMenuItemPayloadType = {
+  item_id: number;
+};
+
+export type OrderMenuItemResponseType = {
+  message: string;
+};
+
+export type DiscardOrderMenuItemResponseType = {
+  message: string;
+};
+
+export type UseGetCurrentOrderPropsType = {
+  enabled?: boolean;
+};
+
+export type GetCurrentOrderResponseType = {
+  order_item_id: string;
+  user_id: string;
+  branch_id: number;
+  restaurant_id: string;
+  item_id: number;
+  item_name: string;
+  submitted_time: string;
+  restaurant_name: string;
+  image_url: string;
 };

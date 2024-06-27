@@ -33,7 +33,6 @@ const MenuManagement = () => {
 
   const [filteredDishes, setFilteredDishes] = useState(menuList);
 
-  console.log(currentUser);
   useEffect(() => {
     if (query === '') {
       setFilteredDishes(menuList);
