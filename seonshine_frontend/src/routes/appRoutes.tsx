@@ -17,6 +17,7 @@ import useAuthStore from '@/store/auth.store';
 import AuthenticateLayout from './guards/AuthenticateLayout';
 import ProtectedLayout from './guards/ProtectedLayout';
 import { paths } from './paths';
+import UserOrder from '@/pages/userOrder';
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuthStore();
@@ -110,6 +111,15 @@ const AppRoutes = () => {
           <Route
             index
             element={<OrderManagement />}
+          />
+        </Route>
+        <Route
+          path={paths.order.menu}
+          element={<ProtectedLayout allowedRoles={[RoleEnum.USER]} />}
+        >
+          <Route
+            index
+            element={<UserOrder />}
           />
         </Route>
       </Routes>
