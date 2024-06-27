@@ -1,8 +1,9 @@
 export type OrderListType = {
-  restaurant_name: string;
-  employee_name: string;
-  ordered_items: string;
-  date: string;
+  restaurant_name?: string;
+  employee_name?: string;
+  ordered_items?: string;
+  amount?: number;
+  date?: string;
 };
 
 export type GetOrderListApiPropsType = {};
@@ -17,4 +18,23 @@ export type GetOrderPeriodResponseType = {
   startMinute: number;
   endHour: number;
   endMinute: number;
+};
+
+export type GetOrderListSummaryApiPropsType = {
+  date?: string;
+};
+
+export type GetOrderListSummaryResponseType = {
+  data: OrderListSummaryItemType[];
+  date: string;
+  restaurant_id: string;
+  restaurant_name: string;
+  total: number;
+};
+
+export type OrderListSummaryItemType = {
+  item_id: number;
+  item_name: string;
+  restaurant_id: string;
+  count: number;
 };
