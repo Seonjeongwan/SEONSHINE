@@ -39,7 +39,7 @@ export const menuItems: MenuItemType[] = [
   {
     name: 'Order',
     icon: 'orderIcon',
-    path: '/order',
+    path: '/order-menu',
     permission: [RoleEnum.USER],
   },
   {
