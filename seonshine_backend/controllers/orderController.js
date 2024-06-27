@@ -43,7 +43,8 @@ export const orderItemCurrentDay = async (req, res) => {
       },
     });
 
-    const isOrderNewMenuItem = !currentOrderItem;
+    const isOrderNewMenuItem =
+      !currentOrderItem || (Number(currentOrderItem.cancel_yn) === Number(orderItemCancelStatus.cancel));
 
     if (isOrderNewMenuItem) {
       if (orderHistory) {
