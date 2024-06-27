@@ -123,7 +123,7 @@ const OrderMenuTab = () => {
         {currentOrder && (
           <Box className="px-2 mb-6">
             <Typography className="font-bold text-2xl mb-4">Ordered Item</Typography>
-            <Box className="rounded-md p-6 box-border grid grid-cols-1 lg:grid-cols-2 gap-4 bg-white w-full md:w-1/2 shadow-xl">
+            <Box className="rounded-md p-6 box-border grid grid-cols-1 lg:grid-cols-2 gap-4 bg-white w-full md:w-2/5 shadow-xl">
               <Stack className="w-full h-48 md:h-64 flex items-center justify-center">
                 <img
                   src={`${avatarBaseURL}${currentOrder.image_url}`}
