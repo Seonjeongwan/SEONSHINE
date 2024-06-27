@@ -3,6 +3,8 @@ import { toast } from 'react-toastify';
 
 import { Box, Step, StepLabel, Stepper } from '@mui/material';
 
+import { RoleEnum } from '@/types/user';
+
 import { useSignUpApi, useSignUpVerifyApi } from '@/apis/hooks/signUpApi.hook';
 import { useLoadingStore } from '@/store/loading.store';
 
@@ -18,7 +20,7 @@ const steps = ['Select User Type', 'Enter User Information', 'Verify OTP', 'Pend
 const secondsCountdown = 120;
 const SignUpPage = () => {
   const [step, setStep] = useState<SignUpStepsType>('select_user_type');
-  const [userType, setUserType] = useState<string>('');
+  const [userType, setUserType] = useState<RoleEnum>(RoleEnum.USER);
   const [userEmail, setUserEmail] = useState<string>('');
   const { mutate: signUpUser, isPending: isSignUpPending } = useSignUpApi();
   const { mutate: verifyOtp, isPending: isVerifyPending } = useSignUpVerifyApi();
@@ -43,7 +45,7 @@ const SignUpPage = () => {
     setStep((prev) => nextStepMap[prev]);
   };
 
-  const handleSubmitUserType = (user_type: string) => {
+  const handleSubmitUserType = (user_type: RoleEnum) => {
     setUserType(user_type);
     setLoading(false);
     nextStep();
