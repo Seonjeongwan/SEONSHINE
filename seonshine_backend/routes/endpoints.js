@@ -39,6 +39,7 @@ export const endpoints = {
     getOrderPeriod: "/valid-period",
     getOrderListDetail: "/list/detail",
     getOrderListSummary: "/list/summary",
+    getOrderHistoryList: "/list/history",
     getCurrentOrder: "/current-order"
   }
 };
