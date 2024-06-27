@@ -306,10 +306,25 @@ export const getCurrentOrder = async (req, res) => {
       },
       raw: true,
     });
+
     if (currentOrderItem) {
       currentOrderItem.submitted_time = dayjs(
         currentOrderItem.submitted_time
       ).format(dateTimeFormat.full);
+
+      const restaurantId = currentOrderItem.restaurant_id;
+      const restaurant = await User.findByPk(restaurantId, {
+        attributes: ["username"],
+        raw: true,
+      });
+      currentOrderItem.restaurant_name = restaurant.username;
+
+      const itemId = currentOrderItem.item_id;
+      const menuItem = await MenuItem.findByPk(itemId, {
+        attributes: ["image_url"],
+        raw: true,
+      });
+      currentOrderItem.image_url = menuItem.image_url;
     }
     res.status(httpStatusCodes.success).json(currentOrderItem);
   } catch (error) {
