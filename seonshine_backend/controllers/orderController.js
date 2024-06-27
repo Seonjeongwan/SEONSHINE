@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
-import { Op, Sequelize } from "sequelize";
+import { Op, QueryTypes, Sequelize } from "sequelize";
 import { UserRole } from "../constants/auth.js";
+import { dateTimeFormat } from "../constants/format.js";
 import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
 import { orderItemCancelStatus, orderStatus } from "../constants/order.js";
 import { sequelizeOrderDb } from "../db/dbConfig.js";
@@ -220,6 +221,47 @@ export const getOrderListSummary = async (req, res) => {
       date,
       total: totalCount,
     });
+  } catch (error) {
+    console.log("error :>> ", error);
+    res
+      .status(httpStatusCodes.internalServerError)
+      .send(httpStatusErrors.internalServerError);
+  }
+};
+
+export const getOrderListDetail = async (req, res) => {
+  const { date = "" } = req.query;
+
+  const select =
+    "SELECT o.user_id, o.restaurant_id, o.item_id, o.item_name, u.username, u2.username as restaurant_name, o.updated_at as submitted_time FROM order_db.order_items o JOIN user_db.users u ON o.user_id = u.user_id JOIN user_db.users u2 ON o.restaurant_id = u2.user_id";
+
+  const where = "WHERE order_date = :date";
+
+  const query = `${select} ${where}`;
+
+  try {
+    const rows = await sequelizeOrderDb.query(query, {
+      replacements: {
+        date,
+      },
+      type: QueryTypes.SELECT,
+    });
+
+    const rowsConvertedDate = (rows || []).map(row => {
+      return {
+        ...row,
+        submitted_time: dayjs(row.submitted_time).format(dateTimeFormat.full),
+      };
+    })
+
+    const totalCount = rowsConvertedDate.length;
+
+    res.status(httpStatusCodes.success).send({
+      data: rowsConvertedDate,
+      date,
+      total: totalCount,
+    });
+    
   } catch (error) {
     console.log("error :>> ", error);
     res
