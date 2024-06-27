@@ -1,9 +1,10 @@
 import dayjs from "dayjs";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
+import { UserRole } from "../constants/auth.js";
 import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
 import { orderItemCancelStatus, orderStatus } from "../constants/order.js";
 import { sequelizeOrderDb } from "../db/dbConfig.js";
-import { OrderHistory, OrderItem } from "../models/index.js";
+import { OrderHistory, OrderItem, User } from "../models/index.js";
 import MenuItem from "../models/menuItemModel.js";
 
 export const orderItemCurrentDay = async (req, res) => {
@@ -178,39 +179,46 @@ export const discardCurrentOrderItem = async (req, res) => {
   }
 };
 
-//TODO: Get order list by date
-export const getOrderList = async (req, res) => {
-
-  const {
-    page_size = 25,
-    page_number = 1,
-    sort_key = "updated_at",
-    sort_type = "asc",
-    date = "",
-    restaurant_id = ""
-  } = req.query;
-  const offset = (page_number - 1) * page_size;
+export const getOrderListSummary = async (req, res) => {
+  const { date = "" } = req.query;
+  const currentUser = req.user;
+  const { user_id, role_id } = currentUser;
 
   try {
-    //TODO: Check current role is user or restaurant for specific attributes can get
-    const { count, rows } = await OrderItem.findAndCountAll({
-      where: {
-        restaurant_id,
-        order_date: date,
-      },
-      order: [[sort_key, sort_type.toUpperCase()]],
-      offset: Number(offset),
-      limit: Number(page_size),
+    let condition = { order_date: date };
+    if (Number(role_id) === Number(UserRole.restaurant)) {
+      condition.restaurant_id = user_id;
+    }
+
+    const totalCount = await OrderItem.count({
+      where: condition,
     });
+
+    const rows = await OrderItem.findAll({
+      attributes: [
+        "item_id",
+        "item_name",
+        "restaurant_id",
+        [Sequelize.fn("COUNT", Sequelize.col("item_id")), "count"],
+      ],
+      where: condition,
+      group: ["item_name", "item_id", "restaurant_id"],
+    });
+
+    let restaurantId = null;
+    let restaurantName = null;
+    if (rows?.length) {
+      restaurantId = rows[0].restaurant_id;
+      const restaurant = await User.findByPk(restaurantId, { raw: true });
+      restaurantName = restaurant.username;
+    }
 
     res.status(httpStatusCodes.success).send({
       data: rows,
+      restaurant_id: restaurantId,
+      restaurant_name: restaurantName,
       date,
-      page_number,
-      page_size,
-      sort_key,
-      sort_type,
-      total: count,
+      total: totalCount,
     });
   } catch (error) {
     console.log("error :>> ", error);
