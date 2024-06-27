@@ -8,6 +8,9 @@ import logo from '@/assets/images/logo.png';
 import { menuItems } from '@/constants/menu';
 import { useAuth } from '@/hooks/useAuth';
 import { paths } from '@/routes/paths';
+import { RoleEnum } from '@/types/user';
+
+import useAuthStore from '@/store/auth.store';
 
 import UserProfileModal from '../userProfileModal';
 import { iconMap } from './constants';
@@ -16,10 +19,12 @@ import { MenuItemType, SidebarPropsType } from './types';
 const Sidebar = ({ role }: SidebarPropsType) => {
   const { logout } = useAuth();
 
+  const { currentUser } = useAuthStore();
+
   const allowedMenuItems = menuItems.filter((item) => item.permission.includes(role));
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleOpenModal = () => setIsModalOpen(true);
+  const handleOpenModal = () => role === RoleEnum.ADMIN && setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
   return (
@@ -66,7 +71,7 @@ const Sidebar = ({ role }: SidebarPropsType) => {
         </IconButton>
         {isModalOpen && (
           <UserProfileModal
-            userId={'shinhanadmin'}
+            userId={currentUser?.user_id as string}
             isOpen={isModalOpen}
             onClose={handleCloseModal}
           />
