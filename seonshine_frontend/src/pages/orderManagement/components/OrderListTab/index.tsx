@@ -13,7 +13,7 @@ import useTable from '@/hooks/useTable';
 import { OrderListType } from '@/types/order';
 import { RoleEnum } from '@/types/user';
 
-import { useGetOrderListByDateApi } from '@/apis/hooks/orderListApi.hook';
+import { useGetOrderListSumaryApi } from '@/apis/hooks/orderListApi.hook';
 import useAuthStore from '@/store/auth.store';
 
 import { OrderListRestaurantTableHeader } from './OrderListRestaurantTableHeader';
@@ -45,13 +45,8 @@ const OrderListTab = () => {
 
   const watchedDate = watch('date');
 
-  const { data: orderList, isFetching } = useGetOrderListByDateApi({
+  const { data: orderList, isFetching } = useGetOrderListSumaryApi({
     date: watchedDate,
-    restaurant_id: 'shinhanuser10',
-    page_size: pageSize,
-    page_number: currentPage,
-    sort_key: sortKey,
-    sort_type: sortType,
   });
 
   const columns = !!restaurantId ? OrderListRestaurantTableHeader : OrderListTableHeader;
@@ -59,7 +54,7 @@ const OrderListTab = () => {
   const data: OrderListType[] = orderList
     ? orderList.data.map((order) => ({
         ordered_items: order.item_name,
-        amount: order.quantity,
+        amount: order.count,
       }))
     : [];
 

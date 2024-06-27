@@ -20,37 +20,21 @@ export type GetOrderPeriodResponseType = {
   endMinute: number;
 };
 
-export type GetOrderListByDateApiPropsType = {
-  page_size: number;
-  page_number: number;
-  sort_key?: string;
-  sort_type?: 'asc' | 'desc';
+export type GetOrderListSummaryApiPropsType = {
   date?: string;
-  restaurant_id?: string;
 };
 
-export type GetOrderListByDateResponseType = {
-  data: OrderItemType[];
+export type GetOrderListSummaryResponseType = {
+  data: OrderListSummaryItemType[];
   date: string;
-  page_number: string;
-  page_size: string;
-  sort_key: string;
-  sort_type: string;
+  restaurant_id: string;
+  restaurant_name: string;
   total: number;
 };
 
-export type OrderItemType = {
-  order_item_id: string;
-  order_id: string;
-  user_id: string;
-  branch_id: number;
-  restaurant_id: string;
+export type OrderListSummaryItemType = {
   item_id: number;
   item_name: string;
-  quantity: number;
-  price: number;
-  order_date: string;
-  cancel_yn: string;
-  created_at: string;
-  updated_at: string;
+  restaurant_id: string;
+  count: number;
 };
