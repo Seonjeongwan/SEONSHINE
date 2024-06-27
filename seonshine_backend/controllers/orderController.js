@@ -44,7 +44,9 @@ export const orderItemCurrentDay = async (req, res) => {
     });
 
     const isOrderNewMenuItem =
-      !currentOrderItem || (Number(currentOrderItem.cancel_yn) === Number(orderItemCancelStatus.cancel));
+      !currentOrderItem ||
+      Number(currentOrderItem.cancel_yn) ===
+        Number(orderItemCancelStatus.cancel);
 
     if (isOrderNewMenuItem) {
       if (orderHistory) {
@@ -187,7 +189,10 @@ export const getOrderListSummary = async (req, res) => {
   const { user_id, role_id } = currentUser;
 
   try {
-    let condition = { order_date: date };
+    let condition = {
+      order_date: date,
+      cancel_yn: { [Op.not]: orderItemCancelStatus.cancel },
+    };
     if (Number(role_id) === Number(UserRole.restaurant)) {
       condition.restaurant_id = user_id;
     }
@@ -283,16 +288,14 @@ export const getOrderHistory = async (req, res) => {
     const rows = await sequelizeOrderDb.query(query, {
       replacements: {
         from,
-        to
+        to,
       },
       type: QueryTypes.SELECT,
     });
 
-    res
-      .status(httpStatusCodes.success)
-      .json({ data: rows });
+    res.status(httpStatusCodes.success).json({ data: rows });
   } catch (error) {
-    console.log('error :>> ', error);
+    console.log("error :>> ", error);
     res
       .status(httpStatusCodes.internalServerError)
       .send(httpStatusErrors.internalServerError);
@@ -319,8 +322,8 @@ export const getCurrentOrder = async (req, res) => {
         user_id: currentUser.user_id,
         order_date: currentDate,
         cancel_yn: {
-          [Op.not]: orderItemCancelStatus.cancel
-        }
+          [Op.not]: orderItemCancelStatus.cancel,
+        },
       },
       raw: true,
     });
