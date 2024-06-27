@@ -15,10 +15,7 @@ import { useGetBranches } from '@/apis/hooks/userApi.hook';
 import { EnterUserInformationPropsType } from '../../types';
 import { SignUpSchema, SignUpSchemaType } from './schema';
 
-const ProfileRegistration = ({
-  handleSubmitInformation,
-  userType,
-}: EnterUserInformationPropsType) => {
+const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInformationPropsType) => {
   const {
     handleSubmit,
     register,
@@ -40,7 +37,13 @@ const ProfileRegistration = ({
   const { data: branchData = [] } = useGetBranches({ enabled: true });
 
   const submitForm = (data: SignUpSchemaType) => {
-    handleSubmitInformation({ ...data, userType, branch_id: selectedBranch });
+    let modifiedData = { ...data };
+
+    if (userType === RoleEnum.USER && !data.email.includes('@shinhan.com')) {
+      modifiedData.email = data.email + '@shinhan.com';
+    }
+
+    handleSubmitInformation({ ...modifiedData, userType, branch_id: selectedBranch });
   };
   // will use custom hook useSignUp after having the API
   // const { mutate: signUpUser } = useSignUpApi();

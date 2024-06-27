@@ -6,7 +6,7 @@ import { RoleEnum } from '@/types/user';
 
 export const SignUpSchema = zod
   .object({
-    userType: zod.string(),
+    userType: zod.nativeEnum(RoleEnum),
     employeeId: zod
       .string()
       .trim()
@@ -22,7 +22,7 @@ export const SignUpSchema = zod
       }),
     confirmPassword: zod.string(),
     fullName: zod.string().min(1, { message: errorMessages.require }),
-    email: zod.string().email({ message: errorMessages.emailInvalid }),
+    email: zod.string(),
     phoneNumber: zod
       .string()
       .min(1, { message: errorMessages.require })
@@ -35,13 +35,23 @@ export const SignUpSchema = zod
     message: 'Branch field is required',
     path: ['branch_id'],
   })
+  .refine((values) => values.password === values.confirmPassword, {
+    message: errorMessages.passwordNotMatch,
+    path: ['confirmPassword'],
+  })
   .refine(
-    (values) => {
-      return values.password === values.confirmPassword;
+    (data) => {
+      if (data.userType === RoleEnum.USER) {
+        return typeof data.email === 'string';
+      } else {
+        const emailSchema = zod.string().email({ message: errorMessages.emailInvalid });
+        const result = emailSchema.safeParse(data.email);
+        return result.success;
+      }
     },
     {
-      message: errorMessages.passwordNotMatch,
-      path: ['confirmPassword'],
+      message: errorMessages.emailInvalid,
+      path: ['email'],
     },
   );
 
@@ -50,6 +60,7 @@ export type SignUpVerifySchemaType = {
   code: string;
   email: string;
 };
+
 export const OtpSchema = zod.object({
   otp: zod.string().trim().regex(otpRegex, 'OTP must have 6 digits'),
 });

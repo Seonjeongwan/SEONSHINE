@@ -1,7 +1,8 @@
 import express from "express";
 import {
   discardCurrentOrderItem,
-  getOrderList,
+  getOrderListDetail,
+  getOrderListSummary,
   getOrderPeriod,
   orderItemCurrentDay,
 } from "../controllers/orderController.js";
@@ -30,9 +31,15 @@ orderRoute.get(
 );
 
 orderRoute.get(
-  endpoints.order.getOrderList,
+  endpoints.order.getOrderListSummary,
   authenticateToken(),
-  getOrderList
+  getOrderListSummary
+);
+
+orderRoute.get(
+  endpoints.order.getOrderListDetail,
+  authenticateToken(),
+  getOrderListDetail
 );
 
 export default orderRoute;
