@@ -14,10 +14,12 @@ import loginBanner from '@/assets/images/login-banner.png';
 import logo from '@/assets/images/logo.png';
 import { useAuth } from '@/hooks/useAuth';
 import { paths } from '@/routes/paths';
+import { UserStatusEnum } from '@/types/user';
 
 import { useLoginApi } from '@/apis/hooks/authApi.hook';
 import { useLoadingStore } from '@/store/loading.store';
 
+import PendingApprovalPage from '../signUp/components/PendingApproval';
 import { LoginSchema, LoginSchemaType } from './schemas';
 
 const LoginPage = () => {
@@ -32,6 +34,7 @@ const LoginPage = () => {
       password: '',
     },
   });
+  const [isWaiting, setIsWaiting] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const { mutate: exeLogin, isPending } = useLoginApi();
@@ -49,8 +52,18 @@ const LoginPage = () => {
     exeLogin(data, {
       onSuccess: (data) => {
         setLoading(false);
-        handleLoginSuccess(data.user, data.user.token, !!rememberCheckboxRef.current?.checked);
-        navigate(paths.index);
+        if (!data) return;
+
+        const { user_status, user } = data;
+
+        if (Number(user_status) === UserStatusEnum.WAITING_CONFIRM) {
+          setIsWaiting(true);
+        }
+
+        if (user) {
+          handleLoginSuccess(user, user.token, !!rememberCheckboxRef.current?.checked);
+          navigate(paths.index);
+        }
       },
       onError: () => {
         toast.error('Login failed!');
@@ -72,165 +85,172 @@ const LoginPage = () => {
       alignItems="center"
       className="w-full h-screen"
     >
-      <Stack className="w-full h-full bg-white shadow-md md:rounded-md shadow-black-100 md:w-280 md:h-200">
-        <Box className="grid w-full h-full grid-cols-1 md:grid-cols-2">
-          <Box className="hidden h-full md:flex md:items-center md:justify-center bg-gradient-to-br from-blue-500 to-yellow-500 opacity-90 z-0">
-            <img
-              src={loginBanner}
-              className="w-full z-10"
-              alt="Login banner"
-            />
-          </Box>
-          <Stack
-            justifyContent="center"
-            alignItems="center"
-            className="h-full px-8 py-8"
-          >
-            <form
-              onSubmit={handleSubmit(submitForm)}
-              className="w-full"
-              noValidate
+      {isWaiting ? (
+        <PendingApprovalPage
+          className="items-center"
+          handleGotoLogin={() => setIsWaiting(false)}
+        />
+      ) : (
+        <Stack className="w-full h-full bg-white shadow-md md:rounded-md shadow-black-100 md:w-280 md:h-200">
+          <Box className="grid w-full h-full grid-cols-1 md:grid-cols-2">
+            <Box className="hidden h-full md:flex md:items-center md:justify-center bg-gradient-to-br from-blue-500 to-yellow-500 opacity-90 z-0">
+              <img
+                src={loginBanner}
+                className="w-full z-10"
+                alt="Login banner"
+              />
+            </Box>
+            <Stack
+              justifyContent="center"
+              alignItems="center"
+              className="h-full px-8 py-8"
             >
-              <Stack
-                flexDirection="column"
-                className="h-full"
+              <form
+                onSubmit={handleSubmit(submitForm)}
+                className="w-full"
+                noValidate
               >
                 <Stack
-                  justifyContent="center"
-                  alignItems="center"
-                  className="mb-16"
+                  flexDirection="column"
+                  className="h-full"
                 >
-                  <Box
-                    className="hidden xs:block md:hidden"
-                    sx={{
-                      width: {
-                        xs: '80px',
-                        md: '120px',
-                      },
-                      height: {
-                        xs: '80px',
-                        md: '120px',
-                      },
-                    }}
-                  >
-                    <img
-                      src={logo}
-                      alt="Logo"
-                      className="object-cover"
-                    />
-                  </Box>
-                  <Typography
-                    variant="heading1"
-                    component="h1"
-                    className="text-center tracking-wider"
-                    sx={{
-                      fontSize: {
-                        xs: '48px',
-                        md: '64px',
-                      },
-                    }}
-                  >
-                    Seonshine
-                  </Typography>
-                </Stack>
-
-                <Box className="grid gap-4 mt-4">
                   <Stack
-                    direction="column"
-                    className="gap-2"
+                    justifyContent="center"
+                    alignItems="center"
+                    className="mb-16"
                   >
-                    <FormLabel
-                      title="Employee ID"
-                      required
-                    />
-                    <FormInput
-                      name="employeeId"
-                      autoFocus
-                      register={register}
-                      placeholder="Employee ID"
-                      error={errors.employeeId}
-                    />
-                  </Stack>
-                  <Stack
-                    direction="column"
-                    className="gap-2"
-                  >
-                    <FormLabel
-                      title="Password"
-                      required
-                    />
-                    <FormInput
-                      name="password"
-                      register={register}
-                      placeholder="Password"
-                      error={errors.password}
-                      type={showPassword ? 'text' : 'password'}
-                      endAdornment={
-                        <IconButton
-                          onMouseDown={handleTogglePassword}
-                          onMouseUp={handleTogglePassword}
-                        >
-                          {showPassword ? <Visibility /> : <VisibilityOff />}
-                        </IconButton>
-                      }
-                    />
-                  </Stack>
-                </Box>
-                <Stack
-                  marginTop={2}
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        size="small"
-                        inputRef={rememberCheckboxRef}
+                    <Box
+                      className="hidden xs:block md:hidden"
+                      sx={{
+                        width: {
+                          xs: '80px',
+                          md: '120px',
+                        },
+                        height: {
+                          xs: '80px',
+                          md: '120px',
+                        },
+                      }}
+                    >
+                      <img
+                        src={logo}
+                        alt="Logo"
+                        className="object-cover"
                       />
-                    }
-                    label="Remember me"
-                    sx={{
-                      '.MuiFormControlLabel-label': {
-                        fontSize: '13px',
-                      },
-                    }}
-                  />
-                  <Link
-                    href={paths.forgotPassword}
-                    className="text-sm"
+                    </Box>
+                    <Typography
+                      variant="heading1"
+                      component="h1"
+                      className="text-center tracking-wider"
+                      sx={{
+                        fontSize: {
+                          xs: '48px',
+                          md: '64px',
+                        },
+                      }}
+                    >
+                      Seonshine
+                    </Typography>
+                  </Stack>
+
+                  <Box className="grid gap-4 mt-4">
+                    <Stack
+                      direction="column"
+                      className="gap-2"
+                    >
+                      <FormLabel
+                        title="Employee ID"
+                        required
+                      />
+                      <FormInput
+                        name="employeeId"
+                        autoFocus
+                        register={register}
+                        placeholder="Employee ID"
+                        error={errors.employeeId}
+                      />
+                    </Stack>
+                    <Stack
+                      direction="column"
+                      className="gap-2"
+                    >
+                      <FormLabel
+                        title="Password"
+                        required
+                      />
+                      <FormInput
+                        name="password"
+                        register={register}
+                        placeholder="Password"
+                        error={errors.password}
+                        type={showPassword ? 'text' : 'password'}
+                        endAdornment={
+                          <IconButton
+                            onMouseDown={handleTogglePassword}
+                            onMouseUp={handleTogglePassword}
+                          >
+                            {showPassword ? <Visibility /> : <VisibilityOff />}
+                          </IconButton>
+                        }
+                      />
+                    </Stack>
+                  </Box>
+                  <Stack
+                    marginTop={2}
+                    justifyContent="space-between"
+                    alignItems="center"
                   >
-                    Forgot Password?
-                  </Link>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          size="small"
+                          inputRef={rememberCheckboxRef}
+                        />
+                      }
+                      label="Remember me"
+                      sx={{
+                        '.MuiFormControlLabel-label': {
+                          fontSize: '13px',
+                        },
+                      }}
+                    />
+                    <Link
+                      href={paths.forgotPassword}
+                      className="text-sm"
+                    >
+                      Forgot Password?
+                    </Link>
+                  </Stack>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    className="mt-4 text-lg"
+                    type="submit"
+                    disabled={isPending}
+                  >
+                    Login
+                  </Button>
+                  <hr className="w-full my-4" />
+                  <Stack>
+                    <Typography
+                      component="span"
+                      fontSize="13px"
+                    >
+                      No account yet?&nbsp;
+                    </Typography>
+                    <Link
+                      href={paths.signUp}
+                      className="text-sm"
+                    >
+                      Sign Up
+                    </Link>
+                  </Stack>
                 </Stack>
-                <Button
-                  variant="contained"
-                  fullWidth
-                  className="mt-4 text-lg"
-                  type="submit"
-                  disabled={isPending}
-                >
-                  Login
-                </Button>
-                <hr className="w-full my-4" />
-                <Stack>
-                  <Typography
-                    component="span"
-                    fontSize="13px"
-                  >
-                    No account yet?&nbsp;
-                  </Typography>
-                  <Link
-                    href={paths.signUp}
-                    className="text-sm"
-                  >
-                    Sign Up
-                  </Link>
-                </Stack>
-              </Stack>
-            </form>
-          </Stack>
-        </Box>
-      </Stack>
+              </form>
+            </Stack>
+          </Box>
+        </Stack>
+      )}
     </Stack>
   );
 };
