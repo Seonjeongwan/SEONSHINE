@@ -3,7 +3,7 @@ import { CurrentUserType } from '@/types/user';
 
 export type LoginResponseType = {
   message: string;
-  user: CurrentUserType;
+  user?: CurrentUserType;
   user_status: string;
 };
 

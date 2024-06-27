@@ -6,8 +6,14 @@ import { Box, Button, Stack, Typography } from '@mui/material';
 import { paths } from '@/routes/paths';
 
 const title = 'Account Verification';
-const description = 'An OTP has been sent to your email. Please enter the OTP to verify your account.';
-const PendingApprovalPage = () => {
+const description =
+  'Your account is under approval process now. Please wait for administrator’s confirmation before using the application';
+
+type PendingApprovalPagePropsType = {
+  className?: string;
+  handleGotoLogin?: () => void;
+};
+const PendingApprovalPage = ({ className, handleGotoLogin }: PendingApprovalPagePropsType) => {
   const navigate = useNavigate();
 
   const renderDescription = description?.split('. ').map((text, index, array) => (
@@ -19,11 +25,12 @@ const PendingApprovalPage = () => {
 
   const handleClickGoToLogin = () => {
     navigate(paths.login);
+    handleGotoLogin?.();
   };
   return (
     <Stack
       justifyContent="center"
-      className="min-h-screen"
+      className={`min-h-screen ${className}`}
     >
       <Stack
         direction="column"

@@ -21,10 +21,10 @@ import { approvalItemDelete, approvalItemleteDescription } from './constant';
 type ModalMenuItemPropsType = {
   selectedItem?: GetMenuListResponseType | null;
   onClose: () => void;
-  item_id?: string;
+  item_id?: number;
   restaurant_id?: string;
 };
-const ModalMenuItem = ({ selectedItem, onClose, item_id = '', restaurant_id = '' }: ModalMenuItemPropsType) => {
+const ModalMenuItem = ({ selectedItem, onClose, item_id = 0, restaurant_id = '' }: ModalMenuItemPropsType) => {
   const {
     control,
     handleSubmit,

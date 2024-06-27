@@ -54,3 +54,21 @@ export type OrderItemType = {
   created_at: string;
   updated_at: string;
 };
+export type GetOrderListSummaryApiPropsType = {
+  date?: string;
+};
+
+export type GetOrderListSummaryResponseType = {
+  data: OrderListSummaryItemType[];
+  date: string;
+  restaurant_id: string;
+  restaurant_name: string;
+  total: number;
+};
+
+export type OrderListSummaryItemType = {
+  item_id: number;
+  item_name: string;
+  restaurant_id: string;
+  count: number;
+};

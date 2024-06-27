@@ -2,9 +2,10 @@ import { useState } from 'react';
 
 import { Box } from '@mui/material';
 
-import OrderHistoryTab from './components/OrderMenuTab';
 import OrderListTab from './components/OrderListTab';
+import OrderHistoryTab from './components/OrderMenuTab';
 import { StyledTab, StyledTabs } from './styled';
+import UserOrderListTab from './components/OrderListTab';
 
 type TabPanelPropsType = {
   children?: React.ReactNode;
@@ -37,17 +38,19 @@ const OrderManagement = () => {
   };
 
   return (
-    <Box className="w-full">
-      <StyledTabs
-        value={value}
-        onChange={handleChange}
-        aria-label="management tabs"
-        TabIndicatorProps={{ style: { display: 'none' } }}
-      >
-        <StyledTab label="Order" />
-        <StyledTab label="Order List" />
-      </StyledTabs>
-      <Box className="px-4 md:px-8 mt-8">
+    <Box className="w-full relative">
+      <Box className="sticky top-0 z-10 w-full bg-gray-100 py-4">
+        <StyledTabs
+          value={value}
+          onChange={handleChange}
+          aria-label="management tabs"
+          TabIndicatorProps={{ style: { display: 'none' } }}
+        >
+          <StyledTab label="Order" />
+          <StyledTab label="Order List" />
+        </StyledTabs>
+      </Box>
+      <Box className="px-4 md:px-8">
         <TabPanel
           value={value}
           index={0}
@@ -58,7 +61,7 @@ const OrderManagement = () => {
           value={value}
           index={1}
         >
-          <OrderListTab />
+          <UserOrderListTab />
         </TabPanel>
       </Box>
     </Box>

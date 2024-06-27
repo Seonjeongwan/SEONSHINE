@@ -106,7 +106,7 @@ const AppRoutes = () => {
         </Route>
         <Route
           path={paths.order.index}
-          element={<ProtectedLayout allowedRoles={[RoleEnum.ADMIN, RoleEnum.RESTAURANT, RoleEnum.USER]} />}
+          element={<ProtectedLayout allowedRoles={[RoleEnum.ADMIN, RoleEnum.RESTAURANT]} />}
         >
           <Route
             index
