@@ -109,11 +109,6 @@ const OrderMenuTab = () => {
     return `${year}.${month}.${day} - ${hours}:${minutes}`;
   }
 
-  // Example usage:
-  const timestamp = '2024-06-27 08:38:06';
-  const formattedDate = formatTimestamp(timestamp);
-  console.log(formattedDate); // Output: 2024.06.27 - 08:38
-
   return (
     <Box className="px-2 md:px-4">
       <Stack
