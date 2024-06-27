@@ -247,12 +247,12 @@ export const getOrderListDetail = async (req, res) => {
       type: QueryTypes.SELECT,
     });
 
-    const rowsConvertedDate = (rows || []).map(row => {
+    const rowsConvertedDate = (rows || []).map((row) => {
       return {
         ...row,
         submitted_time: dayjs(row.submitted_time).format(dateTimeFormat.full),
       };
-    })
+    });
 
     const totalCount = rowsConvertedDate.length;
 
@@ -261,7 +261,6 @@ export const getOrderListDetail = async (req, res) => {
       date,
       total: totalCount,
     });
-    
   } catch (error) {
     console.log("error :>> ", error);
     res
@@ -272,14 +271,47 @@ export const getOrderListDetail = async (req, res) => {
 
 //TODO: Get Order History
 export const getOrderHistory = async (req, res) => {
+  // try {
+  //   const { from, to } = req.query;
+  //   const rows = await OrderHistory
+  //   res
+  //     .status(httpStatusCodes.success)
+  //     .json({ total: total, data: list, date: currentDate });
+  // } catch (error) {
+  //   res
+  //     .status(httpStatusCodes.internalServerError)
+  //     .send(httpStatusErrors.internalServerError);
+  // }
+};
+
+export const getCurrentOrder = async (req, res) => {
   try {
-    const { date } = req.query;
-    const list = [];
-    let total = 0;
-    const currentDate = dayjs().format("YYYY-MM-DD");
-    res
-      .status(httpStatusCodes.success)
-      .json({ total: total, data: list, date: currentDate });
+    const currentDate = dayjs().format(dateTimeFormat.short);
+
+    const currentUser = req.user;
+
+    const currentOrderItem = await OrderItem.findOne({
+      attributes: [
+        "order_item_id",
+        "user_id",
+        "branch_id",
+        "restaurant_id",
+        "item_id",
+        "item_name",
+        ["updated_at", "submitted_time"],
+      ],
+      where: {
+        user_id: currentUser.user_id,
+        order_date: currentDate,
+      },
+      raw: true,
+    });
+    if (currentOrderItem) {
+      currentOrderItem.submitted_time = dayjs(
+        currentOrderItem.submitted_time
+      ).format(dateTimeFormat.full);
+    }
+    res.status(httpStatusCodes.success).json(currentOrderItem);
   } catch (error) {
     res
       .status(httpStatusCodes.internalServerError)
