@@ -103,14 +103,11 @@ export const verifySignUp = async (req, res) => {
 };
 
 export const checkIdEmailExist = async (userId, email) => {
-  console.log('email :>> ', email);
   const user = await User.findOne({
     where: {
       [Op.or]: [{ user_id: userId.trim() }, { email: email.trim() }],
     },
   });
-
-  console.log('user :>> ', user);
 
   const isExist = !!user;
   return isExist;
@@ -164,6 +161,41 @@ export const login = async (req, res) => {
         .status(httpStatusCodes.badRequest)
         .json({ message: "User not exist" });
     }
+  } catch (error) {
+    res
+      .status(httpStatusCodes.internalServerError)
+      .json({ error: httpStatusErrors.internalServerError });
+  }
+};
+
+export const signUpResendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const userInfo = await getFromTemporaryDb(`signup-user-${email}`);
+    if (!userInfo) {
+      return res
+        .status(httpStatusCodes.badRequest)
+        .send({ error: "User signup information not found. Please sign up again" });
+    }
+
+    const isSuccessSendingEmailCode = await sendAndSaveEmailVerificationCode(
+      email
+    );
+
+    if (isSuccessSendingEmailCode) {
+      return res
+        .status(200)
+        .send({ message: "Resend email verification successful" });
+    }
+  } catch (error) {
+    res
+      .status(httpStatusCodes.internalServerError)
+      .json({ error: httpStatusErrors.internalServerError });
+  }
+};
+
+export const resendOtp = async (req, res) => {
+  try {
   } catch (error) {
     res
       .status(httpStatusCodes.internalServerError)

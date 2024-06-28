@@ -1,6 +1,7 @@
 export const endpoints = {
   login: "/login",
   signUp: "/sign-up",
+  signUpResendOtp: "/sign-up/resend-otp",
   signUpVerification: "/verify-sign-up",
   branches: {
     getAll: "/branches",
