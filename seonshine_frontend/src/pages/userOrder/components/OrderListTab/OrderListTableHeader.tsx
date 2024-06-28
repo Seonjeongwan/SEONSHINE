@@ -1,10 +1,10 @@
-import { OrderListType } from '@/types/order';
+import { OrderListDetailItemType, OrderListType } from '@/types/order';
 import { CustomColumnDef } from '@/types/table';
 
 export const OrderListTableHeader: CustomColumnDef<OrderListType>[] = [
   {
     accessorKey: 'no',
-    header: 'No',
+    header: 'No.',
     cell: (order) => {
       return order.row.index + 1;
     },

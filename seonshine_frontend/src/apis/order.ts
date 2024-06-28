@@ -1,6 +1,8 @@
 import axiosInstance from '@/configs/axios';
 import {
   GetOrderListApiPropsType,
+  GetOrderListDetailApiPropsType,
+  GetOrderListDetailResponseType,
   GetOrderListResponseType,
   GetOrderListSummaryApiPropsType,
   GetOrderListSummaryResponseType,
@@ -27,3 +29,13 @@ export const getOrderListSummary = async (
   });
   return response.data;
 };
+
+export const getOrderListDetail = async (
+  params: GetOrderListDetailApiPropsType,
+): Promise<GetOrderListDetailResponseType> => {
+  const response = await axiosInstance.get<GetOrderListDetailResponseType>('/order/list/detail', {
+    params: params,
+  });
+  return response.data;
+};
+
