@@ -1,3 +1,3 @@
 export const errorCodes = {
-  idOrEmailExist: "ERR01",
+  idOrEmailExist: "ID_EMAIL_EXIST",
 };

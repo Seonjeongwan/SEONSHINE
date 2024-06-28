@@ -6,6 +6,7 @@ import OrderListTab from './components/OrderListTab';
 import OrderHistoryTab from './components/OrderMenuTab';
 import { StyledTab, StyledTabs } from './styled';
 import UserOrderListTab from './components/OrderListTab';
+import OrderMenuTab from './components/OrderMenuTab';
 
 type TabPanelPropsType = {
   children?: React.ReactNode;
@@ -38,7 +39,7 @@ const OrderManagement = () => {
   };
 
   return (
-    <Box className="w-full relative">
+    <Box className="w-full">
       <Box className="sticky top-0 z-10 w-full bg-gray-100 py-4">
         <StyledTabs
           value={value}
@@ -55,7 +56,7 @@ const OrderManagement = () => {
           value={value}
           index={0}
         >
-          <OrderHistoryTab />
+          <OrderMenuTab />
         </TabPanel>
         <TabPanel
           value={value}

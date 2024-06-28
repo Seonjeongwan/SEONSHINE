@@ -1,6 +1,8 @@
 import axiosInstance from '@/configs/axios';
 import {
   GetOrderListApiPropsType,
+  GetOrderListDetailApiPropsType,
+  GetOrderListDetailResponseType,
   GetOrderListHistoryApiPropsType,
   GetOrderListHistoryResponseType,
   GetOrderListResponseType,
@@ -34,6 +36,15 @@ export const getOrderListHistory = async (
   params: GetOrderListHistoryApiPropsType,
 ): Promise<GetOrderListHistoryResponseType> => {
   const response = await axiosInstance.get<GetOrderListHistoryResponseType>('/order/list/history', {
+    params: params,
+  });
+  return response.data;
+};
+
+export const getOrderListDetail = async (
+  params: GetOrderListDetailApiPropsType,
+): Promise<GetOrderListDetailResponseType> => {
+  const response = await axiosInstance.get<GetOrderListDetailResponseType>('/order/list/detail', {
     params: params,
   });
   return response.data;

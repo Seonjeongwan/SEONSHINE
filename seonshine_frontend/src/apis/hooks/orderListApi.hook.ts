@@ -2,6 +2,8 @@ import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
 import {
   GetOrderListApiPropsType,
+  GetOrderListDetailApiPropsType,
+  GetOrderListDetailResponseType,
   GetOrderListHistoryApiPropsType,
   GetOrderListHistoryResponseType,
   GetOrderListResponseType,
@@ -10,7 +12,7 @@ import {
   GetOrderPeriodResponseType,
 } from '@/types/order';
 
-import { getOrderList, getOrderListHistory, getOrderListSummary, getOrderPeriod } from '../order';
+import { getOrderList, getOrderListDetail, getOrderListHistory, getOrderListSummary, getOrderPeriod } from '../order';
 
 export const useGetOrderListApi = (params: GetOrderListApiPropsType): UseQueryResult<GetOrderListResponseType> => {
   return useQuery({
@@ -48,6 +50,16 @@ export const useGetOrderListHistoryApi = (
     queryKey: ['getOrderListHistory'],
     queryFn: async () => {
       return getOrderListHistory(params);
+    },
+  });
+};
+export const useGetOrderListDetailApi = (
+  params: GetOrderListDetailApiPropsType,
+): UseQueryResult<GetOrderListDetailResponseType> => {
+  return useQuery({
+    queryKey: ['getOrderListDetail', params],
+    queryFn: async () => {
+      return getOrderListDetail(params);
     },
   });
 };

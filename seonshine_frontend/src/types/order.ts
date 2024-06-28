@@ -58,3 +58,18 @@ export type OrderListHistoryItemType = {
   restaurant_address: string;
   restaurant_image_url: string | null;
 };
+export type GetOrderListDetailApiPropsType = {
+  date?: string;
+};
+
+export type GetOrderListDetailResponseType = { data: OrderListDetailItemType[]; date: string; total: number };
+
+export type OrderListDetailItemType = {
+  user_id: string;
+  restaurant_id: string;
+  item_id: number;
+  item_name: string;
+  username: string;
+  restaurant_name: string;
+  submitted_time: string;
+};
