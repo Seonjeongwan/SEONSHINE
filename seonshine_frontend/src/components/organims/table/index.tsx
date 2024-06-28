@@ -1,4 +1,4 @@
-import { ChangeEvent, memo, useMemo, useState } from 'react';
+import { ChangeEvent, memo, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ArrowDownward, ArrowUpward } from '@mui/icons-material';
 import {
@@ -46,6 +46,7 @@ const Table = <T extends object>({
   size = 'normal',
 }: UserTableProps<T>) => {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const tableContainerRef = useRef<HTMLDivElement>(null);
 
   const memoizedData = useMemo(() => data, [data]);
   const memoizedColumns = useMemo(() => columns, [columns]);
@@ -72,32 +73,51 @@ const Table = <T extends object>({
     onPageChange?.(newPage);
   };
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (tableContainerRef.current) {
+        const viewportHeight = window.innerHeight;
+        const containerTop = tableContainerRef.current.getBoundingClientRect().top;
+        const maxHeight = viewportHeight - containerTop - 88;
+        tableContainerRef.current.style.maxHeight = `${maxHeight}px`;
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   return (
-    <Box className="overflow-y-auto bg-white px-4 pb-4">
-      <TableContainer>
-        <MuiTable>
-          {!isFetching && (
-            <TableHead>
-              {getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableCell
-                      key={header.id}
-                      className={`font-bold text-md border-black-300 px-2 ${size === 'normal' ? 'py-5' : 'py-3'} whitespace-nowrap`}
-                      sx={{ textAlign: (header.column.columnDef as CustomColumnDef<T>).align || 'left' }}
-                      onClick={() => header.column.getCanSort() && header.column.toggleSorting()}
-                    >
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                      {{
-                        asc: <ArrowUpward className="h-4 w-4 ml-1" />,
-                        desc: <ArrowDownward className="h-4 w-4 ml-1" />,
-                      }[header.column.getIsSorted() as string] ?? null}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableHead>
-          )}
+    <Box className=" bg-white px-4 pb-4">
+      <TableContainer
+        ref={tableContainerRef}
+        className="overflow-auto"
+      >
+        <MuiTable stickyHeader>
+          <TableHead>
+            {getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableCell
+                    key={header.id}
+                    className={`font-bold text-md border-black-300 px-2 ${size === 'normal' ? 'py-5' : 'py-3'} whitespace-nowrap`}
+                    sx={{ textAlign: (header.column.columnDef as CustomColumnDef<T>).align || 'left' }}
+                    onClick={() => header.column.getCanSort() && header.column.toggleSorting()}
+                  >
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    {{
+                      asc: <ArrowUpward className="h-4 w-4 ml-1" />,
+                      desc: <ArrowDownward className="h-4 w-4 ml-1" />,
+                    }[header.column.getIsSorted() as string] ?? null}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableHead>
           <TableBody>
             {!isFetching
               ? getRowModel().rows.map((row) => (
