@@ -19,8 +19,8 @@ import { generateToken } from "../utils/token.js";
 export const signUp = async (req, res) => {
   try {
     const user = req.body;
-    const { email, password, user_id } = user;
-    const isExistIdOrEmail = await checkIdEmailExist(user_id, password);
+    const { email, user_id } = user;
+    const isExistIdOrEmail = await checkIdEmailExist(user_id, email);
     if (isExistIdOrEmail) {
       return res.status(httpStatusCodes.conflict).send({
         message: messageErrors.idOrEmailExist,
@@ -77,7 +77,7 @@ export const verifySignUp = async (req, res) => {
         const userResponse = await User.create(user);
         await UserProfile.create({
           user_id: userResponse.user_id,
-          address: "",
+          address: userInfo.address || "",
         });
         await deleteFromTemporaryDb(`signup-user-${email}`);
         //Delete all verification code sign up by email
@@ -98,16 +98,19 @@ export const verifySignUp = async (req, res) => {
     console.log("error :>> ", error);
     res
       .status(httpStatusCodes.internalServerError)
-      .json({ error: JSON.stringify(error) });
+      .json({ error: httpStatusErrors.internalServerError });
   }
 };
 
 export const checkIdEmailExist = async (userId, email) => {
+  console.log('email :>> ', email);
   const user = await User.findOne({
     where: {
       [Op.or]: [{ user_id: userId.trim() }, { email: email.trim() }],
     },
   });
+
+  console.log('user :>> ', user);
 
   const isExist = !!user;
   return isExist;
