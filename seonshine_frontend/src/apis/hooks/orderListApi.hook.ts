@@ -4,13 +4,15 @@ import {
   GetOrderListApiPropsType,
   GetOrderListDetailApiPropsType,
   GetOrderListDetailResponseType,
+  GetOrderListHistoryApiPropsType,
+  GetOrderListHistoryResponseType,
   GetOrderListResponseType,
   GetOrderListSummaryApiPropsType,
   GetOrderListSummaryResponseType,
   GetOrderPeriodResponseType,
 } from '@/types/order';
 
-import { getOrderList, getOrderListDetail, getOrderListSummary, getOrderPeriod } from '../order';
+import { getOrderList, getOrderListDetail, getOrderListHistory, getOrderListSummary, getOrderPeriod } from '../order';
 
 export const useGetOrderListApi = (params: GetOrderListApiPropsType): UseQueryResult<GetOrderListResponseType> => {
   return useQuery({
@@ -30,17 +32,27 @@ export const useGetOrderPeriodApi = (): UseQueryResult<GetOrderPeriodResponseTyp
   });
 };
 
-export const useGetOrderListSumaryApi = (
+export const useGetOrderListSummaryApi = (
   params: GetOrderListSummaryApiPropsType,
 ): UseQueryResult<GetOrderListSummaryResponseType> => {
   return useQuery({
-    queryKey: ['getOrderListByDate', params],
+    queryKey: ['OrderListSummary', params],
     queryFn: async () => {
       return getOrderListSummary(params);
     },
   });
 };
 
+export const useGetOrderListHistoryApi = (
+  params: GetOrderListHistoryApiPropsType,
+): UseQueryResult<GetOrderListHistoryResponseType> => {
+  return useQuery({
+    queryKey: ['getOrderListHistory'],
+    queryFn: async () => {
+      return getOrderListHistory(params);
+    },
+  });
+};
 export const useGetOrderListDetailApi = (
   params: GetOrderListDetailApiPropsType,
 ): UseQueryResult<GetOrderListDetailResponseType> => {

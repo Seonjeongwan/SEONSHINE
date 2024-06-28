@@ -3,6 +3,8 @@ import {
   GetOrderListApiPropsType,
   GetOrderListDetailApiPropsType,
   GetOrderListDetailResponseType,
+  GetOrderListHistoryApiPropsType,
+  GetOrderListHistoryResponseType,
   GetOrderListResponseType,
   GetOrderListSummaryApiPropsType,
   GetOrderListSummaryResponseType,
@@ -30,6 +32,15 @@ export const getOrderListSummary = async (
   return response.data;
 };
 
+export const getOrderListHistory = async (
+  params: GetOrderListHistoryApiPropsType,
+): Promise<GetOrderListHistoryResponseType> => {
+  const response = await axiosInstance.get<GetOrderListHistoryResponseType>('/order/list/history', {
+    params: params,
+  });
+  return response.data;
+};
+
 export const getOrderListDetail = async (
   params: GetOrderListDetailApiPropsType,
 ): Promise<GetOrderListDetailResponseType> => {
@@ -38,4 +49,3 @@ export const getOrderListDetail = async (
   });
   return response.data;
 };
-

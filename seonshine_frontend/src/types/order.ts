@@ -39,6 +39,25 @@ export type OrderListSummaryItemType = {
   count: number;
 };
 
+export type GetOrderListHistoryApiPropsType = {
+  from?: string;
+  to?: string;
+};
+
+export type GetOrderListHistoryResponseType = {
+  data: OrderListHistoryItemType[];
+};
+
+export type OrderListHistoryItemType = {
+  order_id: string;
+  branch_id: number;
+  restaurant_id: string;
+  order_date: string;
+  total_amount: number;
+  restaurant_name: string;
+  restaurant_address: string;
+  restaurant_image_url: string | null;
+};
 export type GetOrderListDetailApiPropsType = {
   date?: string;
 };

@@ -2,35 +2,15 @@ import { useState } from 'react';
 
 import { Box } from '@mui/material';
 
+import { StyledTab, StyledTabs } from '@/components/molecules/tab/styled';
+import TabPanel from '@/components/molecules/tab/TabPannel';
+
 import OrderHistoryTab from './components/OrderHistoryTab';
 import OrderListTab from './components/OrderListTab';
-import { StyledTab, StyledTabs } from './styled';
-
-type TabPanelPropsType = {
-  children?: React.ReactNode;
-  dir?: string;
-  index: number;
-  value: number;
-};
-
-function TabPanel(props: TabPanelPropsType) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <Box
-      role="tabpanel"
-      hidden={value !== index}
-      id={`full-width-tabpanel-${index}`}
-      aria-labelledby={`full-width-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box>{children}</Box>}
-    </Box>
-  );
-}
 
 const OrderManagement = () => {
   const [value, setValue] = useState<number>(0);
+  const [orderDate, setOrderDate] = useState<string>('');
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -38,27 +18,34 @@ const OrderManagement = () => {
 
   return (
     <Box className="w-full">
-      <StyledTabs
-        value={value}
-        onChange={handleChange}
-        aria-label="management tabs"
-        TabIndicatorProps={{ style: { display: 'none' } }}
-      >
-        <StyledTab label="Order List" />
-        <StyledTab label="Order History" />
-      </StyledTabs>
+      <Box className="sticky top-0 z-10 bg-black-100">
+        <StyledTabs
+          value={value}
+          onChange={handleChange}
+          aria-label="management tabs"
+          TabIndicatorProps={{ style: { display: 'none' } }}
+        >
+          <StyledTab label="Order List" />
+          <StyledTab label="Order History" />
+        </StyledTabs>
+      </Box>
       <Box className="px-4 md:px-8 mt-8">
         <TabPanel
           value={value}
           index={0}
         >
-          <OrderListTab />
+          <OrderListTab orderDate={orderDate} />
         </TabPanel>
         <TabPanel
           value={value}
           index={1}
         >
-          <OrderHistoryTab />
+          <OrderHistoryTab
+            handleViewDetail={(orderDate) => {
+              setValue(0);
+              setOrderDate(orderDate);
+            }}
+          />
         </TabPanel>
       </Box>
     </Box>
