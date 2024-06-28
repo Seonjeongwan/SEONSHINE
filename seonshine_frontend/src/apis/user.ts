@@ -4,19 +4,24 @@ import {
   ChangeStatusResponseType,
   CreateMenuItemPayloadType,
   CreateMenuItemResponseType,
+  DiscardOrderMenuItemResponseType,
   GetAllRestaurantResponseType,
+  GetCurrentOrderResponseType,
   GetMenuListApiPropsType,
   GetMenuListResponseType,
   GetRestaurantDetailApiPropsType,
   GetRestaurantDetailResponseType,
   GetRestaurantListApiPropsType,
   GetRestaurantListResponseType,
+  GetTodayMenuListResponseType,
   GetUserDetailApiPropsType,
   GetUserDetailResponseType,
   GetUserListApiPropsType,
   GetUserListResponseType,
   GetWaitingUserListApiPropsType,
   GetWaitingUserListResponseType,
+  OrderMenuItemPayloadType,
+  OrderMenuItemResponseType,
   RestaurantAssignedType,
   RestaurantAssignResponseType,
   UpdateMenuItemPayloadType,
@@ -122,7 +127,7 @@ export const getMenuList = async ({ restaurant_id }: GetMenuListApiPropsType): P
 
 export const updateMenuItem = async (
   payload: UpdateMenuItemPayloadType,
-  item_id: string,
+  item_id: number,
 ): Promise<UpdateMenuItemResponseType> => {
   const formData = new FormData();
   formData.append('name', payload.name);
@@ -137,7 +142,7 @@ export const updateMenuItem = async (
   return response.data;
 };
 
-export const deleteMenuItem = async (item_id: string): Promise<{ message: string }> => {
+export const deleteMenuItem = async (item_id: number): Promise<{ message: string }> => {
   const response = await axiosInstance.delete<{ message: string }>(`/menu/item/${item_id}`);
   return response.data;
 };
@@ -164,5 +169,25 @@ export const getRestaurantAssignList = async (): Promise<RestaurantAssignedType[
 
 export const asssignRestaurant = async (payload: RestaurantAssignedType): Promise<RestaurantAssignResponseType> => {
   const response = await axiosInstance.post<RestaurantAssignResponseType>(`/restaurant/assign-date`, payload);
+  return response.data;
+};
+
+export const getTodayMenuList = async (): Promise<GetTodayMenuListResponseType[]> => {
+  const response = await axiosInstance.get<GetTodayMenuListResponseType[]>('/menu/current-day-list');
+  return response.data;
+};
+
+export const orderMenuItem = async (payload: OrderMenuItemPayloadType): Promise<OrderMenuItemResponseType> => {
+  const response = await axiosInstance.post<OrderMenuItemResponseType>(`/order/order-menu-item`, payload);
+  return response.data;
+};
+
+export const discardOrderMenuItem = async (): Promise<DiscardOrderMenuItemResponseType> => {
+  const response = await axiosInstance.post<DiscardOrderMenuItemResponseType>(`/order/discard-current-order`);
+  return response.data;
+};
+
+export const getCurrentOrder = async (): Promise<GetCurrentOrderResponseType> => {
+  const response = await axiosInstance.get<GetCurrentOrderResponseType>('/order/current-order');
   return response.data;
 };

@@ -4,19 +4,24 @@ import {
   ChangeStatusPayloadType,
   ChangeStatusResponseType,
   CreateMenuItemPayloadType,
+  DiscardOrderMenuItemResponseType,
   GetAllRestaurantResponseType,
+  GetCurrentOrderResponseType,
   GetMenuListApiPropsType,
   GetMenuListResponseType,
   GetRestaurantDetailApiPropsType,
   GetRestaurantDetailResponseType,
   GetRestaurantListApiPropsType,
   GetRestaurantListResponseType,
+  GetTodayMenuListResponseType,
   GetUserDetailApiPropsType,
   GetUserDetailResponseType,
   GetUserListApiPropsType,
   GetUserListResponseType,
   GetWaitingUserListApiPropsType,
   GetWaitingUserListResponseType,
+  OrderMenuItemPayloadType,
+  OrderMenuItemResponseType,
   UpdateMenuItemPayloadType,
   UpdateMenuItemResponseType,
   UpdateRestaurantPayloadType,
@@ -25,7 +30,9 @@ import {
   UpdateUserResponseType,
   UploadImagePayloadType,
   UploadImageResponseType,
+  UseGetCurrentOrderPropsType,
   UseGetRestaurantsPropsType,
+  UseGetTodayMenuListPropsType,
 } from '@/types/user';
 
 import {
@@ -35,13 +42,17 @@ import {
   changeUserAvatar,
   createMenuItem,
   deleteMenuItem,
-  getMenuList,
+  discardOrderMenuItem,
   getAllRestaurants,
+  getCurrentOrder,
+  getMenuList,
   getRestaurantDetail,
   getRestaurantList,
+  getTodayMenuList,
   getUserDetail,
   getUserList,
   getWaitingUserList,
+  orderMenuItem,
   updateMenuItem,
   updateRestaurant,
   updateUser,
@@ -166,9 +177,7 @@ export const useGetAllRestaurantsApi = ({
   });
 };
 
-export const useGetMenuListlApi = (
-  params: GetMenuListApiPropsType,
-): UseQueryResult<GetMenuListResponseType[]> => {
+export const useGetMenuListlApi = (params: GetMenuListApiPropsType): UseQueryResult<GetMenuListResponseType[]> => {
   return useQuery({
     queryKey: ['getMenuList', params],
     queryFn: async () => {
@@ -180,7 +189,7 @@ export const useGetMenuListlApi = (
 export const useUpdateMenuItemApi = ({
   item_id,
 }: {
-  item_id: string;
+  item_id: number;
 }): UseMutationResult<UpdateMenuItemResponseType, unknown, UpdateMenuItemPayloadType> => {
   return useMutation({
     mutationFn: async (payload) => {
@@ -189,7 +198,7 @@ export const useUpdateMenuItemApi = ({
   });
 };
 
-export const useDeleteMenuItemApi = (item_id: string): UseMutationResult<{ message: string }, unknown, void> => {
+export const useDeleteMenuItemApi = (item_id: number): UseMutationResult<{ message: string }, unknown, void> => {
   return useMutation({
     mutationFn: async () => {
       return deleteMenuItem(item_id);
@@ -202,5 +211,45 @@ export const useCreateMenuItemApi = (): UseMutationResult<{ message: string }, u
     mutationFn: async (payload) => {
       return createMenuItem(payload);
     },
+  });
+};
+
+export const useGetTodayMenuListApi = ({
+  enabled = true,
+}: UseGetTodayMenuListPropsType): UseQueryResult<GetTodayMenuListResponseType> => {
+  return useQuery({
+    queryKey: ['todayMenuList'],
+    queryFn: async () => {
+      return getTodayMenuList();
+    },
+    enabled,
+  });
+};
+
+export const useOrderMenuItem = (): UseMutationResult<OrderMenuItemResponseType, unknown, OrderMenuItemPayloadType> => {
+  return useMutation({
+    mutationFn: async (payload) => {
+      return orderMenuItem(payload);
+    },
+  });
+};
+
+export const useDiscardOrderMenuItem = (): UseMutationResult<DiscardOrderMenuItemResponseType, unknown, void> => {
+  return useMutation({
+    mutationFn: async () => {
+      return discardOrderMenuItem();
+    },
+  });
+};
+
+export const useGetCurrentOrder = ({
+  enabled = true,
+}: UseGetCurrentOrderPropsType): UseQueryResult<GetCurrentOrderResponseType> => {
+  return useQuery({
+    queryKey: ['getCurrentOrder'],
+    queryFn: async () => {
+      return getCurrentOrder();
+    },
+    enabled,
   });
 };
