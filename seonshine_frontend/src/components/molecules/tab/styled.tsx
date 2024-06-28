@@ -1,33 +1,39 @@
-import { styled, Tab, TabProps, Tabs } from '@mui/material';
+import { Children, cloneElement } from 'react';
 
-export const StyledTabs = styled(Tabs)(({ theme }) => ({
+import { styled, Tab, TabProps, Tabs, TabsProps } from '@mui/material';
+
+export const StyledTabs = styled(({ children, ...props }: TabsProps) => {
+  const tabcount = Children.count(children);
+  const childrenWithProps = Children.map(children, (child) =>
+    cloneElement(child as React.ReactElement<any>, { tabcount }),
+  );
+  return <Tabs {...props}>{childrenWithProps}</Tabs>;
+})(({ theme }) => ({
   position: 'relative',
-  marginBottom: theme.spacing(2),
+  marginBottom: 0,
   minHeight: '44px',
   '& .MuiTabs-indicator': {
     backgroundColor: 'transparent',
   },
-  [theme.breakpoints.up('sm')]: {
-    '&::after': {
-      content: '""',
-      position: 'absolute',
-      left: 0,
-      right: 0,
-      bottom: 0,
-      height: '2px',
-      backgroundColor: theme.palette.black[300],
-    },
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: '2px',
+    backgroundColor: theme.palette.black[300],
   },
 }));
 
-export const StyledTab = styled((props: TabProps) => (
+export const StyledTab = styled((props: TabProps & { tabcount?: number }) => (
   <Tab
     disableRipple
     {...props}
   />
-))(({ theme }) => ({
+))(({ theme, tabcount }) => ({
   textTransform: 'none',
-  width: 'calc(100% / 2)',
+  width: `calc(100% / ${tabcount})`,
   minHeight: '44px',
   fontWeight: theme.typography.fontWeightBold,
   fontSize: '16px',

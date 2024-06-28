@@ -2,33 +2,12 @@ import { useState } from 'react';
 
 import { Box } from '@mui/material';
 
+import { StyledTab, StyledTabs } from '@/components/molecules/tab/styled';
+import TabPanel from '@/components/molecules/tab/TabPannel';
+
 import ApprovalTab from './components/ApprovalTab';
 import RestaurantManagementTab from './components/RestaurantManagementTab';
 import UserManagementTab from './components/UserManagementTab';
-import { StyledTab, StyledTabs } from './styled';
-
-type TabPanelPropsType = {
-  children?: React.ReactNode;
-  dir?: string;
-  index: number;
-  value: number;
-};
-
-function TabPanel(props: TabPanelPropsType) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <Box
-      role="tabpanel"
-      hidden={value !== index}
-      id={`full-width-tabpanel-${index}`}
-      aria-labelledby={`full-width-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box>{children}</Box>}
-    </Box>
-  );
-}
 
 const UserManagement = () => {
   const [value, setValue] = useState<number>(0);

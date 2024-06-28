@@ -48,7 +48,7 @@ const MainLayout = ({ children, role }: MainLayoutPropsType) => {
           <ArrowForwardIos />
         </IconButton>
         <Header />
-        <Box className="flex-1 overflow-auto">{children}</Box>
+        <Box className="flex-1 overflow-auto scroll-smooth">{children}</Box>
       </Stack>
     </Stack>
   );

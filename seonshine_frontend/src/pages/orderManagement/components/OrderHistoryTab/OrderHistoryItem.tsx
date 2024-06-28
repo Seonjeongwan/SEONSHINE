@@ -1,40 +1,65 @@
+import { Link } from 'react-router-dom';
+
 import { Avatar, Stack, Typography } from '@mui/material';
 
-const OrderHistoryItem = () => {
+import { avatarBaseURL } from '@/constants/image';
+import { useDeviceType } from '@/hooks/useDeviceType';
+import { OrderListHistoryItemType } from '@/types/order';
+
+type OrderHistoryItemPropsType = {
+  item: OrderListHistoryItemType;
+  handleViewDetail?: (orderDate: string) => void;
+};
+
+const OrderHistoryItem = ({ item, handleViewDetail }: OrderHistoryItemPropsType) => {
+  const { order_date, restaurant_image_url, restaurant_name, restaurant_address, total_amount } = item;
+
+  const { isMobile } = useDeviceType();
+  const onClickDetail = () => {
+    handleViewDetail?.(order_date);
+  };
+
   return (
     <Stack
       direction="column"
-      gap={6}
+      gap={4}
     >
-      <Typography className="text-2xl font-bold">2024-06-18</Typography>
+      <Typography className="text-2xl font-bold">{order_date}</Typography>
       <Stack
-        className="bg-white min-h-max min-w-max rounded-s-full"
+        direction={isMobile ? 'column' : 'row'}
+        className="bg-white min-h-max min-w-max rounded-xl sm:rounded-s-full p-4 sm:pr-6"
         alignItems="center"
-        gap={4}
+        gap={8}
       >
         <Avatar
-          // src={!user?.profile_picture_url ? '' : `${avatarBaseURL}${user?.profile_picture_url}`}
-          src={''}
-          className="w-28 h-28 m-4 hidden sm:flex"
+          src={!restaurant_image_url ? '' : `${avatarBaseURL}${restaurant_image_url}`}
+          className="w-28 h-28 hidden sm:flex"
         />
         <Stack
           direction="column"
           justifyContent="space-around"
           gap={6}
-          className="w-3/5"
+          className="w-full sm:w-3/5"
         >
-          <Typography className="text-4xl font-bold">Kitchen Seoul</Typography>
-          <Typography className="text-lg font-normal">Diamond Plaza, District 1</Typography>
+          <Typography className="text-4xl font-bold">{restaurant_name}</Typography>
+          <Typography className="text-lg font-normal">{restaurant_address}</Typography>
         </Stack>
         <Stack
-          direction="column"
+          direction={isMobile ? 'row' : 'column'}
           alignItems="flex-end"
           justifyContent="space-between"
           gap={10}
-          className="mx-auto pr-2"
+          className="ml-0 sm:ml-auto pr-2 self-start sm:self-center w-full sm:w-auto"
         >
-          <Typography className="text-lg font-normal text-right whitespace-nowrap">Order amount: 18</Typography>
-          <Typography className="text-lg font-normal underline text-blue-500">Detail</Typography>
+          <Typography className="text-lg font-normal text-right whitespace-nowrap">
+            {`Order amount: ${total_amount}`}
+          </Typography>
+          <button
+            onClick={onClickDetail}
+            className="text-lg font-normal underline text-blue-500 hover"
+          >
+            Detail
+          </button>
         </Stack>
       </Stack>
     </Stack>

@@ -12,7 +12,7 @@ import useTable from '@/hooks/useTable';
 import { OrderListType } from '@/types/order';
 import { RoleEnum } from '@/types/user';
 
-import { useGetOrderListSumaryApi } from '@/apis/hooks/orderListApi.hook';
+import { useGetOrderListSummaryApi } from '@/apis/hooks/orderListApi.hook';
 import useAuthStore from '@/store/auth.store';
 
 import { OrderListRestaurantTableHeader } from './OrderListRestaurantTableHeader';
@@ -23,14 +23,18 @@ const ITEMS_PER_PAGE = 20;
 
 const today = format(new Date(), dateFormat);
 
-const OrderListTab = () => {
+type OrderListTabPropsType = {
+  orderDate?: string;
+};
+
+const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
   const { currentUser } = useAuthStore();
 
   const restaurantId = currentUser?.role_id === RoleEnum.RESTAURANT ? currentUser.user_id : '';
 
   const { control, watch } = useForm<DateSchemaType>({
     resolver: zodResolver(DateSchema),
-    defaultValues: { date: today },
+    defaultValues: { date: orderDate ? orderDate : today },
   });
 
   const { currentPage, handleSortingChange } = useTable({
@@ -40,7 +44,7 @@ const OrderListTab = () => {
 
   const watchedDate = watch('date');
 
-  const { data: orderList, isFetching } = useGetOrderListSumaryApi({
+  const { data: orderList, isFetching } = useGetOrderListSummaryApi({
     date: watchedDate,
   });
 

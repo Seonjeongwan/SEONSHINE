@@ -1,64 +1,123 @@
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box, Button, Stack, Typography } from '@mui/material';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { format, isValid, parseISO } from 'date-fns';
+import { Box, Button, Grid, Stack, Typography } from '@mui/material';
+import { useQueryClient } from '@tanstack/react-query';
+import { format, subDays } from 'date-fns';
 
-import DatePickerMUI from '../DatePickerMUI';
+import DatePicker from '@/components/molecules/datePicker';
+
+import { useGetOrderListHistoryApi } from '@/apis/hooks/orderListApi.hook';
+
 import OrderHistoryItem from './OrderHistoryItem';
 import { FromToDateSchema, FromToDateSchemaType } from './schema';
 
 const today = format(new Date(), 'yyyy-MM-dd');
+const sevenDaysAgo = format(subDays(new Date(), 7), 'yyyy-MM-dd');
 
-const OrderHistoryTab = () => {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FromToDateSchemaType>({
+type OrderHistoryTabPropsStyle = {
+  handleViewDetail: (orderDate: string) => void;
+};
+
+const OrderHistoryTab = ({ handleViewDetail }: OrderHistoryTabPropsStyle) => {
+  const { control, handleSubmit, watch } = useForm<FromToDateSchemaType>({
     resolver: zodResolver(FromToDateSchema),
-    defaultValues: { fromDate: today, toDate: today },
+    defaultValues: { fromDate: sevenDaysAgo, toDate: today },
   });
 
-  const onClickSearch = (data: FromToDateSchemaType) => {
-    console.log({ data });
+  const queryClient = useQueryClient();
+
+  const watchedFromDate = watch('fromDate');
+  const watchedToDate = watch('toDate');
+
+  const { data: OrderHistoryList } = useGetOrderListHistoryApi({
+    from: watchedFromDate,
+    to: watchedToDate,
+  });
+
+  const onClickSearch = () => {
+    queryClient.invalidateQueries({ queryKey: ['getOrderListHistory'] });
   };
+
   return (
     <Stack
       direction="column"
       gap={6}
+      sx={{ padding: '16px' }}
     >
-      <Stack
+      <Grid
+        container
+        spacing={4}
         alignItems="center"
-        gap={8}
+        className="w-full lg:w-4/5 xl:w-3/5"
       >
-        <Typography className="text-2xl font-bold">From</Typography>
-        <DatePickerMUI<FromToDateSchemaType>
-          control={control}
-          name="fromDate"
-        />
-
-        <Typography className="text-2xl font-bold">To</Typography>
-        <DatePickerMUI<FromToDateSchemaType>
-          control={control}
-          name="toDate"
-        />
-        <Box className="w-1/4 md:w-1/6 lg:w-1/12 h-full">
+        <Grid
+          item
+          xs={12}
+          sm={1}
+        >
+          <Typography className="text-2xl font-bold">From</Typography>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={11}
+          md={4}
+        >
+          <DatePicker<FromToDateSchemaType>
+            control={control}
+            name="fromDate"
+            maxDate={watchedToDate}
+          />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={1}
+        >
+          <Typography className="text-2xl font-bold">To</Typography>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={8}
+          md={4}
+        >
+          <DatePicker<FromToDateSchemaType>
+            control={control}
+            name="toDate"
+            minDate={watchedFromDate}
+          />
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={3}
+          md={2}
+        >
           <Button
             variant="outlined"
             color="primary"
             onClick={handleSubmit(onClickSearch)}
-            className="font-bold text-black-500 rounded-full bg-black-200 hover:bg-black-300 border-none hover:border-none h-full w-full text-base"
+            className="font-bold text-black-500 rounded-full bg-black-200 hover:bg-black-300 border-none hover:border-none w-full py-3 text-base max-w-36"
           >
             Search
           </Button>
-        </Box>
+        </Grid>
+      </Grid>
+      <Stack
+        direction="column"
+        gap={4}
+      >
+        {OrderHistoryList &&
+          OrderHistoryList.data.map((item) => (
+            <OrderHistoryItem
+              key={item.order_id}
+              item={item}
+              handleViewDetail={handleViewDetail}
+            />
+          ))}
       </Stack>
-      <OrderHistoryItem />
-      <OrderHistoryItem />
     </Stack>
   );
 };
