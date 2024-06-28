@@ -22,6 +22,7 @@ import ConfirmModal from '@/components/organims/confirmModal';
 import { avatarBaseURL } from '@/constants/image';
 import { GetMenuListApiPropsType, GetMenuListResponseType, GetTodayMenuListResponseType } from '@/types/user';
 
+import { useGetOrderPeriodApi } from '@/apis/hooks/orderListApi.hook';
 import {
   useDiscardOrderMenuItem,
   useGetCurrentOrder,
@@ -46,13 +47,22 @@ const OrderMenuTab = () => {
   const [isConfirmOrderModalOpen, setIsConfirmOrderModalOpen] = useState<boolean>(false);
   const [isConfirmDiscardOrderModalOpen, setIsConfirmDiscardOrderModalOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<GetMenuListResponseType | null>(null);
+  const { data: orderPeriod } = useGetOrderPeriodApi();
 
   const handleClickOrderButton = (dish: GetMenuListResponseType) => {
+    if (isOrderDisabled()) {
+      toast.warning('Ordering is only available during the designated order period.');
+      return;
+    }
     setSelectedItem(dish);
     setIsConfirmOrderModalOpen(true);
   };
 
   const handleClickDiscardButton = () => {
+    if (isOrderDisabled()) {
+      toast.warning('Cancelling is only available during the designated order period.');
+      return;
+    }
     setIsConfirmDiscardOrderModalOpen(true);
   };
 
@@ -103,11 +113,24 @@ const OrderMenuTab = () => {
     const year = dateObj.getFullYear();
     const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
     const day = dateObj.getDate().toString().padStart(2, '0');
-    const hours = dateObj.getHours().toString().padStart(2, '0');
+    const hours = (dateObj.getHours() + 7).toString().padStart(2, '0');
     const minutes = dateObj.getMinutes().toString().padStart(2, '0');
 
     return `${year}.${month}.${day} - ${hours}:${minutes}`;
   }
+
+  const isOrderDisabled = () => {
+    if (!orderPeriod) return false;
+    const { startHour, startMinute, endHour, endMinute } = orderPeriod;
+
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    return (
+      (currentHour > startHour || (currentHour === startHour && currentMinute >= startMinute)) &&
+      (currentHour < endHour || (currentHour === endHour && currentMinute <= endMinute))
+    );
+  };
 
   return (
     <Box className="px-2 md:px-4">
