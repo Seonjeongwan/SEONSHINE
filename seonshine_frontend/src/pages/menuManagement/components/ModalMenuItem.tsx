@@ -154,7 +154,7 @@ const ModalMenuItem = ({ selectedItem, onClose, item_id = 0, restaurant_id = '' 
             className="h-full"
           >
             <Stack
-              className="rounded-md p-8 box-border cursor-pointer bg-gray-100 flex flex-col items-center"
+              className="rounded-md p-8 box-border cursor-pointer bg-black-100 flex flex-col items-center"
               direction="column"
               gap={2}
             >
