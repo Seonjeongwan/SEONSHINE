@@ -1,8 +1,18 @@
 export const endpoints = {
-  login: "/login",
-  signUp: "/sign-up",
-  signUpResendOtp: "/sign-up/resend-otp",
-  signUpVerification: "/verify-sign-up",
+  auth: {
+    login: "/login",
+    forgotPassword: {
+      sendOtp: "/forgot-password/send-otp",
+      resendOtp: "/forgot-password/resend-otp",
+      verifyOtp: "/forgot-password/verify-otp",
+      changePassword: "/forgot-password/reset-password",
+    },
+    signup: {
+      index: "/sign-up",
+      resendOtp: "/sign-up/resend-otp",
+      verification: "/verify-sign-up",
+    },
+  },
   branches: {
     getAll: "/branches",
     add: "/branches",
@@ -32,7 +42,7 @@ export const endpoints = {
     detail: "/item/:id",
     edit: "/item/:id",
     delete: "/item/:id",
-    currentDayList: "/current-day-list"
+    currentDayList: "/current-day-list",
   },
   order: {
     orderItemCurrentDay: "/order-menu-item",
@@ -41,6 +51,6 @@ export const endpoints = {
     getOrderListDetail: "/list/detail",
     getOrderListSummary: "/list/summary",
     getOrderHistoryList: "/list/history",
-    getCurrentOrder: "/current-order"
-  }
+    getCurrentOrder: "/current-order",
+  },
 };

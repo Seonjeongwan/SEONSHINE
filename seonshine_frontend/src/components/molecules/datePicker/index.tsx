@@ -1,6 +1,6 @@
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
-import { Box, Typography } from '@mui/material';
+import { Box, FormHelperText } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import { DatePicker as XDatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -13,6 +13,8 @@ type DatePickerPropsType<T extends FieldValues> = {
   control: Control<T>;
   disabled?: boolean;
   varirant?: 'normal' | 'small';
+  minDate?: string;
+  maxDate?: string;
 };
 
 const DatePicker = <T extends FieldValues>({
@@ -20,6 +22,8 @@ const DatePicker = <T extends FieldValues>({
   control,
   disabled,
   varirant = 'normal',
+  minDate,
+  maxDate,
 }: DatePickerPropsType<T>) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -53,6 +57,8 @@ const DatePicker = <T extends FieldValues>({
                   onChange(formattedDate);
                 }}
                 format={dateFormat}
+                minDate={minDate ? parseISO(minDate) : undefined}
+                maxDate={maxDate ? parseISO(maxDate) : undefined}
                 disabled={disabled}
                 sx={(theme) => {
                   return varirant === 'normal'
@@ -94,7 +100,7 @@ const DatePicker = <T extends FieldValues>({
                 }}
                 className="bg-white max-w-96 rounded-full"
               />
-              {error && <Typography color="error">{error.message}</Typography>}
+              {error && <FormHelperText color="error">{error.message}</FormHelperText>}
             </Box>
           );
         }}
