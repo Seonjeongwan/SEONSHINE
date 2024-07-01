@@ -19,7 +19,6 @@ type AccountVerificationProps = {
   className?: string;
 };
 
-
 const AccountVerification = ({
   title = 'Account Verification',
   description = 'An OTP has been sent to your email. Please enter the OTP to verify your account.',
@@ -32,6 +31,7 @@ const AccountVerification = ({
     handleSubmit,
     control,
     getValues,
+    reset,
     formState: { errors },
   } = useForm<OtpSchemaType>({
     resolver: zodResolver(OtpSchema),
@@ -91,6 +91,7 @@ const AccountVerification = ({
   const resetTimer = () => {
     setSeconds(secondsCountdown);
     setIsActive(true);
+    reset();
   };
 
   const onSubmit = (data: OtpSchemaType) => handleSubmitOtp(data.otp);
