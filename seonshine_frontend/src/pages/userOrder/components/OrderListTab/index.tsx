@@ -36,7 +36,7 @@ const UserOrderListTab = () => {
   const watchedDate = watch('date');
 
   const { data: orderList, isFetching } = useGetOrderListDetailApi({
-    date: watchedDate,
+    params: { date: watchedDate },
   });
   const columns = OrderListTableHeader;
 

@@ -32,14 +32,19 @@ export const useGetOrderPeriodApi = (): UseQueryResult<GetOrderPeriodResponseTyp
   });
 };
 
-export const useGetOrderListSummaryApi = (
-  params: GetOrderListSummaryApiPropsType,
-): UseQueryResult<GetOrderListSummaryResponseType> => {
+export const useGetOrderListSummaryApi = ({
+  params,
+  enabled = true,
+}: {
+  params: GetOrderListSummaryApiPropsType;
+  enabled?: boolean;
+}): UseQueryResult<GetOrderListSummaryResponseType> => {
   return useQuery({
     queryKey: ['OrderListSummary', params],
     queryFn: async () => {
       return getOrderListSummary(params);
     },
+    enabled,
   });
 };
 
@@ -53,13 +58,18 @@ export const useGetOrderListHistoryApi = (
     },
   });
 };
-export const useGetOrderListDetailApi = (
-  params: GetOrderListDetailApiPropsType,
-): UseQueryResult<GetOrderListDetailResponseType> => {
+export const useGetOrderListDetailApi = ({
+  params,
+  enabled = true,
+}: {
+  params: GetOrderListDetailApiPropsType;
+  enabled?: boolean;
+}): UseQueryResult<GetOrderListDetailResponseType> => {
   return useQuery({
     queryKey: ['getOrderListDetail', params],
     queryFn: async () => {
       return getOrderListDetail(params);
     },
+    enabled,
   });
 };
