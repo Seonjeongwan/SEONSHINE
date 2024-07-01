@@ -32,6 +32,7 @@ const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInf
       email: '',
       phoneNumber: '',
       branch_id: 0,
+      address: '',
     },
   });
   const { data: branchData = [] } = useGetBranches({ enabled: true });
@@ -157,93 +158,146 @@ const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInf
                       error={errors.fullName}
                     />
                   </Stack>
-                  <Stack direction={userType === RoleEnum.USER ? 'row' : 'column'}>
-                    <Stack
-                      direction="column"
-                      className={'w-full'}
-                    >
-                      <FormLabel
-                        title="Email"
-                        required
-                      />
-                      <FormInput
-                        name="email"
-                        register={register}
-                        placeholder="Email"
-                        error={errors.email}
-                        className="w-full"
-                        endAdornment={userType == RoleEnum.USER ? <Box>@shinhan.com</Box> : ''}
-                      />
-                    </Stack>
-                  </Stack>
-                  <Stack
-                    direction={userType == RoleEnum.USER ? 'row' : 'column'}
-                    justifyContent="space-between"
-                  >
-                    <Stack
-                      direction="column"
-                      className={userType == RoleEnum.USER ? 'mr-2 w-1/2' : 'w-full'}
-                    >
-                      <FormLabel
-                        title="Phone number"
-                        required
-                      />
-                      <FormInput
-                        name="phoneNumber"
-                        register={register}
-                        placeholder="Phone Number"
-                        error={errors.phoneNumber}
-                        className={userType == RoleEnum.USER ? '' : 'w-full'}
-                      />
-                    </Stack>
-                    {userType == RoleEnum.USER && (
+                  {userType == RoleEnum.USER ? (
+                    <Stack direction={userType === RoleEnum.USER ? 'row' : 'column'}>
                       <Stack
                         direction="column"
-                        className="w-1/2"
+                        className={userType == RoleEnum.USER ? 'w-full' : 'mr-2 w-1/2'}
                       >
                         <FormLabel
-                          title="Branch name"
+                          title="Email"
                           required
                         />
-                        <FormControl>
-                          <Select
-                            placeholder="Branch Name"
-                            displayEmpty
-                            inputProps={{ 'aria-label': 'Without label' }}
-                            labelId="branch-select-label"
-                            value={selectedBranch}
-                            onChange={(e) => {
-                              setSelectedBranch(e.target.value);
-                              setValue('branch_id', e.target.value);
-                            }}
-                            size="small"
-                            variant="filled"
-                            error={!!errors.branch_id}
-                            sx={{
-                              '& .MuiSelect-select': {
-                                backgroundColor: '#f2f4f8',
-                                borderRadius: '4px',
-                              },
-                              '& .MuiSelect-icon': {
-                                color: 'inherit',
-                              },
-                            }}
-                          >
-                            {Array.isArray(branchData) &&
-                              branchData.map((branch) => (
-                                <MenuItem
-                                  key={branch.branch_id}
-                                  value={branch.branch_id}
-                                >
-                                  {branch.branch_name}
-                                </MenuItem>
-                              ))}
-                          </Select>
-                        </FormControl>
-                        {errors.branch_id && <Typography color="error">{errors.branch_id.message}</Typography>}
+                        <FormInput
+                          name="email"
+                          register={register}
+                          placeholder="Email"
+                          error={errors.email}
+                          className="w-full"
+                          endAdornment={userType == RoleEnum.USER ? <Box>@shinhan.com</Box> : ''}
+                        />
                       </Stack>
-                    )}
-                  </Stack>
+                    </Stack>
+                  ) : (
+                    <Stack direction={'row'}>
+                      <Stack
+                        direction="column"
+                        className={'mr-2 w-1/2'}
+                      >
+                        <FormLabel
+                          title="Email"
+                          required
+                        />
+                        <FormInput
+                          name="email"
+                          register={register}
+                          placeholder="Email"
+                          error={errors.email}
+                          className="w-full"
+                        />
+                      </Stack>
+                      <Stack
+                        direction="column"
+                        className={'w-1/2'}
+                      >
+                        <FormLabel
+                          title="Phone number"
+                          required
+                        />
+                        <FormInput
+                          name="phoneNumber"
+                          register={register}
+                          placeholder="Phone Number"
+                          error={errors.phoneNumber}
+                          className={'w-full'}
+                        />
+                      </Stack>
+                    </Stack>
+                  )}
+                  {userType == RoleEnum.USER && (
+                    <Stack
+                      direction={'row'}
+                      justifyContent="space-between"
+                    >
+                      <Stack
+                        direction="column"
+                        className={'mr-2 w-1/2'}
+                      >
+                        <FormLabel
+                          title="Phone number"
+                          required
+                        />
+                        <FormInput
+                          name="phoneNumber"
+                          register={register}
+                          placeholder="Phone Number"
+                          error={errors.phoneNumber}
+                          className={userType == RoleEnum.USER ? '' : 'w-full'}
+                        />
+                      </Stack>
+                      {userType == RoleEnum.USER && (
+                        <Stack
+                          direction="column"
+                          className="w-1/2"
+                        >
+                          <FormLabel
+                            title="Branch name"
+                            required
+                          />
+                          <FormControl>
+                            <Select
+                              placeholder="Branch Name"
+                              displayEmpty
+                              inputProps={{ 'aria-label': 'Without label' }}
+                              labelId="branch-select-label"
+                              value={selectedBranch}
+                              onChange={(e) => {
+                                setSelectedBranch(e.target.value);
+                                setValue('branch_id', e.target.value);
+                              }}
+                              size="small"
+                              variant="filled"
+                              error={!!errors.branch_id}
+                              sx={{
+                                '& .MuiSelect-select': {
+                                  backgroundColor: '#f2f4f8',
+                                  borderRadius: '4px',
+                                },
+                                '& .MuiSelect-icon': {
+                                  color: 'inherit',
+                                },
+                              }}
+                            >
+                              {Array.isArray(branchData) &&
+                                branchData.map((branch) => (
+                                  <MenuItem
+                                    key={branch.branch_id}
+                                    value={branch.branch_id}
+                                  >
+                                    {branch.branch_name}
+                                  </MenuItem>
+                                ))}
+                            </Select>
+                          </FormControl>
+                          {errors.branch_id && <Typography color="error">{errors.branch_id.message}</Typography>}
+                        </Stack>
+                      )}
+                    </Stack>
+                  )}
+                  {userType !== RoleEnum.USER && (
+                    <Stack direction="column">
+                      <FormLabel
+                        title="Address"
+                        required
+                      />
+                      <FormInput
+                        name="address"
+                        register={register}
+                        placeholder="Address"
+                        error={errors.address}
+                      />
+                    </Stack>
+                  )}
                 </Box>
                 <Stack className="pb-10 pt-10">
                   <Button

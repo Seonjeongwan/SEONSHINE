@@ -30,10 +30,15 @@ export const SignUpSchema = zod
         message: errorMessages.phoneNumberInvalid,
       }),
     branch_id: zod.union([zod.string(), zod.number()]),
+    address: zod.string(),
   })
   .refine((data) => data.userType !== RoleEnum.USER || (data.userType === RoleEnum.USER && data.branch_id), {
     message: 'Branch field is required',
     path: ['branch_id'],
+  })
+  .refine((data) => data.userType !== RoleEnum.RESTAURANT || (data.userType === RoleEnum.RESTAURANT && data.address), {
+    message: 'Address field is required',
+    path: ['address'],
   })
   .refine((values) => values.password === values.confirmPassword, {
     message: errorMessages.passwordNotMatch,
@@ -42,6 +47,9 @@ export const SignUpSchema = zod
   .refine(
     (data) => {
       if (data.userType === RoleEnum.USER) {
+        if (typeof data.email === 'string' && data.email.includes('@gmail.com')) {
+          return false;
+        }
         return typeof data.email === 'string';
       } else {
         const emailSchema = zod.string().email({ message: errorMessages.emailInvalid });
@@ -56,8 +64,13 @@ export const SignUpSchema = zod
   );
 
 export type SignUpSchemaType = zod.infer<typeof SignUpSchema>;
+
 export type SignUpVerifySchemaType = {
   code: string;
+  email: string;
+};
+
+export type ResendSignUpOtpSchemaType = {
   email: string;
 };
 
