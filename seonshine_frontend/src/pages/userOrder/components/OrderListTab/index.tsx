@@ -9,7 +9,7 @@ import Table from '@/components/organims/table';
 import useTable from '@/hooks/useTable';
 import { OrderListType } from '@/types/order';
 
-import { useGetOrderListDetailApi, useGetOrderListSumaryApi } from '@/apis/hooks/orderListApi.hook';
+import { useGetOrderListDetailApi } from '@/apis/hooks/orderListApi.hook';
 
 import { OrderListTableHeader } from './OrderListTableHeader';
 import { DateSchema, DateSchemaType } from './schema';

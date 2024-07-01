@@ -278,10 +278,16 @@ export const getOrderListDetail = async (req, res) => {
 export const getOrderHistory = async (req, res) => {
   try {
     const { from, to } = req.query;
+    const currentUser = req.user;
+    const {user_id, role_id} = currentUser;
     const select = `SELECT o.order_id, o.branch_id, o.restaurant_id, o.order_date, o.total_amount, u.username as restaurant_name, p.address as restaurant_address, p.profile_picture_url as restaurant_image_url 
     FROM order_db.order_history o JOIN user_db.users u ON o.restaurant_id = u.user_id LEFT JOIN user_db.user_profiles p ON p.user_id = o.restaurant_id`;
 
-    const where = "WHERE order_date between :from AND :to";
+    let where = "WHERE order_date between :from AND :to";
+
+    if(Number(role_id) === Number(UserRole.restaurant)) {
+      where += " AND restaurant_id = :user_id";
+    }
 
     const query = `${select} ${where}`;
 
@@ -289,6 +295,7 @@ export const getOrderHistory = async (req, res) => {
       replacements: {
         from,
         to,
+        user_id,
       },
       type: QueryTypes.SELECT,
     });
