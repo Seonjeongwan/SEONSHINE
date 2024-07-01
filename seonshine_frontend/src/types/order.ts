@@ -73,3 +73,5 @@ export type OrderListDetailItemType = {
   restaurant_name: string;
   submitted_time: string;
 };
+
+export type ViewModeType = 'summary' | 'detail';
