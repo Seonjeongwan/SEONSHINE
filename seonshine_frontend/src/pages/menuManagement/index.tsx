@@ -59,7 +59,7 @@ const MenuManagement = () => {
   return (
     <Box className="px-4 md:px-8">
       <Stack direction="column">
-        <Box className="sticky top-0 z-10 h-full w-full bg-gray-100 py-4">
+        <Box className="sticky top-0 z-10 h-full w-full bg-black-100">
           <Stack className="h-full">
             {currentUser?.role_id == RoleEnum.ADMIN && (
               <FormControl

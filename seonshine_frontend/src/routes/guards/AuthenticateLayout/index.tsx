@@ -20,7 +20,7 @@ const AuthenticateLayout = () => {
   }
 
   return (
-    <Box className="bg-gray-100">
+    <Box className="bg-black-100">
       <Outlet />
     </Box>
   );

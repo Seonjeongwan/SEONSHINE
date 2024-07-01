@@ -40,7 +40,7 @@ const OrderManagement = () => {
 
   return (
     <Box className="w-full">
-      <Box className="sticky top-0 z-10 w-full bg-gray-100 py-4">
+      <Box className="sticky top-0 z-10 w-full bg-black-100">
         <StyledTabs
           value={value}
           onChange={handleChange}
