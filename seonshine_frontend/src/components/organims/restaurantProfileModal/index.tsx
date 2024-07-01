@@ -183,7 +183,7 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
     >
       <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full md:w-2/3 lg:w-2/5 bg-white shadow-xl rounded-lg mx-1">
         <Box className="flex flex-col md:flex-row">
-          <Box className="w-full md:w-1/4 bg-gray-100 flex flex-col items-center rounded-lg p-4 md:p-0">
+          <Box className="w-full md:w-1/4 bg-black-100 flex flex-col items-center rounded-lg p-4 md:p-0">
             <div className="relative">
               {isLoading ? (
                 <Skeleton
