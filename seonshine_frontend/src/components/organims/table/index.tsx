@@ -129,7 +129,7 @@ const Table = <T extends object>({
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
-                        className={`text-black-500 text-md border-0 px-2 ${size === 'normal' ? 'py-1' : 'py-0'}`}
+                        className={`text-black-500 text-md border-0 px-2 ${size === 'normal' ? 'py-1' : 'py-0'} whitespace-nowrap`}
                         sx={{ textAlign: (cell.column.columnDef as CustomColumnDef<T>).align || 'left' }}
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
