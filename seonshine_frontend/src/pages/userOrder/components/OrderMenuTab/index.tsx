@@ -49,8 +49,21 @@ const OrderMenuTab = () => {
   const [selectedItem, setSelectedItem] = useState<GetMenuListResponseType | null>(null);
   const { data: orderPeriod } = useGetOrderPeriodApi();
 
+  const isOrderEnabled = () => {
+    if (!orderPeriod) return false;
+    const { startHour, startMinute, endHour, endMinute } = orderPeriod;
+
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    return (
+      (currentHour > startHour || (currentHour === startHour && currentMinute >= startMinute)) &&
+      (currentHour < endHour || (currentHour === endHour && currentMinute <= endMinute))
+    );
+  };
+
   const handleClickOrderButton = (dish: GetMenuListResponseType) => {
-    if (isOrderDisabled()) {
+    if (!isOrderEnabled()) {
       toast.warning('Ordering is only available during the designated order period.');
       return;
     }
@@ -59,7 +72,7 @@ const OrderMenuTab = () => {
   };
 
   const handleClickDiscardButton = () => {
-    if (isOrderDisabled()) {
+    if (!isOrderEnabled()) {
       toast.warning('Cancelling is only available during the designated order period.');
       return;
     }
@@ -118,19 +131,6 @@ const OrderMenuTab = () => {
 
     return `${year}.${month}.${day} - ${hours}:${minutes}`;
   }
-
-  const isOrderDisabled = () => {
-    if (!orderPeriod) return false;
-    const { startHour, startMinute, endHour, endMinute } = orderPeriod;
-
-    const now = new Date();
-    const currentHour = now.getHours();
-    const currentMinute = now.getMinutes();
-    return (
-      (currentHour > startHour || (currentHour === startHour && currentMinute >= startMinute)) &&
-      (currentHour < endHour || (currentHour === endHour && currentMinute <= endMinute))
-    );
-  };
 
   return (
     <Box className="px-2 md:px-4">
