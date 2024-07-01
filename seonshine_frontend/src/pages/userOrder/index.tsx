@@ -1,12 +1,13 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { Box } from '@mui/material';
 
 import OrderListTab from './components/OrderListTab';
-import OrderHistoryTab from './components/OrderMenuTab';
-import { StyledTab, StyledTabs } from './styled';
 import UserOrderListTab from './components/OrderListTab';
+import OrderHistoryTab from './components/OrderMenuTab';
 import OrderMenuTab from './components/OrderMenuTab';
+import { StyledTab, StyledTabs } from './styled';
 
 type TabPanelPropsType = {
   children?: React.ReactNode;
@@ -32,7 +33,9 @@ function TabPanel(props: TabPanelPropsType) {
 }
 
 const OrderManagement = () => {
-  const [value, setValue] = useState<number>(0);
+  const location = useLocation();
+  const localState = location.state;
+  const [value, setValue] = useState<number>(localState?.tab || 0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);

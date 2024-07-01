@@ -299,3 +299,17 @@ export type GetCurrentOrderResponseType = {
   restaurant_name: string;
   image_url: string;
 };
+
+export type UseGetDashboardSummaryPropsType = { enabled?: boolean };
+export type GetDashboardSummaryResponseType = {
+  today_restaurant_id: string;
+  today_restaurant_name: string;
+  ordered_users_count: number;
+  active_users_count: number;
+  waiting_approval_users_count: number;
+  current_order_status: number;
+  current_order_item_name: string;
+  current_order_item_id: number;
+  today_order_users_count: number;
+  assigned_weekdays: number[];
+};

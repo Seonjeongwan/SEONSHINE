@@ -1,34 +1,38 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
 import Slider from 'react-slick';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Stack } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
 import 'slick-carousel/slick/slick-theme.css';
 import 'slick-carousel/slick/slick.css';
 
 import Table from '@/components/organims/table';
 
+import { avatarBaseURL } from '@/constants/image';
 import useTable from '@/hooks/useTable';
 import { OrderListType } from '@/types/order';
-import { ChangeStatusPayloadType } from '@/types/user';
+import { RoleEnum } from '@/types/user';
 
-import { useGetOrderListApi } from '@/apis/hooks/orderListApi.hook';
+import { useGetOrderListDetailApi } from '@/apis/hooks/orderListApi.hook';
+import { useGetDashBoardSummary, useGetMenuListlApi, useGetTodayMenuListApi } from '@/apis/hooks/userApi.hook';
+import useAuthStore from '@/store/auth.store';
 
+import { DateSchema, DateSchemaType } from '../orderManagement/components/OrderListTab/schema';
 import { OrderListHeader } from './OrderListHeader';
 
 const Dashboard = () => {
-  const ITEMS_PER_PAGE = 10;
-
+  const { currentUser } = useAuthStore();
   const settings = {
     className: 'center',
     infinite: true,
     centerPadding: '60px',
     slidesToShow: 5,
     swipeToSlide: true,
-    afterChange: function (index: number) {
-      console.log(`Slider Changed to: ${index + 1}, background: #222; color: #bada55`);
-    },
+    afterChange: function (index: number) {},
     responsive: [
       {
         breakpoint: 1024,
@@ -47,65 +51,66 @@ const Dashboard = () => {
     ],
   };
 
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
-  const [selectedUser, setSelectedUser] = useState<ChangeStatusPayloadType>();
+  const ITEMS_PER_PAGE = 10;
 
+  const today = format(new Date(), 'yyyy-MM-dd');
   const queryClient = useQueryClient();
-
-  const { currentPage, sortKey, sortType, pageSize, handlePageChange, handleSortingChange, searchField, searchQuery } =
-    useTable({ initPageSize: ITEMS_PER_PAGE, initSortKey: 'user_id' });
-
-  const { data, isFetching } = useGetOrderListApi({
-    [searchField]: searchQuery,
+  const {
+    control,
+    watch,
+    formState: { errors },
+  } = useForm<DateSchemaType>({
+    resolver: zodResolver(DateSchema),
+    defaultValues: { date: today },
   });
 
-  const columns = OrderListHeader();
-  const dishes = [
-    {
-      name: 'Pho',
-      img: 'https://cdn.tgdd.vn/Files/2022/01/25/1412805/cach-nau-pho-bo-nam-dinh-chuan-vi-thom-ngon-nhu-hang-quan-202201250230038502.jpg ',
-    },
-    {
-      name: 'Bun Bo Hue',
-      img: 'https://cdn.tgdd.vn/Files/2018/04/01/1078873/nau-bun-bo-hue-cuc-de-tai-nha-tu-vien-gia-vi-co-san-202109161718049940.jpg',
-    },
-    {
-      name: 'Noodle',
-      img: 'https://cdn.mediamart.vn/images/news/di-mon-vi-hung-dn-lam-mi-kho-xa-xiu-ngon-nhu-ngoai-hang_16bbe0f5.jpg',
-    },
-    {
-      name: 'Banh mi Sai Gon',
-      img: 'https://static.vinwonders.com/production/banh-mi-sai-gon-2.jpg',
-    },
-    {
-      name: 'Grill Pork Rice',
-      img: 'https://i.ytimg.com/vi/h__kLq8NG2I/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLDqn7vasJHB1JVJB8uobiB67rxztw',
-    },
-    {
-      name: 'Bun Dau Mam Tom',
-      img: 'https://vietnamnomad.com/wp-content/uploads/2023/05/What-is-bun-dau-mam-tom.jpg',
-    },
-  ];
+  const { currentPage, sortKey, sortType, pageSize, handlePageChange, handleSortingChange } = useTable({
+    initPageSize: ITEMS_PER_PAGE,
+    initSortKey: 'item_name',
+  });
+  const watchedDate = watch('date');
 
+  const { data: orderList, isFetching } = useGetOrderListDetailApi({
+    params: { date: watchedDate },
+  });
+
+  const columns = OrderListHeader;
+  const data: OrderListType[] = orderList
+    ? orderList.data.map((order) => ({
+        restaurant_name: order.restaurant_name,
+        employee_name: order.username,
+        ordered_items: order.item_name,
+        date: order.submitted_time,
+      }))
+    : [];
+
+  const { data: todayMenuList } = useGetTodayMenuListApi({ enabled: true });
+  const { data: dashboardSummary } = useGetDashBoardSummary({ enabled: true });
+
+  const navigate = useNavigate();
+  const handleNavigate = () => {
+    {
+      currentUser?.role_id === RoleEnum.USER ? navigate('/order-menu', { state: { tab: 1 } }) : navigate('/order');
+    }
+  };
   return (
     <Box className="px-4 py-2 md:px-8 md:py-4">
       <Stack className="flex flex-wrap md:flex-nowrap gap-4 md:gap-6">
         <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
           <Stack className="flex-grow">Today's Restaurant</Stack>
-          <Stack className="font-bold text-2xl">PAPA'S CHICKEN</Stack>
+          <Stack className="font-bold text-2xl">{dashboardSummary?.today_restaurant_name}</Stack>
         </Box>
         <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
           <Stack className="flex-grow">Ordered Users</Stack>
-          <Stack className="self-end font-bold text-2xl">12</Stack>
+          <Stack className="self-end font-bold text-2xl">{dashboardSummary?.ordered_users_count}</Stack>
         </Box>
         <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
           <Stack className="flex-grow">Active Users</Stack>
-          <Stack className="self-end font-bold text-2xl">32</Stack>
+          <Stack className="self-end font-bold text-2xl">{dashboardSummary?.active_users_count}</Stack>
         </Box>
         <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
           <Stack className="flex-grow">Waiting for Approval</Stack>
-          <Stack className="self-end font-bold text-2xl">8</Stack>
+          <Stack className="self-end font-bold text-2xl">{dashboardSummary?.waiting_approval_users_count}</Stack>
         </Box>
       </Stack>
       <Stack className="mt-6 w-full">
@@ -117,21 +122,28 @@ const Dashboard = () => {
           >
             <h2 className="text-2xl font-bold">Today's Menu</h2>
             <Link
-              to="/restaurant-menu"
+              to="/menu"
               className="text-blue-500 !underline"
             >
               View more
             </Link>
           </Stack>
-          <Box className="flex flex-col bg-white rounded-md mt-2">
+          <Box
+            className="flex flex-col bg-white rounded-md mt-2"
+            sx={{
+              '.slick-prev:before, .slick-next:before': {
+                color: 'grey',
+              },
+            }}
+          >
             <Slider {...settings}>
-              {dishes.map((dish, index) => (
+              {todayMenuList?.menu_list.map((dish, index) => (
                 <Box
                   key={index}
                   className="p-2 md:p-4 outline-none"
                 >
                   <img
-                    src={dish.img}
+                    src={`${avatarBaseURL}${dish.image_url}`}
                     alt={dish.name}
                     className="w-full h-32 md:h-40 object-cover rounded-md"
                   />
@@ -151,15 +163,15 @@ const Dashboard = () => {
             className="mb-2"
           >
             <h2 className="text-2xl font-bold">Order List</h2>
-            <Link
-              to="/order-list"
-              className="text-blue-500 !underline"
+            <div
+              onClick={handleNavigate}
+              className="text-blue-500 !underline cursor-pointer"
             >
               View more
-            </Link>
+            </div>
           </Stack>
           <Table<OrderListType>
-            data={data?.data || []}
+            data={data}
             columns={columns}
             isFetching={isFetching}
             currentPage={0}
