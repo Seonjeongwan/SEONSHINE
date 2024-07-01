@@ -53,4 +53,5 @@ export const endpoints = {
     getOrderHistoryList: "/list/history",
     getCurrentOrder: "/current-order",
   },
+  dashboard: "/dashboard/summary"
 };

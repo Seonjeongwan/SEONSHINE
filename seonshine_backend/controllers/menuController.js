@@ -168,8 +168,6 @@ export const getMenuListByCurrentDay = async (req, res) => {
       raw: true,
     });
 
-    console.log("restaurantAssign :>> ", restaurantAssign);
-
     const response = {
       restaurant_name: "",
       current_day: dayjs().format("YYYY-MM-DD"),
