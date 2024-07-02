@@ -41,7 +41,7 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
     defaultValues: { date: orderDate ? orderDate : today },
   });
 
-  const { currentPage, handleSortingChange } = useTable({
+  const { currentPage, handleSortingChange, sortKey, sortType } = useTable({
     initPageSize: ITEMS_PER_PAGE,
     initSortKey: 'item_name',
   });
@@ -61,15 +61,14 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
   const columns = viewMode === 'summary' ? OrderListRestaurantTableHeader : OrderListTableHeader;
 
   const data: OrderListType[] = useMemo(() => {
+    let data: OrderListType[] = [];
     if (viewMode === 'summary' && orderListSummary) {
-      return orderListSummary.data.map((order) => ({
+      data = orderListSummary.data.map((order) => ({
         ordered_items: order.item_name,
         amount: order.count,
       }));
-    }
-
-    if (viewMode === 'detail' && orderListDetail) {
-      return orderListDetail.data.map((order) => ({
+    } else if (viewMode === 'detail' && orderListDetail) {
+      data = orderListDetail.data.map((order) => ({
         restaurant_name: order.restaurant_name,
         employee_name: order.username,
         ordered_items: order.item_name,
@@ -77,8 +76,23 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
       }));
     }
 
-    return [];
-  }, [viewMode, orderListSummary, orderListDetail]);
+    return data.sort((a, b) => {
+      const aValue = a[sortKey as keyof OrderListType];
+      const bValue = b[sortKey as keyof OrderListType];
+
+      if (aValue === undefined || bValue === undefined) {
+        return 0;
+      }
+
+      if (aValue < bValue) {
+        return sortType === 'asc' ? -1 : 1;
+      } else if (aValue > bValue) {
+        return sortType === 'asc' ? 1 : -1;
+      } else {
+        return 0;
+      }
+    });
+  }, [viewMode, orderListSummary, orderListDetail, sortKey, sortType]);
 
   const onChangeViewMode = (event: React.MouseEvent<HTMLElement>, newAlignment: ViewModeType) => {
     setViewMode(newAlignment);
