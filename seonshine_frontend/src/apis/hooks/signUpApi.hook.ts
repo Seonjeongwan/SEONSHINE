@@ -1,8 +1,8 @@
 import { useMutation, UseMutationResult } from '@tanstack/react-query';
 
-import { SignUpSchemaType, SignUpVerifySchemaType } from '@/pages/signUp/components/ProfileRegistration/schema';
+import { ResendSignUpOtpSchemaType, SignUpSchemaType, SignUpVerifySchemaType } from '@/pages/signUp/components/ProfileRegistration/schema';
 
-import { signUp, SignUpResponseType, signUpVerify, SignUpVerifyResponseType } from '../signUp';
+import { resendSignUpOtp, ResendSignUpOtpResponseType, signUp, SignUpResponseType, signUpVerify, SignUpVerifyResponseType } from '../signUp';
 
 export const useSignUpApi = (): UseMutationResult<SignUpResponseType, unknown, SignUpSchemaType> => {
   return useMutation({
@@ -13,5 +13,11 @@ export const useSignUpApi = (): UseMutationResult<SignUpResponseType, unknown, S
 export const useSignUpVerifyApi = (): UseMutationResult<SignUpVerifyResponseType, unknown, SignUpVerifySchemaType> => {
   return useMutation({
     mutationFn: signUpVerify,
+  });
+};
+
+export const useResendSignUpOtp = (): UseMutationResult<ResendSignUpOtpResponseType, unknown, ResendSignUpOtpSchemaType> => {
+  return useMutation({
+    mutationFn: resendSignUpOtp,
   });
 };
