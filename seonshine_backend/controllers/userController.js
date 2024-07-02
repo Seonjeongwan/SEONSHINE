@@ -294,7 +294,17 @@ export const updateUser = async (req, res) => {
 
   try {
     const user = await User.findOne({
-      where: { user_id: userId, role_id: UserRole.user },
+      where: {
+        user_id: userId,
+        [Op.or]: [
+          {
+            role_id: UserRole.user,
+          },
+          {
+            role_id: UserRole.admin,
+          },
+        ],
+      },
       transaction: transactionUserDb,
     });
 
