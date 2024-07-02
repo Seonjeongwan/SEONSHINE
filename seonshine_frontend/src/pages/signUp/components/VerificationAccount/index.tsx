@@ -7,7 +7,7 @@ import { Box, Button, FormHelperText, Stack, TextField, Typography } from '@mui/
 import { digitRegex } from '@/constants/regex';
 
 import { AccountVerificationPageProps } from '../../types';
-import { SignUpVerifySchemaType } from '../ProfileRegistration/schema';
+import { ResendSignUpOtpSchemaType, SignUpVerifySchemaType } from '../ProfileRegistration/schema';
 import { VerifyOtpSchema, VerifyOtpSchemaType } from './schema';
 
 const AccountVerificationPage = ({
@@ -83,8 +83,8 @@ const AccountVerificationPage = ({
     }
   };
 
-  const hanldeClickResendOtp = () => {
-    handleResendOtp(resetTimer);
+  const hanldeClickResendOtp = (data?: ResendSignUpOtpSchemaType) => {
+    handleResendOtp(resetTimer, { ...data, email: userEmail });
   };
 
   const resetTimer = () => {
@@ -212,7 +212,7 @@ const AccountVerificationPage = ({
             variant="text"
             className="text-center w-max font-bold text-md text-black-500"
             disabled={isActive}
-            onClick={hanldeClickResendOtp}
+            onClick={() => hanldeClickResendOtp()}
           >
             Resend OTP
           </Button>

@@ -5,13 +5,17 @@ import { Box, Step, StepLabel, Stepper } from '@mui/material';
 
 import { RoleEnum } from '@/types/user';
 
-import { useSignUpApi, useSignUpVerifyApi } from '@/apis/hooks/signUpApi.hook';
+import { useResendSignUpOtp, useSignUpApi, useSignUpVerifyApi } from '@/apis/hooks/signUpApi.hook';
 import { useLoadingStore } from '@/store/loading.store';
 
 import ChooseUserType from './components/ChooseUserType';
 import PendingApprovalPage from './components/PendingApproval';
 import ProfileRegistration from './components/ProfileRegistration';
-import { SignUpSchemaType, SignUpVerifySchemaType } from './components/ProfileRegistration/schema';
+import {
+  ResendSignUpOtpSchemaType,
+  SignUpSchemaType,
+  SignUpVerifySchemaType,
+} from './components/ProfileRegistration/schema';
 import AccountVerificationPage from './components/VerificationAccount';
 import { SignUpStepsType } from './types';
 
@@ -24,6 +28,7 @@ const SignUpPage = () => {
   const [userEmail, setUserEmail] = useState<string>('');
   const { mutate: signUpUser, isPending: isSignUpPending } = useSignUpApi();
   const { mutate: verifyOtp, isPending: isVerifyPending } = useSignUpVerifyApi();
+  const { mutate: resendOtp, isPending: isResendOtpPending } = useResendSignUpOtp();
 
   const setLoading = useLoadingStore((state) => state.setLoading);
 
@@ -58,9 +63,9 @@ const SignUpPage = () => {
         setLoading(false);
         nextStep();
       },
-      onError: (err) => {
+      onError: (err: any) => {
         console.error(err);
-        toast.error('Sign up failed!');
+        toast.error(err.response.data.message);
       },
     });
   };
@@ -71,15 +76,25 @@ const SignUpPage = () => {
         setLoading(false);
         nextStep();
       },
-      onError: (err) => {
+      onError: (err: any) => {
         console.error(err);
-        toast.error('Verify failed!');
+        toast.error(err.response.data.message);
       },
     });
   };
 
-  const handleResendOtp = (resetTimer: () => void) => {
+  const handleResendOtp = (resetTimer: () => void, resend_information: ResendSignUpOtpSchemaType) => {
     resetTimer();
+    resendOtp(resend_information, {
+      onSuccess: (res) => {
+        setLoading(false);
+        toast.success(res.message)
+      },
+      onError: (err: any) => {
+        console.error(err);
+        toast.error(err.response.data.error);
+      },
+    });
   };
 
   useEffect(() => {

@@ -129,9 +129,18 @@ export const discardCurrentOrderItem = async (req, res) => {
       where: {
         user_id: currentUser.user_id,
         order_date: currentDate,
-        cancel_yn: {
-          [Op.not]: orderItemCancelStatus.cancel,
-        },
+        [Op.or]: [
+          {
+            cancel_yn: {
+              [Op.not]: orderItemCancelStatus.cancel,
+            },
+          },
+          {
+            cancel_yn: {
+              [Op.is]: null,
+            },
+          },
+        ],
       },
     });
 
@@ -191,7 +200,18 @@ export const getOrderListSummary = async (req, res) => {
   try {
     let condition = {
       order_date: date,
-      cancel_yn: { [Op.not]: orderItemCancelStatus.cancel },
+      [Op.or]: [
+        {
+          cancel_yn: {
+            [Op.not]: orderItemCancelStatus.cancel,
+          },
+        },
+        {
+          cancel_yn: {
+            [Op.is]: null,
+          },
+        },
+      ],
     };
     if (Number(role_id) === Number(UserRole.restaurant)) {
       condition.restaurant_id = user_id;
@@ -279,13 +299,13 @@ export const getOrderHistory = async (req, res) => {
   try {
     const { from, to } = req.query;
     const currentUser = req.user;
-    const {user_id, role_id} = currentUser;
+    const { user_id, role_id } = currentUser;
     const select = `SELECT o.order_id, o.branch_id, o.restaurant_id, o.order_date, o.total_amount, u.username as restaurant_name, p.address as restaurant_address, p.profile_picture_url as restaurant_image_url 
     FROM order_db.order_history o JOIN user_db.users u ON o.restaurant_id = u.user_id LEFT JOIN user_db.user_profiles p ON p.user_id = o.restaurant_id`;
 
     let where = "WHERE order_date between :from AND :to";
 
-    if(Number(role_id) === Number(UserRole.restaurant)) {
+    if (Number(role_id) === Number(UserRole.restaurant)) {
       where += " AND restaurant_id = :user_id";
     }
 
@@ -328,9 +348,18 @@ export const getCurrentOrder = async (req, res) => {
       where: {
         user_id: currentUser.user_id,
         order_date: currentDate,
-        cancel_yn: {
-          [Op.not]: orderItemCancelStatus.cancel,
-        },
+        [Op.or]: [
+          {
+            cancel_yn: {
+              [Op.not]: orderItemCancelStatus.cancel,
+            },
+          },
+          {
+            cancel_yn: {
+              [Op.is]: null,
+            },
+          },
+        ],
       },
       raw: true,
     });

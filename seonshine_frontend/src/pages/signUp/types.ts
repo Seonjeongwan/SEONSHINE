@@ -1,5 +1,10 @@
 import { RoleEnum } from '@/types/user';
-import { SignUpSchemaType, SignUpVerifySchemaType } from './components/ProfileRegistration/schema';
+
+import {
+  ResendSignUpOtpSchemaType,
+  SignUpSchemaType,
+  SignUpVerifySchemaType,
+} from './components/ProfileRegistration/schema';
 
 export type SignUpStepsType = 'select_user_type' | 'enter_user_information' | 'verify_otp' | 'pending_approval';
 
@@ -18,7 +23,7 @@ export type AccountVerificationPageProps = {
   title?: string;
   description?: string;
   secondsCountdown: number;
-  handleResendOtp: (resetTimer: () => void) => void;
+  handleResendOtp: (resetTimer: () => void, resend_information: ResendSignUpOtpSchemaType) => void;
   className?: string;
   size?: 'small' | 'normal';
 };
