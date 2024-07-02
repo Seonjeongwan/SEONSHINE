@@ -1,6 +1,6 @@
 import { CSSProperties } from 'react';
 
-import { TypographyVariantsOptions } from '@mui/material/styles';
+import { createTheme, TypographyVariantsOptions } from '@mui/material/styles';
 
 type PartialRecord<K extends string | number | symbol, T> = { [P in K]?: T };
 
@@ -25,6 +25,8 @@ const fontWeightValue = {
   DemiLight: 350,
 };
 
+const tempTheme = createTheme();
+
 export const customTypographyVariants: TypographyVariantsOptions = {
   heading1: {
     fontSize: '64px',
@@ -37,6 +39,9 @@ export const customTypographyVariants: TypographyVariantsOptions = {
     fontSize: '42px',
     fontWeight: fontWeightValue.Bold,
     lineHeight: '46px',
+    [tempTheme.breakpoints.down('sm')]: {
+      fontSize: '36px',
+    },
   },
   heading3: {
     fontSize: '24px',

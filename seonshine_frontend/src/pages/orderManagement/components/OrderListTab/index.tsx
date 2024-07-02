@@ -41,7 +41,7 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
     defaultValues: { date: orderDate ? orderDate : today },
   });
 
-  const { currentPage, handleSortingChange } = useTable({
+  const { currentPage, handleSortingChange, sortKey, sortType } = useTable({
     initPageSize: ITEMS_PER_PAGE,
     initSortKey: 'item_name',
   });
@@ -60,25 +60,49 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
 
   const columns = viewMode === 'summary' ? OrderListRestaurantTableHeader : OrderListTableHeader;
 
-  const data: OrderListType[] = useMemo(() => {
-    if (viewMode === 'summary' && orderListSummary) {
-      return orderListSummary.data.map((order) => ({
+  const getOrderSummaryData = () => {
+    return (
+      orderListSummary?.data.map((order) => ({
         ordered_items: order.item_name,
         amount: order.count,
-      }));
-    }
+      })) || []
+    );
+  };
 
-    if (viewMode === 'detail' && orderListDetail) {
-      return orderListDetail.data.map((order) => ({
+  const getOrderDetailData = () => {
+    return (
+      orderListDetail?.data.map((order) => ({
         restaurant_name: order.restaurant_name,
         employee_name: order.username,
         ordered_items: order.item_name,
         date: order.submitted_time,
-      }));
-    }
+      })) || []
+    );
+  };
 
-    return [];
-  }, [viewMode, orderListSummary, orderListDetail]);
+  const sortData = (data: OrderListType[]) => {
+    return data.sort((a, b) => {
+      const aValue = a[sortKey as keyof OrderListType];
+      const bValue = b[sortKey as keyof OrderListType];
+
+      if (aValue === undefined || bValue === undefined) {
+        return 0;
+      }
+
+      if (aValue < bValue) {
+        return sortType === 'asc' ? -1 : 1;
+      } else if (aValue > bValue) {
+        return sortType === 'asc' ? 1 : -1;
+      } else {
+        return 0;
+      }
+    });
+  };
+
+  const data: OrderListType[] = useMemo(() => {
+    const data: OrderListType[] = viewMode === 'summary' ? getOrderSummaryData() : getOrderDetailData();
+    return sortData(data);
+  }, [viewMode, orderListSummary, orderListDetail, sortKey, sortType]);
 
   const onChangeViewMode = (event: React.MouseEvent<HTMLElement>, newAlignment: ViewModeType) => {
     setViewMode(newAlignment);
@@ -89,7 +113,10 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
       direction="column"
       className="w-full lg:w-240"
     >
-      <Stack justifyContent="space-between">
+      <Stack
+        justifyContent="space-between"
+        gap={4}
+      >
         <DatePicker<DateSchemaType>
           name="date"
           control={control}
@@ -100,7 +127,7 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
             exclusive
             onChange={onChangeViewMode}
             aria-label="view mode"
-            className="bg-white "
+            className="bg-white"
           >
             <ToggleButton
               value="summary"
@@ -131,6 +158,7 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
       <Stack
         className="my-8"
         justifyContent="space-between"
+        alignItems="center"
       >
         <Typography
           component="h4"

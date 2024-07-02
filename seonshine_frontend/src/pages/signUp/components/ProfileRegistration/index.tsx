@@ -116,8 +116,8 @@ const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInf
                       type={showPassword ? 'text' : 'password'}
                       endAdornment={
                         <IconButton
-                          onMouseDown={handleClickShowPassword}
-                          onMouseUp={handleClickShowPassword}
+                          onPointerUp={handleClickShowPassword}
+                          onPointerDown={handleClickShowPassword}
                         >
                           {showPassword ? <Visibility /> : <VisibilityOff />}
                         </IconButton>
