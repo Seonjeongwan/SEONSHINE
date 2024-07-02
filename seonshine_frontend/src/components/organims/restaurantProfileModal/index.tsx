@@ -66,7 +66,7 @@ const fields = [
 ];
 
 const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onClose }) => {
-  const { data: restaurant, isLoading } = useGetRestaurantDetailApi({ restaurant_id: userId });
+  const { data: restaurant, isLoading } = useGetRestaurantDetailApi({ params: { restaurant_id: userId } });
 
   const { mutate: changeUserAvatar } = useChangeUserAvatarApi(userId);
 

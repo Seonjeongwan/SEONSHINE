@@ -100,12 +100,19 @@ export const useGetRestaurantListApi = (
   });
 };
 
-export const useGetUserDetailApi = (params: GetUserDetailApiPropsType): UseQueryResult<GetUserDetailResponseType> => {
+export const useGetUserDetailApi = ({
+  params,
+  enabled = true,
+}: {
+  params: GetUserDetailApiPropsType;
+  enabled?: boolean;
+}): UseQueryResult<GetUserDetailResponseType> => {
   return useQuery({
     queryKey: ['getUserDetail', params],
     queryFn: async () => {
       return getUserDetail(params);
     },
+    enabled,
   });
 };
 
@@ -119,14 +126,19 @@ export const useChangeUserAvatarApi = (
   });
 };
 
-export const useGetRestaurantDetailApi = (
-  params: GetRestaurantDetailApiPropsType,
-): UseQueryResult<GetRestaurantDetailResponseType> => {
+export const useGetRestaurantDetailApi = ({
+  params,
+  enabled = true,
+}: {
+  params: GetRestaurantDetailApiPropsType;
+  enabled?: boolean;
+}): UseQueryResult<GetRestaurantDetailResponseType> => {
   return useQuery({
     queryKey: ['getRestaurantDetail', params],
     queryFn: async () => {
       return getRestaurantDetail(params);
     },
+    enabled,
   });
 };
 

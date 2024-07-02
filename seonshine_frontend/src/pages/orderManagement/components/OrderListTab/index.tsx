@@ -61,37 +61,48 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
   const columns = viewMode === 'summary' ? OrderListRestaurantTableHeader : OrderListTableHeader;
 
   const data: OrderListType[] = useMemo(() => {
-    let data: OrderListType[] = [];
-    if (viewMode === 'summary' && orderListSummary) {
-      data = orderListSummary.data.map((order) => ({
-        ordered_items: order.item_name,
-        amount: order.count,
-      }));
-    } else if (viewMode === 'detail' && orderListDetail) {
-      data = orderListDetail.data.map((order) => ({
-        restaurant_name: order.restaurant_name,
-        employee_name: order.username,
-        ordered_items: order.item_name,
-        date: order.submitted_time,
-      }));
-    }
+    const getOrderSummaryData = () => {
+      return (
+        orderListSummary?.data.map((order) => ({
+          ordered_items: order.item_name,
+          amount: order.count,
+        })) || []
+      );
+    };
 
-    return data.sort((a, b) => {
-      const aValue = a[sortKey as keyof OrderListType];
-      const bValue = b[sortKey as keyof OrderListType];
+    const getOrderDetailData = () => {
+      return (
+        orderListDetail?.data.map((order) => ({
+          restaurant_name: order.restaurant_name,
+          employee_name: order.username,
+          ordered_items: order.item_name,
+          date: order.submitted_time,
+        })) || []
+      );
+    };
 
-      if (aValue === undefined || bValue === undefined) {
-        return 0;
-      }
+    const sortData = (data: OrderListType[]) => {
+      return data.sort((a, b) => {
+        const aValue = a[sortKey as keyof OrderListType];
+        const bValue = b[sortKey as keyof OrderListType];
 
-      if (aValue < bValue) {
-        return sortType === 'asc' ? -1 : 1;
-      } else if (aValue > bValue) {
-        return sortType === 'asc' ? 1 : -1;
-      } else {
-        return 0;
-      }
-    });
+        if (aValue === undefined || bValue === undefined) {
+          return 0;
+        }
+
+        if (aValue < bValue) {
+          return sortType === 'asc' ? -1 : 1;
+        } else if (aValue > bValue) {
+          return sortType === 'asc' ? 1 : -1;
+        } else {
+          return 0;
+        }
+      });
+    };
+
+    const data: OrderListType[] = viewMode === 'summary' ? getOrderSummaryData() : getOrderDetailData();
+
+    return sortData(data);
   }, [viewMode, orderListSummary, orderListDetail, sortKey, sortType]);
 
   const onChangeViewMode = (event: React.MouseEvent<HTMLElement>, newAlignment: ViewModeType) => {
@@ -103,7 +114,10 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
       direction="column"
       className="w-full lg:w-240"
     >
-      <Stack justifyContent="space-between">
+      <Stack
+        justifyContent="space-between"
+        gap={4}
+      >
         <DatePicker<DateSchemaType>
           name="date"
           control={control}
@@ -114,7 +128,7 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
             exclusive
             onChange={onChangeViewMode}
             aria-label="view mode"
-            className="bg-white "
+            className="bg-white"
           >
             <ToggleButton
               value="summary"
@@ -145,6 +159,7 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
       <Stack
         className="my-8"
         justifyContent="space-between"
+        alignItems="center"
       >
         <Typography
           component="h4"
