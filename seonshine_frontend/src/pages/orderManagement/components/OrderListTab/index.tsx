@@ -60,48 +60,47 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
 
   const columns = viewMode === 'summary' ? OrderListRestaurantTableHeader : OrderListTableHeader;
 
+  const getOrderSummaryData = () => {
+    return (
+      orderListSummary?.data.map((order) => ({
+        ordered_items: order.item_name,
+        amount: order.count,
+      })) || []
+    );
+  };
+
+  const getOrderDetailData = () => {
+    return (
+      orderListDetail?.data.map((order) => ({
+        restaurant_name: order.restaurant_name,
+        employee_name: order.username,
+        ordered_items: order.item_name,
+        date: order.submitted_time,
+      })) || []
+    );
+  };
+
+  const sortData = (data: OrderListType[]) => {
+    return data.sort((a, b) => {
+      const aValue = a[sortKey as keyof OrderListType];
+      const bValue = b[sortKey as keyof OrderListType];
+
+      if (aValue === undefined || bValue === undefined) {
+        return 0;
+      }
+
+      if (aValue < bValue) {
+        return sortType === 'asc' ? -1 : 1;
+      } else if (aValue > bValue) {
+        return sortType === 'asc' ? 1 : -1;
+      } else {
+        return 0;
+      }
+    });
+  };
+
   const data: OrderListType[] = useMemo(() => {
-    const getOrderSummaryData = () => {
-      return (
-        orderListSummary?.data.map((order) => ({
-          ordered_items: order.item_name,
-          amount: order.count,
-        })) || []
-      );
-    };
-
-    const getOrderDetailData = () => {
-      return (
-        orderListDetail?.data.map((order) => ({
-          restaurant_name: order.restaurant_name,
-          employee_name: order.username,
-          ordered_items: order.item_name,
-          date: order.submitted_time,
-        })) || []
-      );
-    };
-
-    const sortData = (data: OrderListType[]) => {
-      return data.sort((a, b) => {
-        const aValue = a[sortKey as keyof OrderListType];
-        const bValue = b[sortKey as keyof OrderListType];
-
-        if (aValue === undefined || bValue === undefined) {
-          return 0;
-        }
-
-        if (aValue < bValue) {
-          return sortType === 'asc' ? -1 : 1;
-        } else if (aValue > bValue) {
-          return sortType === 'asc' ? 1 : -1;
-        } else {
-          return 0;
-        }
-      });
-    };
-
     const data: OrderListType[] = viewMode === 'summary' ? getOrderSummaryData() : getOrderDetailData();
-
     return sortData(data);
   }, [viewMode, orderListSummary, orderListDetail, sortKey, sortType]);
 
