@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Slider from 'react-slick';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { RestaurantRounded } from '@mui/icons-material';
 import { Box, Stack } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
@@ -17,8 +18,8 @@ import useTable from '@/hooks/useTable';
 import { OrderListType } from '@/types/order';
 import { RoleEnum } from '@/types/user';
 
-import { useGetOrderListDetailApi } from '@/apis/hooks/orderListApi.hook';
-import { useGetDashBoardSummary, useGetMenuListlApi, useGetTodayMenuListApi } from '@/apis/hooks/userApi.hook';
+import { useGetOrderListDetailApi, useGetOrderPeriodApi } from '@/apis/hooks/orderListApi.hook';
+import { useGetDashBoardSummary, useGetTodayMenuListApi } from '@/apis/hooks/userApi.hook';
 import useAuthStore from '@/store/auth.store';
 
 import { DateSchema, DateSchemaType } from '../orderManagement/components/OrderListTab/schema';
@@ -64,10 +65,6 @@ const Dashboard = () => {
     defaultValues: { date: today },
   });
 
-  const { currentPage, sortKey, sortType, pageSize, handlePageChange, handleSortingChange } = useTable({
-    initPageSize: ITEMS_PER_PAGE,
-    initSortKey: 'item_name',
-  });
   const watchedDate = watch('date');
 
   const { data: orderList, isFetching } = useGetOrderListDetailApi({
@@ -86,6 +83,7 @@ const Dashboard = () => {
 
   const { data: todayMenuList } = useGetTodayMenuListApi({ enabled: true });
   const { data: dashboardSummary } = useGetDashBoardSummary({ enabled: true });
+  const { data: orderPeriod } = useGetOrderPeriodApi();
 
   const navigate = useNavigate();
   const handleNavigate = () => {
@@ -93,25 +91,90 @@ const Dashboard = () => {
       currentUser?.role_id === RoleEnum.USER ? navigate('/order-menu', { state: { tab: 1 } }) : navigate('/order');
     }
   };
+
+  const isOrderEnabled = () => {
+    if (!orderPeriod) return false;
+    const { startHour, startMinute, endHour, endMinute } = orderPeriod;
+
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    return (
+      (currentHour > startHour || (currentHour === startHour && currentMinute >= startMinute)) &&
+      (currentHour < endHour || (currentHour === endHour && currentMinute <= endMinute))
+    );
+  };
+
+  const dayMapper = (dayNumber: number) => {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    return days[dayNumber];
+  };
+
+  const renderAdminBoxes = () => (
+    <>
+      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+        <Stack className="flex-grow">Today's Restaurant</Stack>
+        <Stack className="font-bold text-2xl">{dashboardSummary?.today_restaurant_name}</Stack>
+      </Box>
+      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+        <Stack className="flex-grow">Ordered Users</Stack>
+        <Stack className="self-end font-bold text-2xl">{dashboardSummary?.ordered_users_count}</Stack>
+      </Box>
+      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+        <Stack className="flex-grow">Active Users</Stack>
+        <Stack className="self-end font-bold text-2xl">{dashboardSummary?.active_users_count}</Stack>
+      </Box>
+      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+        <Stack className="flex-grow">Waiting for Approval</Stack>
+        <Stack className="self-end font-bold text-2xl">{dashboardSummary?.waiting_approval_users_count}</Stack>
+      </Box>
+    </>
+  );
+
+  const renderUserBoxes = () => (
+    <>
+      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+        <Stack className="flex-grow">Today's Restaurant</Stack>
+        <Stack className="font-bold text-2xl">{dashboardSummary?.today_restaurant_name}</Stack>
+      </Box>
+      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+        <Stack className="flex-grow">Order Status</Stack>
+        <Stack className="self-end font-bold text-2xl">
+          {dashboardSummary?.current_order_status == 1 ? 'Ordered' : 'Not Ordered'}
+        </Stack>
+      </Box>
+      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+        <Stack className="flex-grow">Ordered Item</Stack>
+        <Stack className="self-end font-bold text-2xl">{dashboardSummary?.current_order_item_name}</Stack>
+      </Box>
+      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+        <Stack className="flex-grow">Ordered Users</Stack>
+        <Stack className="self-end font-bold text-2xl">{dashboardSummary?.today_order_users_count}</Stack>
+      </Box>
+    </>
+  );
+
+  const renderRestaurantBoxes = () => (
+    <>
+      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+        <Stack className="flex-grow">Assigned Date</Stack>
+        <Stack className="font-bold text-2xl">
+          {dashboardSummary?.assigned_weekdays?.map((day) => dayMapper(day)).join(', ')}
+        </Stack>
+      </Box>
+      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+        <Stack className="flex-grow">Order Status</Stack>
+        <Stack className="self-end font-bold text-2xl">{isOrderEnabled() ? 'Waiting' : 'Ordered'}</Stack>
+      </Box>
+    </>
+  );
+
   return (
     <Box className="px-4 py-2 md:px-8 md:py-4">
       <Stack className="flex flex-wrap md:flex-nowrap gap-4 md:gap-6">
-        <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
-          <Stack className="flex-grow">Today's Restaurant</Stack>
-          <Stack className="font-bold text-2xl">{dashboardSummary?.today_restaurant_name}</Stack>
-        </Box>
-        <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
-          <Stack className="flex-grow">Ordered Users</Stack>
-          <Stack className="self-end font-bold text-2xl">{dashboardSummary?.ordered_users_count}</Stack>
-        </Box>
-        <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
-          <Stack className="flex-grow">Active Users</Stack>
-          <Stack className="self-end font-bold text-2xl">{dashboardSummary?.active_users_count}</Stack>
-        </Box>
-        <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
-          <Stack className="flex-grow">Waiting for Approval</Stack>
-          <Stack className="self-end font-bold text-2xl">{dashboardSummary?.waiting_approval_users_count}</Stack>
-        </Box>
+        {currentUser?.role_id === RoleEnum.ADMIN && renderAdminBoxes()}
+        {currentUser?.role_id === RoleEnum.USER && renderUserBoxes()}
+        {currentUser?.role_id === RoleEnum.RESTAURANT && renderRestaurantBoxes()}
       </Stack>
       <Stack className="mt-6 w-full">
         <Box className="w-full">
@@ -136,17 +199,30 @@ const Dashboard = () => {
               },
             }}
           >
-            <Slider {...settings}>
+            <Slider
+              {...settings}
+              
+            >
               {todayMenuList?.menu_list.map((dish, index) => (
                 <Box
                   key={index}
                   className="p-2 md:p-4 outline-none"
                 >
-                  <img
-                    src={`${avatarBaseURL}${dish.image_url}`}
-                    alt={dish.name}
-                    className="w-full h-32 md:h-40 object-cover rounded-md"
-                  />
+                  {dish.image_url ? (
+                    <img
+                      src={`${avatarBaseURL}${dish.image_url}`}
+                      alt={dish.name}
+                      className="w-full h-32 md:h-40 object-cover rounded-md"
+                    />
+                  ) : (
+                    <Stack className="w-full h-32 md:h-40 items-center bg-gray-200">
+                      <RestaurantRounded
+                        className="w-full h-1/2 opacity-30"
+                        fontSize="large"
+                      />
+                    </Stack>
+                  )}
+
                   <h3 className="text-left mt-2">{dish.name}</h3>
                 </Box>
               ))}
