@@ -200,20 +200,18 @@ export const getOrderListSummary = async (req, res) => {
   try {
     let condition = {
       order_date: date,
-      cancel_yn: {
-        [Op.or]: [
-          {
-            cancel_yn: {
-              [Op.not]: orderItemCancelStatus.cancel,
-            },
+      [Op.or]: [
+        {
+          cancel_yn: {
+            [Op.not]: orderItemCancelStatus.cancel,
           },
-          {
-            cancel_yn: {
-              [Op.is]: null,
-            },
+        },
+        {
+          cancel_yn: {
+            [Op.is]: null,
           },
-        ],
-      },
+        },
+      ],
     };
     if (Number(role_id) === Number(UserRole.restaurant)) {
       condition.restaurant_id = user_id;
