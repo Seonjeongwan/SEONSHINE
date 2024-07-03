@@ -83,7 +83,7 @@ const ApprovalTab = () => {
       <Typography
         variant="heading4"
         component="h3"
-        className="my-8"
+        className="my-4"
       >
         Waiting for Approval
       </Typography>

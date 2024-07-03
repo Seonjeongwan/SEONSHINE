@@ -36,11 +36,11 @@ export const customTypographyVariants: TypographyVariantsOptions = {
     textTransform: 'uppercase',
   },
   heading2: {
-    fontSize: '42px',
+    fontSize: '36px',
     fontWeight: fontWeightValue.Bold,
     lineHeight: '46px',
     [tempTheme.breakpoints.down('sm')]: {
-      fontSize: '36px',
+      fontSize: '32px',
     },
   },
   heading3: {

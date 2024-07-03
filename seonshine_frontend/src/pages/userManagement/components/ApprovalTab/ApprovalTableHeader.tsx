@@ -63,17 +63,20 @@ export const ApprovalTableHeader = (handleAction: (userId: string) => void): Cus
           }}
           sx={({ palette }) => ({
             backgroundColor: palette.green[300],
-            fontSize: '13px',
+            fontSize: '14px',
             fontWeight: 400,
+            padding: '6px',
             width: {
               xs: '80%',
               md: '50%',
               xl: '40%',
             },
+            minWidth: 'min-content',
             borderRadius: '30px',
             boxShadow: 'none',
             ':hover': {
-              backgroundColor: palette.green[300],
+              backgroundColor: palette.green[500],
+              boxShadow: 'none',
             },
           })}
         >
