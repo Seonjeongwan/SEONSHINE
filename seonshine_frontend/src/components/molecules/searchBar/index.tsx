@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { FormEvent, useState } from 'react';
 
 import SearchIcon from '@mui/icons-material/Search';
 import {
   Button,
   FormControl,
+  Grid,
   InputAdornment,
   MenuItem,
   Select,
   SelectChangeEvent,
-  Stack,
   TextField,
 } from '@mui/material';
 
@@ -20,7 +20,13 @@ interface SearchBarProps {
   searchPlaceHolder?: string;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onSearch, options, optionDefault, valueDefault, searchPlaceHolder }) => {
+const SearchBar: React.FC<SearchBarProps> = ({
+  onSearch,
+  options,
+  optionDefault,
+  valueDefault,
+  searchPlaceHolder = 'Search for user',
+}) => {
   const [field, setField] = useState<string>(optionDefault);
   const [query, setQuery] = useState<string>(valueDefault || '');
 
@@ -32,82 +38,118 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, options, optionDefault,
     setQuery(event.target.value);
   };
 
-  const handleSearch = () => {
+  const onSubmitForm = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     onSearch(field, query);
   };
 
   return (
-    <Stack className="flex items-center gap-6 md:gap-8 h-12 md:h-14">
-      <FormControl
-        variant="outlined"
-        className="w-1/4 md:w-1/6 lg:w-1/12 h-full"
+    <form
+      className="w-full lg:w-3/5"
+      onSubmit={onSubmitForm}
+    >
+      <Grid
+        container
+        spacing={3}
+        alignItems="center"
       >
-        <Select
-          defaultValue={optionDefault}
-          displayEmpty
-          inputProps={{ 'aria-label': 'Without label' }}
-          value={field}
-          onChange={handleFieldChange}
-          size="small"
-          className="rounded-xl bg-white font-bold h-full"
-          sx={{
-            '& .MuiSelect-select': {
-              display: 'flex',
-              alignItems: 'center',
-            },
-            '& .MuiOutlinedInput-notchedOutline': {
-              border: 'none',
-            },
-          }}
+        <Grid
+          item
+          xs={5}
+          sm={3}
+          className="h-14"
         >
-          {options.map((option) => (
-            <MenuItem
-              key={option.value}
-              value={option.value}
+          <FormControl
+            variant="outlined"
+            fullWidth
+            className="bg-white rounded-xl h-full"
+          >
+            <Select
+              defaultValue={optionDefault}
+              displayEmpty
+              inputProps={{ 'aria-label': 'Without label' }}
+              value={field}
+              onChange={handleFieldChange}
+              size="small"
+              sx={{
+                height: '100%',
+                '& .MuiSelect-select': {
+                  display: 'flex',
+                  alignItems: 'center',
+                  minWidth: '70px',
+                  fontSize: '14px',
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  border: 'none',
+                },
+              }}
             >
-              {option.label}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <Stack className="w-1/2 md:w-2/3 lg:w-5/6 h-full">
-        <TextField
-          defaultValue={valueDefault}
-          value={query}
-          placeholder="Search for user"
-          onChange={handleQueryChange}
-          variant="outlined"
-          className="bg-white rounded-full h-full w-full"
-          sx={{
-            '& .MuiOutlinedInput-root': {
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              '& fieldset': {
-                border: 'none',
-              },
-            },
-          }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </Stack>
-      <Stack className="w-1/4 md:w-1/6 lg:w-1/12 h-full">
-        <Button
-          variant="outlined"
-          color="primary"
-          onClick={handleSearch}
-          className="font-bold text-black-500 rounded-full bg-black-200 hover:bg-black-300 border-none hover:border-none h-full w-full text-base"
+              {options.map((option) => (
+                <MenuItem
+                  key={option.value}
+                  value={option.value}
+                >
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid
+          item
+          xs={7}
+          className="h-14"
         >
-          Search
-        </Button>
-      </Stack>
-    </Stack>
+          <TextField
+            defaultValue={valueDefault}
+            value={query}
+            placeholder={searchPlaceHolder}
+            onChange={handleQueryChange}
+            variant="outlined"
+            fullWidth
+            className="bg-white rounded-full h-full"
+            sx={{
+              height: '100%',
+              '& .MuiOutlinedInput-root': {
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                '& fieldset': {
+                  border: 'none',
+                },
+                '& .MuiInputBase-input': {
+                  paddingBlock: '14px',
+                  fontSize: '14px',
+                },
+              },
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ fontSize: '28px' }} />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+        <Grid
+          item
+          xs={3}
+          sm={2}
+          className="h-14"
+        >
+          <Button
+            variant="outlined"
+            color="primary"
+            type="submit"
+            fullWidth
+            className="font-bold text-black-500 rounded-full bg-black-200 hover:bg-black-300 hover:text-white border-none hover:border-none h-full px-6"
+          >
+            Search
+          </Button>
+        </Grid>
+      </Grid>
+    </form>
   );
 };
 

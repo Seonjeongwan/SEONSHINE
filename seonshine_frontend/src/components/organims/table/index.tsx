@@ -36,7 +36,7 @@ const Table = <T extends object>({
   data,
   columns,
   isFetching = false,
-  skeletonHeight = 28,
+  skeletonHeight = 10,
   pageCount,
   currentPage,
   onPageChange,
@@ -46,13 +46,13 @@ const Table = <T extends object>({
   size = 'normal',
 }: UserTableProps<T>) => {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [tableData, setTableData] = useState<T[]>([]);
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
-  const memoizedData = useMemo(() => data, [data]);
   const memoizedColumns = useMemo(() => columns, [columns]);
 
   const { getHeaderGroups, getRowModel, getAllColumns } = useReactTable<T>({
-    data: memoizedData,
+    data: tableData,
     columns: memoizedColumns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
@@ -66,12 +66,21 @@ const Table = <T extends object>({
     },
   });
 
+  const noDataFound = !isFetching && (!tableData || tableData.length === 0);
+
+  const showSkeleton = isFetching && (!tableData || tableData.length === 0);
+
   const columnCount = getAllColumns().length;
-  const noDataFound = !isFetching && (!memoizedData || memoizedData.length === 0);
 
   const handlePageChange = (event: ChangeEvent<unknown>, newPage: number) => {
     onPageChange?.(newPage);
   };
+
+  useEffect(() => {
+    if (!isFetching) {
+      setTableData(data);
+    }
+  }, [data, isFetching]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -92,56 +101,85 @@ const Table = <T extends object>({
   }, []);
 
   return (
-    <Box className=" bg-white px-4 pb-4">
+    <Box className="bg-white px-4 pb-4">
       <TableContainer
         ref={tableContainerRef}
         className="overflow-auto"
       >
         <MuiTable stickyHeader>
-          <TableHead>
-            {getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableCell
-                    key={header.id}
-                    className={`font-bold text-md border-black-300 px-2 ${size === 'normal' ? 'py-5' : 'py-3'} whitespace-nowrap`}
-                    sx={{ textAlign: (header.column.columnDef as CustomColumnDef<T>).align || 'left' }}
-                    onClick={() => header.column.getCanSort() && header.column.toggleSorting()}
-                  >
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                    {{
-                      asc: <ArrowUpward className="h-4 w-4 ml-1" />,
-                      desc: <ArrowDownward className="h-4 w-4 ml-1" />,
-                    }[header.column.getIsSorted() as string] ?? null}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableHead>
+          {!showSkeleton && (
+            <TableHead>
+              {getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableCell
+                      key={header.id}
+                      className={`font-bold text-md border-black-300 px-2 ${size === 'normal' ? 'py-5' : 'py-3'} ${
+                        header.column.getCanSort() ? 'cursor-pointer' : ''
+                      } whitespace-nowrap group`}
+                      sx={{
+                        textAlign: (header.column.columnDef as CustomColumnDef<T>).align || 'left',
+                      }}
+                      onClick={() => header.column.getCanSort() && header.column.toggleSorting()}
+                    >
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                      {header.column.getCanSort() && (
+                        <span className="ml-1">
+                          {{
+                            asc: <ArrowUpward className="h-4 w-4" />,
+                            desc: <ArrowDownward className="h-4 w-4" />,
+                          }[header.column.getIsSorted() as string] ?? (
+                            <ArrowUpward className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          )}
+                        </span>
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHead>
+          )}
+
           <TableBody>
-            {!isFetching
-              ? getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    onClick={() => onClickRow?.(row.original)}
-                    className="hover:bg-black-100"
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        className={`text-black-500 text-md border-0 px-2 ${size === 'normal' ? 'py-1' : 'py-0'} whitespace-nowrap`}
-                        sx={{ textAlign: (cell.column.columnDef as CustomColumnDef<T>).align || 'left' }}
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              : Array.from({ length: data.length || 4 }, (_, i) => (
+            {showSkeleton
+              ? Array.from({ length: 5 }, (_, i) => (
                   <TableRow key={i}>
                     {Array.from({ length: columnCount }, (_, j) => (
                       <TableCell key={j}>
                         <Skeleton height={skeletonHeight} />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              : getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    onClick={() => onClickRow?.(row.original)}
+                    className="hover:bg-black-100 relative"
+                  >
+                    {row.getVisibleCells().map((cell, cellIndex) => (
+                      <TableCell
+                        key={cell.id}
+                        className={`text-black-500 text-md border-0 px-2 ${size === 'normal' ? 'py-1' : 'py-0'} ${
+                          cellIndex === 0 ? 'pt-2' : ''
+                        } whitespace-nowrap relative`}
+                        sx={{ textAlign: (cell.column.columnDef as CustomColumnDef<T>).align || 'left' }}
+                      >
+                        <Box className="relative">
+                          <Box
+                            className={`${isFetching ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
+                          >
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </Box>
+                          {isFetching && (
+                            <Box className="absolute inset-0 flex items-center justify-center bg-white">
+                              <Skeleton
+                                height={skeletonHeight}
+                                width="100%"
+                              />
+                            </Box>
+                          )}
+                        </Box>
                       </TableCell>
                     ))}
                   </TableRow>
