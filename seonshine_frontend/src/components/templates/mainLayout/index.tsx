@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { ArrowForwardIos } from '@mui/icons-material';
+import { Menu } from '@mui/icons-material';
 import { Box, Drawer, IconButton, Stack } from '@mui/material';
 
 import Header from '@/components/organims/header';
@@ -42,10 +42,10 @@ const MainLayout = ({ children, role }: MainLayoutPropsType) => {
         className="flex-1 overflow-hidden py-8"
       >
         <IconButton
-          className="md:hidden absolute top-1/2 -left-2 -translate-y-1/2 bg-gray-200 rounded-md w-8 h-12 opacity-50 hover:opacity-100"
+          className="md:hidden absolute top-1/2 -left-2 -translate-y-1/2 bg-gray-200 rounded-md w-12 h-14 opacity-60 hover:opacity-100"
           onClick={toggleSidebar}
         >
-          <ArrowForwardIos />
+          <Menu />
         </IconButton>
         <Header />
         <Box className="flex-1 overflow-auto scroll-smooth">{children}</Box>

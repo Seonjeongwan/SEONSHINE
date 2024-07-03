@@ -67,7 +67,7 @@ const fields: Array<{
 ];
 
 const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onClose }) => {
-  const { data: user, isLoading } = useGetUserDetailApi({ user_id: userId });
+  const { data: user, isLoading } = useGetUserDetailApi({ params: { user_id: userId } });
   const { mutate: changeUserAvatar } = useChangeUserAvatarApi(userId);
 
   const { data: branchData } = useGetBranches({ enabled: true });

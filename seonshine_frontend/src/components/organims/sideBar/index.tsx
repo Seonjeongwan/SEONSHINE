@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 
 import { Logout, Notifications } from '@mui/icons-material';
@@ -10,16 +10,36 @@ import { useAuth } from '@/hooks/useAuth';
 import { paths } from '@/routes/paths';
 import { RoleEnum } from '@/types/user';
 
+import { useGetRestaurantDetailApi, useGetUserDetailApi } from '@/apis/hooks/userApi.hook';
 import useAuthStore from '@/store/auth.store';
 
 import UserProfileModal from '../userProfileModal';
 import { iconMap } from './constants';
 import { MenuItemType, SidebarPropsType } from './types';
+import { avatarBaseURL } from '@/constants/image';
 
 const Sidebar = ({ role }: SidebarPropsType) => {
   const { logout } = useAuth();
 
   const { currentUser } = useAuthStore();
+
+  const { data: userDetail } = useGetUserDetailApi({
+    params: { user_id: currentUser?.user_id as string },
+    enabled: currentUser?.role_id !== RoleEnum.RESTAURANT,
+  });
+
+  const { data: resaurantDetail } = useGetRestaurantDetailApi({
+    params: { restaurant_id: currentUser?.user_id as string },
+    enabled: currentUser?.role_id === RoleEnum.RESTAURANT,
+  });
+
+  const avatarUrl = useMemo(
+    () =>
+      currentUser?.role_id === RoleEnum.RESTAURANT
+        ? resaurantDetail?.profile_picture_url
+        : userDetail?.profile_picture_url,
+    [userDetail, resaurantDetail],
+  );
 
   const allowedMenuItems = menuItems.filter((item) => item.permission.includes(role));
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -67,7 +87,10 @@ const Sidebar = ({ role }: SidebarPropsType) => {
           className="w-12 h-12"
           onClick={handleOpenModal}
         >
-          <Avatar className="bg-gray-200" />
+          <Avatar
+            src={!avatarUrl ? '' : `${avatarBaseURL}${avatarUrl}`}
+            className="bg-gray-200"
+          />
         </IconButton>
         {isModalOpen && (
           <UserProfileModal

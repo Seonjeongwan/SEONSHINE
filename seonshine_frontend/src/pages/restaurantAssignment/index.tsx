@@ -85,7 +85,7 @@ const RestaurantAssignment = () => {
   }, [assignedRestaurantList, allRestaurants]);
 
   return (
-    <Box className="px-4 md:px-8 mt-8 w-full lg:w-280 min-w-max">
+    <Box className="px-4 md:px-8 mt-8 w-full lg:w-280">
       <Table<AssignTableType>
         data={!assignedRestaurantList ? [] : getDataAssignTable}
         columns={columns}
