@@ -64,7 +64,7 @@ const MenuManagement = () => {
             {currentUser?.role_id == RoleEnum.ADMIN && (
               <FormControl
                 variant="outlined"
-                className="w-1/4 rounded-xl mr-4"
+                className="w-1/2 md:w-1/4 rounded-xl mr-4"
               >
                 <Select
                   displayEmpty

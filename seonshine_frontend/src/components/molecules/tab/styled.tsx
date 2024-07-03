@@ -11,7 +11,7 @@ export const StyledTabs = styled(({ children, ...props }: TabsProps) => {
 })(({ theme }) => ({
   position: 'relative',
   marginBottom: 0,
-  minHeight: '44px',
+  minHeight: '40px',
   '& .MuiTabs-indicator': {
     backgroundColor: 'transparent',
   },
@@ -34,18 +34,24 @@ export const StyledTab = styled((props: TabProps & { tabcount?: number }) => (
 ))(({ theme, tabcount }) => ({
   textTransform: 'none',
   width: `calc(100% / ${tabcount})`,
-  minHeight: '44px',
+  maxWidth: '240px',
+  minHeight: '40px',
   fontWeight: theme.typography.fontWeightBold,
-  fontSize: '16px',
+  fontSize: '14px',
   [theme.breakpoints.up('sm')]: {
-    fontSize: '20px',
+    fontSize: '16px',
   },
+  padding: '8px',
   borderTopLeftRadius: '10px',
   borderTopRightRadius: '10px',
   border: `1px solid ${theme.palette.black[200]}`,
   borderBottom: 'none',
   backgroundColor: theme.palette.grey[300],
   marginBottom: '-1px',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  display: 'block',
   '&:hover': {
     color: theme.palette.text.primary,
     backgroundColor: theme.palette.black[200],

@@ -7,6 +7,7 @@ import {
   DiscardOrderMenuItemResponseType,
   GetAllRestaurantResponseType,
   GetCurrentOrderResponseType,
+  GetDashboardSummaryResponseType,
   GetMenuListApiPropsType,
   GetMenuListResponseType,
   GetRestaurantDetailApiPropsType,
@@ -31,6 +32,7 @@ import {
   UploadImagePayloadType,
   UploadImageResponseType,
   UseGetCurrentOrderPropsType,
+  UseGetDashboardSummaryPropsType,
   UseGetRestaurantsPropsType,
   UseGetTodayMenuListPropsType,
 } from '@/types/user';
@@ -45,6 +47,7 @@ import {
   discardOrderMenuItem,
   getAllRestaurants,
   getCurrentOrder,
+  getDashboardSummary,
   getMenuList,
   getRestaurantDetail,
   getRestaurantList,
@@ -261,6 +264,18 @@ export const useGetCurrentOrder = ({
     queryKey: ['getCurrentOrder'],
     queryFn: async () => {
       return getCurrentOrder();
+    },
+    enabled,
+  });
+};
+
+export const useGetDashBoardSummary = ({
+  enabled = true,
+}: UseGetDashboardSummaryPropsType): UseQueryResult<GetDashboardSummaryResponseType> => {
+  return useQuery({
+    queryKey: ['getDashboardSummary'],
+    queryFn: async () => {
+      return getDashboardSummary();
     },
     enabled,
   });

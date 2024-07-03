@@ -244,7 +244,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
               {fields.map((field) => {
                 return isLoading || isPending ? (
                   <Skeleton
-                    height={30}
+                    height={35}
                     key={field.name}
                   />
                 ) : (

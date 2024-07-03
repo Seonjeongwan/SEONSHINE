@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useLocation } from 'react-router-dom';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormatListBulletedOutlined, SummarizeOutlined } from '@mui/icons-material';
@@ -30,10 +31,10 @@ type OrderListTabPropsType = {
 };
 
 const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
-  const [viewMode, setViewMode] = useState<ViewModeType>('summary');
-
   const { currentUser } = useAuthStore();
-
+  const location = useLocation();
+  const localState = location.state;
+  const [viewMode, setViewMode] = useState<ViewModeType>(localState?.viewMode || 'summary');
   const isAdmin = currentUser?.role_id === RoleEnum.ADMIN;
 
   const { control, watch } = useForm<DateSchemaType>({
@@ -60,53 +61,54 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
 
   const columns = viewMode === 'summary' ? OrderListRestaurantTableHeader : OrderListTableHeader;
 
+  const getOrderSummaryData = () => {
+    return (
+      orderListSummary?.data.map((order) => ({
+        ordered_items: order.item_name,
+        amount: order.count,
+      })) || []
+    );
+  };
+
+  const getOrderDetailData = () => {
+    return (
+      orderListDetail?.data.map((order) => ({
+        restaurant_name: order.restaurant_name,
+        employee_name: order.username,
+        ordered_items: order.item_name,
+        date: order.submitted_time,
+      })) || []
+    );
+  };
+
+  const sortData = (data: OrderListType[]) => {
+    return data.sort((a, b) => {
+      const aValue = a[sortKey as keyof OrderListType];
+      const bValue = b[sortKey as keyof OrderListType];
+
+      if (aValue === undefined || bValue === undefined) {
+        return 0;
+      }
+
+      if (aValue < bValue) {
+        return sortType === 'asc' ? -1 : 1;
+      } else if (aValue > bValue) {
+        return sortType === 'asc' ? 1 : -1;
+      } else {
+        return 0;
+      }
+    });
+  };
+
   const data: OrderListType[] = useMemo(() => {
-    const getOrderSummaryData = () => {
-      return (
-        orderListSummary?.data.map((order) => ({
-          ordered_items: order.item_name,
-          amount: order.count,
-        })) || []
-      );
-    };
-
-    const getOrderDetailData = () => {
-      return (
-        orderListDetail?.data.map((order) => ({
-          restaurant_name: order.restaurant_name,
-          employee_name: order.username,
-          ordered_items: order.item_name,
-          date: order.submitted_time,
-        })) || []
-      );
-    };
-
-    const sortData = (data: OrderListType[]) => {
-      return data.sort((a, b) => {
-        const aValue = a[sortKey as keyof OrderListType];
-        const bValue = b[sortKey as keyof OrderListType];
-
-        if (aValue === undefined || bValue === undefined) {
-          return 0;
-        }
-
-        if (aValue < bValue) {
-          return sortType === 'asc' ? -1 : 1;
-        } else if (aValue > bValue) {
-          return sortType === 'asc' ? 1 : -1;
-        } else {
-          return 0;
-        }
-      });
-    };
-
     const data: OrderListType[] = viewMode === 'summary' ? getOrderSummaryData() : getOrderDetailData();
-
     return sortData(data);
   }, [viewMode, orderListSummary, orderListDetail, sortKey, sortType]);
 
-  const onChangeViewMode = (event: React.MouseEvent<HTMLElement>, newAlignment: ViewModeType) => {
-    setViewMode(newAlignment);
+  const onChangeViewMode = (event: React.MouseEvent<HTMLElement>, newViewMode: ViewModeType) => {
+    if (newViewMode !== null) {
+      setViewMode(newViewMode);
+    }
   };
 
   return (
