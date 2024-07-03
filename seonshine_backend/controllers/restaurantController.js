@@ -1,5 +1,5 @@
 import { QueryTypes } from "sequelize";
-import { UserRole } from "../constants/auth.js";
+import { UserRole, UserStatus } from "../constants/auth.js";
 import { httpStatusCodes, httpStatusErrors } from "../constants/http.js";
 import { sequelizeUserDb } from "../db/dbConfig.js";
 import { User, UserProfile } from "../models/index.js";
@@ -30,7 +30,7 @@ export const getRestaurantList = async (req, res) => {
     offset: Number(offset),
     user_id: `%${user_id}%`,
     username: `%${username}%`,
-    user_status: ["1", "2", "9"],
+    user_status: [UserStatus.active, UserStatus.inactive, UserStatus.inactiveByAdmin],
   };
 
   try {
