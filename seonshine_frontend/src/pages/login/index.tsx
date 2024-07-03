@@ -91,9 +91,9 @@ const LoginPage = () => {
           handleGotoLogin={() => setIsWaiting(false)}
         />
       ) : (
-        <Stack className="w-full h-full bg-white shadow-md md:rounded-md shadow-black-100 md:w-280 md:h-200">
+        <Stack className="w-full h-full bg-white shadow-md md:rounded-2xl shadow-black-100 md:w-280 md:h-176">
           <Box className="grid w-full h-full grid-cols-1 md:grid-cols-2">
-            <Box className="hidden h-full md:flex md:items-center md:justify-center bg-gradient-to-br from-blue-500 to-yellow-500 opacity-90 z-0">
+            <Box className="hidden h-full md:flex md:items-center md:justify-center bg-gradient-to-br from-blue-500 to-yellow-500 opacity-90 z-0 rounded-es-2xl rounded-ss-2xl">
               <img
                 src={loginBanner}
                 className="w-full z-10"
