@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 
-import { Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 
 import SearchBar from '@/components/molecules/searchBar';
@@ -96,7 +96,7 @@ const UserManagementTab = () => {
       <Typography
         variant="heading4"
         component="h3"
-        className="my-8"
+        className="my-4"
       >
         User List
       </Typography>

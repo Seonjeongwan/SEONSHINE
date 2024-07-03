@@ -91,11 +91,12 @@ const RestaurantManagementTab = () => {
         onSearch={handleSearch}
         options={searchRestaurantOptions}
         optionDefault={defaultOption}
+        searchPlaceHolder="Search for restaurant"
       />
       <Typography
         variant="heading4"
         component="h3"
-        className="my-8"
+        className="my-4"
       >
         Restaurant List
       </Typography>

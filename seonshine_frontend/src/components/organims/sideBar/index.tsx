@@ -5,6 +5,7 @@ import { Logout, Notifications } from '@mui/icons-material';
 import { Avatar, Badge, Box, IconButton, Stack, Typography } from '@mui/material';
 
 import logo from '@/assets/images/logo.png';
+import { avatarBaseURL } from '@/constants/image';
 import { menuItems } from '@/constants/menu';
 import { useAuth } from '@/hooks/useAuth';
 import { paths } from '@/routes/paths';
@@ -13,12 +14,15 @@ import { RoleEnum } from '@/types/user';
 import { useGetRestaurantDetailApi, useGetUserDetailApi } from '@/apis/hooks/userApi.hook';
 import useAuthStore from '@/store/auth.store';
 
+import ConfirmModal from '../confirmModal';
 import UserProfileModal from '../userProfileModal';
 import { iconMap } from './constants';
 import { MenuItemType, SidebarPropsType } from './types';
-import { avatarBaseURL } from '@/constants/image';
 
 const Sidebar = ({ role }: SidebarPropsType) => {
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const { logout } = useAuth();
 
   const { currentUser } = useAuthStore();
@@ -42,7 +46,6 @@ const Sidebar = ({ role }: SidebarPropsType) => {
   );
 
   const allowedMenuItems = menuItems.filter((item) => item.permission.includes(role));
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOpenModal = () => role === RoleEnum.ADMIN && setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -141,13 +144,20 @@ const Sidebar = ({ role }: SidebarPropsType) => {
 
       <IconButton
         className="absolute left-8 bottom-8 p-0"
-        onClick={logout}
+        onClick={() => setIsConfirmModalOpen(true)}
       >
         <Logout
           sx={{ fontSize: 24 }}
           className="hover:opacity-70 text-black-500"
         />
       </IconButton>
+      <ConfirmModal
+        open={isConfirmModalOpen}
+        title="Log Out Confirmation"
+        description="Are you sure you want to log out?"
+        handleClose={() => setIsConfirmModalOpen(false)}
+        handleConfirm={logout}
+      />
     </Stack>
   );
 };

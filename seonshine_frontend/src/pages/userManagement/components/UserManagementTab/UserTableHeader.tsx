@@ -1,4 +1,4 @@
-import { Button } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 
 import { CustomColumnDef } from '@/types/table';
 import { labelUserStatus, UserStatusEnum, UserType } from '@/types/user';
@@ -44,7 +44,7 @@ export const UserTableHeader = (
         <Button
           variant="text"
           color="primary"
-          className="hover:bg-transparent underline"
+          className="hover:bg-transparent underline text-md p-0"
           onClick={() => handleView(user.row.original.user_id)}
         >
           View
@@ -76,22 +76,25 @@ export const UserTableHeader = (
           sx={({ palette }) => ({
             backgroundColor:
               user.row.original.user_status == UserStatusEnum.ACTIVE ? palette.red[200] : palette.blue[400],
-            fontSize: '13px',
+            fontSize: '14px',
             fontWeight: 400,
+            padding: '6px',
             width: {
               xs: '80%',
               md: '50%',
               xl: '40%',
             },
+            minWidth: 'min-content',
             borderRadius: '30px',
             boxShadow: 'none',
             ':hover': {
               backgroundColor:
-                user.row.original.user_status == UserStatusEnum.ACTIVE ? palette.red[200] : palette.blue[400],
+                user.row.original.user_status == UserStatusEnum.ACTIVE ? palette.red[500] : palette.blue[500],
+              boxShadow: 'none',
             },
           })}
         >
-          {user.row.original.user_status == UserStatusEnum.ACTIVE ? 'Deactivate' : 'Activate'}
+          {user.row.original.user_status == UserStatusEnum.ACTIVE ? 'Deactivate' : '\u00A0\u00A0Activate\u00A0\u00A0'}
         </Button>
       );
     },

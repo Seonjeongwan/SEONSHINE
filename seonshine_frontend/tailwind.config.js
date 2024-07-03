@@ -108,6 +108,7 @@ export default {
       131: '32.86rem',
       145: '36.25rem',
       171: '42.86rem',
+      176: '44rem',
       200: '50rem',
       fit: 'fit-content',
     }),
