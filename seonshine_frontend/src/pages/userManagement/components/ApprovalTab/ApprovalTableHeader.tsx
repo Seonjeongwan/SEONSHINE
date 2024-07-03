@@ -75,7 +75,7 @@ export const ApprovalTableHeader = (handleAction: (userId: string) => void): Cus
             borderRadius: '30px',
             boxShadow: 'none',
             ':hover': {
-              backgroundColor: palette.green[400],
+              backgroundColor: palette.green[500],
               boxShadow: 'none',
             },
           })}

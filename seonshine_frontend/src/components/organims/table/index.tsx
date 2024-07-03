@@ -155,14 +155,14 @@ const Table = <T extends object>({
                   <TableRow
                     key={row.id}
                     onClick={() => onClickRow?.(row.original)}
-                    className="hover:bg-black-100 relative"
+                    className="hover:bg-black-100"
                   >
                     {row.getVisibleCells().map((cell, cellIndex) => (
                       <TableCell
                         key={cell.id}
                         className={`text-black-500 text-md border-0 px-2 ${size === 'normal' ? 'py-1' : 'py-0'} ${
                           cellIndex === 0 ? 'pt-2' : ''
-                        } whitespace-nowrap relative`}
+                        } whitespace-nowrap`}
                         sx={{ textAlign: (cell.column.columnDef as CustomColumnDef<T>).align || 'left' }}
                       >
                         <Box className="relative">

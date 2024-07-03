@@ -109,7 +109,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
             fullWidth
             className="bg-white rounded-full h-full"
             sx={{
-              height: '100%',
               '& .MuiOutlinedInput-root': {
                 height: '100%',
                 display: 'flex',
