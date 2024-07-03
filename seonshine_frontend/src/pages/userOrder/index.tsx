@@ -8,6 +8,7 @@ import UserOrderListTab from './components/OrderListTab';
 import OrderHistoryTab from './components/OrderMenuTab';
 import OrderMenuTab from './components/OrderMenuTab';
 import { StyledTab, StyledTabs } from './styled';
+import { UserOrderTabEnum } from '@/types/order';
 
 type TabPanelPropsType = {
   children?: React.ReactNode;
@@ -35,7 +36,7 @@ function TabPanel(props: TabPanelPropsType) {
 const OrderManagement = () => {
   const location = useLocation();
   const localState = location.state;
-  const [value, setValue] = useState<number>(localState?.tab || 0);
+  const [value, setValue] = useState<number>(localState?.tab || UserOrderTabEnum.ORDER_MENU);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);

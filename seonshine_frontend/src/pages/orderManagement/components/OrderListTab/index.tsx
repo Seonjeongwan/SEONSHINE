@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useLocation } from 'react-router-dom';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormatListBulletedOutlined, SummarizeOutlined } from '@mui/icons-material';
@@ -30,10 +31,10 @@ type OrderListTabPropsType = {
 };
 
 const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
-  const [viewMode, setViewMode] = useState<ViewModeType>('summary');
-
   const { currentUser } = useAuthStore();
-
+  const location = useLocation();
+  const localState = location.state;
+  const [viewMode, setViewMode] = useState<ViewModeType>(localState?.viewMode || 'summary');
   const isAdmin = currentUser?.role_id === RoleEnum.ADMIN;
 
   const { control, watch } = useForm<DateSchemaType>({
@@ -80,8 +81,10 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
     return [];
   }, [viewMode, orderListSummary, orderListDetail]);
 
-  const onChangeViewMode = (event: React.MouseEvent<HTMLElement>, newAlignment: ViewModeType) => {
-    setViewMode(newAlignment);
+  const onChangeViewMode = (event: React.MouseEvent<HTMLElement>, newViewMode: ViewModeType) => {
+    if (newViewMode !== null) {
+      setViewMode(newViewMode);
+    }
   };
 
   return (

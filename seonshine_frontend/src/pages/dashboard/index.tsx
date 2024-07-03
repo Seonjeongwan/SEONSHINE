@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import Slider from 'react-slick';
@@ -13,17 +13,23 @@ import 'slick-carousel/slick/slick.css';
 
 import Table from '@/components/organims/table';
 
+import { days } from '@/constants/date';
 import { avatarBaseURL } from '@/constants/image';
 import useTable from '@/hooks/useTable';
-import { OrderListType } from '@/types/order';
+import { OrderListType, UserOrderTabEnum } from '@/types/order';
 import { RoleEnum } from '@/types/user';
 
-import { useGetOrderListDetailApi, useGetOrderPeriodApi } from '@/apis/hooks/orderListApi.hook';
+import {
+  useGetOrderListDetailApi,
+  useGetOrderListSummaryApi,
+  useGetOrderPeriodApi,
+} from '@/apis/hooks/orderListApi.hook';
 import { useGetDashBoardSummary, useGetTodayMenuListApi } from '@/apis/hooks/userApi.hook';
 import useAuthStore from '@/store/auth.store';
 
 import { DateSchema, DateSchemaType } from '../orderManagement/components/OrderListTab/schema';
 import { OrderListHeader } from './OrderListHeader';
+import { OrderListRestaurantTableHeader } from './OrderListRestaurantTableHeader';
 
 const Dashboard = () => {
   const { currentUser } = useAuthStore();
@@ -71,24 +77,43 @@ const Dashboard = () => {
     params: { date: watchedDate },
   });
 
-  const columns = OrderListHeader;
-  const data: OrderListType[] = orderList
-    ? orderList.data.map((order) => ({
+  const { data: orderListSummary } = useGetOrderListSummaryApi({
+    params: { date: watchedDate },
+  });
+
+  const columns = currentUser?.role_id === RoleEnum.RESTAURANT ? OrderListRestaurantTableHeader : OrderListHeader;
+  const data: OrderListType[] = useMemo(() => {
+    if (currentUser?.role_id === RoleEnum.RESTAURANT && orderListSummary) {
+      return orderListSummary.data.map((order) => ({
+        ordered_items: order.item_name,
+        amount: order.count,
+      }));
+    }
+
+    if ((currentUser?.role_id === RoleEnum.USER || currentUser?.role_id === RoleEnum.ADMIN) && orderList) {
+      return orderList.data.map((order) => ({
         restaurant_name: order.restaurant_name,
         employee_name: order.username,
         ordered_items: order.item_name,
         date: order.submitted_time,
-      }))
-    : [];
+      }));
+    }
+
+    return [];
+  }, [currentUser, orderListSummary, orderList]);
 
   const { data: todayMenuList } = useGetTodayMenuListApi({ enabled: true });
   const { data: dashboardSummary } = useGetDashBoardSummary({ enabled: true });
   const { data: orderPeriod } = useGetOrderPeriodApi();
 
   const navigate = useNavigate();
-  const handleNavigate = () => {
+  const handleClickViewMore = () => {
     {
-      currentUser?.role_id === RoleEnum.USER ? navigate('/order-menu', { state: { tab: 1 } }) : navigate('/order');
+      currentUser?.role_id === RoleEnum.USER
+        ? navigate('/order-menu', { state: { tab: UserOrderTabEnum.ORDER_LIST } })
+        : currentUser?.role_id === RoleEnum.RESTAURANT
+          ? navigate('/order')
+          : navigate('/order', { state: { viewMode: 'detail' } });
     }
   };
 
@@ -106,7 +131,6 @@ const Dashboard = () => {
   };
 
   const dayMapper = (dayNumber: number) => {
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
     return days[dayNumber];
   };
 
@@ -168,13 +192,16 @@ const Dashboard = () => {
       </Box>
     </>
   );
+  const renderHeaderSummaryBoxesBasedRole = (role_id: RoleEnum | undefined) => {
+    if (role_id === RoleEnum.ADMIN) return renderAdminBoxes();
+    if (role_id === RoleEnum.USER) return renderUserBoxes();
+    if (role_id === RoleEnum.RESTAURANT) return renderRestaurantBoxes();
+  };
 
   return (
     <Box className="px-4 py-2 md:px-8 md:py-4">
       <Stack className="flex flex-wrap md:flex-nowrap gap-4 md:gap-6">
-        {currentUser?.role_id === RoleEnum.ADMIN && renderAdminBoxes()}
-        {currentUser?.role_id === RoleEnum.USER && renderUserBoxes()}
-        {currentUser?.role_id === RoleEnum.RESTAURANT && renderRestaurantBoxes()}
+        {renderHeaderSummaryBoxesBasedRole(currentUser?.role_id)}
       </Stack>
       <Stack className="mt-6 w-full">
         <Box className="w-full">
@@ -199,10 +226,7 @@ const Dashboard = () => {
               },
             }}
           >
-            <Slider
-              {...settings}
-              
-            >
+            <Slider {...settings}>
               {todayMenuList?.menu_list.map((dish, index) => (
                 <Box
                   key={index}
@@ -240,7 +264,7 @@ const Dashboard = () => {
           >
             <h2 className="text-2xl font-bold">Order List</h2>
             <div
-              onClick={handleNavigate}
+              onClick={handleClickViewMore}
               className="text-blue-500 !underline cursor-pointer"
             >
               View more
