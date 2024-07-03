@@ -16,9 +16,9 @@ export const getRestaurantList = async (req, res) => {
   } = req.query;
   const offset = (page_number - 1) * page_size;
   const select =
-    "SELECT u.user_id, u.username, u.user_status, r.weekday FROM user_db.users u LEFT JOIN restaurant_db.restaurant_assigned r ON u.user_id = r.restaurant_id";
+    "SELECT u.user_id, u.username, u.user_status, GROUP_CONCAT(r.weekday ORDER BY r.weekday ASC SEPARATOR ', ') AS weekday FROM user_db.users u LEFT JOIN restaurant_db.restaurant_assigned r ON u.user_id = r.restaurant_id";
   const where =
-    "WHERE user_status IN(:user_status) AND role_id = 2 AND user_id LIKE :user_id AND username LIKE :username";
+    "WHERE user_status IN(:user_status) AND role_id = 2 AND user_id LIKE :user_id AND username LIKE :username GROUP BY user_id";
   const sorting = `ORDER BY ${sort_key} ${sort_type.toUpperCase()}`;
   const paging = "LIMIT :page_size OFFSET :offset";
   const query = `${select} ${where} ${sorting} ${paging}`;
@@ -39,11 +39,6 @@ export const getRestaurantList = async (req, res) => {
       type: QueryTypes.SELECT,
     });
 
-    const usersWithoutPassword = users.map((user) => {
-      delete user.password_hash;
-      return user;
-    });
-
     const countResult = await sequelizeUserDb.query(countQuery, {
       replacements: queryParams,
       type: QueryTypes.SELECT,
@@ -52,7 +47,7 @@ export const getRestaurantList = async (req, res) => {
     const totalRecords = countResult?.[0]?.total || 0;
 
     res.status(httpStatusCodes.success).send({
-      data: usersWithoutPassword,
+      data: users,
       page_number,
       page_size,
       sort_key,
