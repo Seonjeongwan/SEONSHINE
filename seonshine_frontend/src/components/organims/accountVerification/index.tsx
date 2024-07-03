@@ -21,7 +21,7 @@ type AccountVerificationProps = {
 
 const AccountVerification = ({
   title = 'Account Verification',
-  description = 'An OTP has been sent to your email. Please enter the OTP to verify your account.',
+  description = 'An OTP has been sent to your email.<br />Please enter the OTP to verify your account.',
   handleSubmitOtp,
   secondsCountdown,
   handleResendOtp,

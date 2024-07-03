@@ -17,18 +17,11 @@ const AccountVerificationLayout = ({
   size = 'normal',
   className,
 }: AccountVerificationLayoutProps) => {
-  const renderDescription = description.split('. ').map((text, index, array) => (
-    <React.Fragment key={index}>
-      {`${text}${index < array.length - 1 ? '.' : ''}`}
-      <br />
-    </React.Fragment>
-  ));
-
   return (
     <Stack
       alignItems="center"
       justifyContent="center"
-      className={`${className} + min-h-screen`}
+      className={`min-h-screen ${className}`}
     >
       <Stack
         direction="column"
@@ -49,9 +42,8 @@ const AccountVerificationLayout = ({
         <Typography
           variant="bodyS"
           className="text-center min-w-max"
-        >
-          {renderDescription}
-        </Typography>
+          dangerouslySetInnerHTML={{ __html: description }}
+        />
         {children}
       </Stack>
     </Stack>

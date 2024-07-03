@@ -16,7 +16,7 @@ const ResetSuccessfully = () => {
   return (
     <AccountVerificationLayout
       title="Reset Password"
-      description="You have successfully changed your password. Please log in to use the service."
+      description="You have successfully changed your password.<br />Please log in to use the service."
       size="small"
     >
       <Box

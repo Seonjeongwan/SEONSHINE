@@ -98,6 +98,7 @@ const ForgotPasswordPage = () => {
           handleSubmitOtp={handleSubmitOtp}
           secondsCountdown={timeCountdown}
           handleResendOtp={handleResendOtp}
+          className="relative"
         />
       )}
       {step === 'enter_new_password' && <EnterNewPassword handleSubmitPassword={handleSubmitPassword} />}
