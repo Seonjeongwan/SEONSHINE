@@ -9,6 +9,7 @@ import {
   orderItemCurrentDay,
 } from "../controllers/orderController.js";
 import { authenticateToken } from "../middleware/auth.js";
+import { validateOrderList } from "../middleware/validation/orderValidate.js";
 import { endpoints } from "./endpoints.js";
 
 const orderRoute = express.Router();
@@ -35,12 +36,14 @@ orderRoute.get(
 orderRoute.get(
   endpoints.order.getOrderListSummary,
   authenticateToken(),
+  validateOrderList,
   getOrderListSummary
 );
 
 orderRoute.get(
   endpoints.order.getOrderListDetail,
   authenticateToken(),
+  validateOrderList,
   getOrderListDetail
 );
 
