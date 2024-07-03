@@ -116,7 +116,6 @@ const AccountVerificationPage = ({
   return (
     <Stack
       justifyContent="center"
-      className={`${className} + min-h-screen`}
     >
       <form
         onSubmit={handleSubmit(submitForm)}

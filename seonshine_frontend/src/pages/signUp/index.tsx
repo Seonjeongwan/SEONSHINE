@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
-import { Box, Step, StepLabel, Stepper } from '@mui/material';
+import { Box, Stack, Step, StepLabel, Stepper } from '@mui/material';
 
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { RoleEnum } from '@/types/user';
 
 import { useResendSignUpOtp, useSignUpApi, useSignUpVerifyApi } from '@/apis/hooks/signUpApi.hook';
@@ -88,7 +89,7 @@ const SignUpPage = () => {
     resendOtp(resend_information, {
       onSuccess: (res) => {
         setLoading(false);
-        toast.success(res.message)
+        toast.success(res.message);
       },
       onError: (err: any) => {
         console.error(err);
@@ -104,11 +105,13 @@ const SignUpPage = () => {
   useEffect(() => {
     setLoading(isVerifyPending);
   }, [isVerifyPending]);
+
+  const { isMobile } = useDeviceType();
   return (
-    <Box sx={{ width: '100%', overflowY: 'hidden' }}>
-      <Box className="h-20vh min-h-[20vh]">
+    <Box className="w-full min-h-screen h-full">
+      {!isMobile && (
         <Stepper
-          className="pt-20 w-1/2 flex justify-center mx-auto"
+          className="pt-20 w-1/3 flex justify-center mx-auto"
           activeStep={stepIndexMap[step]}
           alternativeLabel
         >
@@ -118,28 +121,54 @@ const SignUpPage = () => {
             </Step>
           ))}
         </Stepper>
-      </Box>
-      <Box className="h-80vh min-h-[0vh]">
-        {step === 'select_user_type' && <ChooseUserType handleSubmitUserType={handleSubmitUserType} />}
-        {step === 'enter_user_information' && (
+      )}
+      {step === 'select_user_type' && (
+        <Stack
+          alignItems="center"
+          justifyContent="center"
+          className="pt-12"
+        >
+          <ChooseUserType handleSubmitUserType={handleSubmitUserType} />
+        </Stack>
+      )}
+      {step === 'enter_user_information' && (
+        <Stack
+          alignItems="center"
+          justifyContent="center"
+          className="py-12"
+        >
           <ProfileRegistration
             handleSubmitInformation={handleSubmitInformation}
             userType={userType}
           />
-        )}
-        {step === 'verify_otp' && (
+        </Stack>
+      )}
+      {step === 'verify_otp' && (
+        <Stack
+          alignItems="center"
+          justifyContent="center"
+          className="pt-12"
+        >
           <AccountVerificationPage
             title="Account Verification"
-            description="Your account is under approval process now.
-Please wait for administrator’s confirmation before using the application"
+            description="An OTP has been sent to your email. 
+          Please enter the OTP to verify you account"
             handleResendOtp={handleResendOtp}
             handleSubmitOtp={handleSubmitOtp}
             secondsCountdown={secondsCountdown}
             userEmail={userEmail}
           />
-        )}
-        {step === 'pending_approval' && <PendingApprovalPage />}
-      </Box>
+        </Stack>
+      )}
+      {step === 'pending_approval' && (
+        <Stack
+          alignItems="center"
+          justifyContent="center"
+          className="pt-12"
+        >
+          <PendingApprovalPage />
+        </Stack>
+      )}
     </Box>
   );
 };

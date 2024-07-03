@@ -30,7 +30,6 @@ const PendingApprovalPage = ({ className, handleGotoLogin }: PendingApprovalPage
   return (
     <Stack
       justifyContent="center"
-      className={`min-h-screen ${className}`}
     >
       <Stack
         direction="column"
