@@ -8,6 +8,7 @@ import {
   Box,
   Button,
   FormControl,
+  Grid,
   InputAdornment,
   MenuItem,
   Select,
@@ -141,16 +142,39 @@ const OrderMenuTab = () => {
         {currentOrder && (
           <Box className="px-2 mb-6">
             <Typography className="font-bold text-2xl mb-4">Ordered Item</Typography>
-            <Box className="rounded-md p-6 box-border grid grid-cols-1 lg:grid-cols-2 gap-4 bg-white w-full md:w-2/5 shadow-xl">
-              <Stack className="w-full h-48 md:h-64 flex items-center justify-center">
-                <img
-                  src={`${avatarBaseURL}${currentOrder.image_url}`}
-                  alt={currentOrder.item_name}
-                  className="object-cover h-full w-full rounded-md"
-                />
-              </Stack>
-              <Stack className="flex justify-between">
-                <Box className="ml-4">
+            <Grid
+              container
+              spacing={2}
+              className="rounded-md p-6 box-border bg-white w-full sm:w-2/3 md:w-2/3 lg:w-1/2 shadow-xl"
+            >
+              <Grid
+                item
+                xs={12}
+                md={6}
+                className="flex items-center justify-center h-48 md:h-64"
+              >
+                {currentOrder.image_url ? (
+                  <img
+                    src={`${avatarBaseURL}${currentOrder.image_url}`}
+                    className="h-full w-full object-cover"
+                    alt={currentOrder.item_name}
+                  />
+                ) : (
+                  <Stack className="w-full h-full items-center bg-gray-200">
+                    <RestaurantRounded
+                      className="w-full h-1/2 opacity-30"
+                      fontSize="large"
+                    />
+                  </Stack>
+                )}
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                md={6}
+                className="flex flex-col justify-between"
+              >
+                <Box className="ml-0 md:ml-4 mt-4 md:mt-0">
                   <Typography className="font-bold text-3xl overflow-hidden whitespace-nowrap overflow-ellipsis">
                     {currentOrder.item_name}
                   </Typography>
@@ -163,12 +187,12 @@ const OrderMenuTab = () => {
                   onClick={handleClickDiscardButton}
                   variant="outlined"
                   color="error"
-                  className="self-end rounded-2xl font-bold w-1/3"
+                  className="self-end rounded-2xl font-bold mt-4 md:mt-0 w-full md:w-auto"
                 >
                   Cancel
                 </Button>
-              </Stack>
-            </Box>
+              </Grid>
+            </Grid>
           </Box>
         )}
         <Box className="px-2">

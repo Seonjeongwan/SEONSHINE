@@ -75,3 +75,8 @@ export type OrderListDetailItemType = {
 };
 
 export type ViewModeType = 'summary' | 'detail';
+
+export enum UserOrderTabEnum {
+  ORDER_MENU = 0,
+  ORDER_LIST = 1,
+}

@@ -7,6 +7,7 @@ import {
   DiscardOrderMenuItemResponseType,
   GetAllRestaurantResponseType,
   GetCurrentOrderResponseType,
+  GetDashboardSummaryResponseType,
   GetMenuListApiPropsType,
   GetMenuListResponseType,
   GetRestaurantDetailApiPropsType,
@@ -189,5 +190,10 @@ export const discardOrderMenuItem = async (): Promise<DiscardOrderMenuItemRespon
 
 export const getCurrentOrder = async (): Promise<GetCurrentOrderResponseType> => {
   const response = await axiosInstance.get<GetCurrentOrderResponseType>('/order/current-order');
+  return response.data;
+};
+
+export const getDashboardSummary = async (): Promise<GetDashboardSummaryResponseType> => {
+  const response = await axiosInstance.get<GetDashboardSummaryResponseType>('/common/dashboard/summary');
   return response.data;
 };
