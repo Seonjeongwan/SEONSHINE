@@ -55,7 +55,7 @@ const Sidebar = ({ role }: SidebarPropsType) => {
       direction="column"
       alignItems="center"
       gap={6}
-      className="bg-white text-black-500 h-full p-4 relative"
+      className="bg-white text-black-500 h-full max-h-dvh p-4"
     >
       <Link
         to={paths.dashboard}
@@ -123,34 +123,42 @@ const Sidebar = ({ role }: SidebarPropsType) => {
         </IconButton>
       </Stack>
 
-      <Stack direction="column">
-        {allowedMenuItems.map((item: MenuItemType) => {
-          if (item.path === paths.dashboard) return null;
-          const Icon = iconMap[item.icon];
-          return (
-            <NavLink
-              to={item.path}
-              key={item.name}
-              className={({ isActive }) =>
-                `flex p-4 gap-3 items-center rounded-md border-b  ${isActive ? 'bg-black-200' : 'hover:bg-black-100'}`
-              }
-            >
-              <Icon sx={{ fontSize: 24 }} />
-              <Typography variant="buttonM">{item.name}</Typography>
-            </NavLink>
-          );
-        })}
+      <Stack
+        direction="column"
+        alignItems="start"
+        justifyContent="space-between"
+        className="h-full"
+      >
+        <Stack direction="column">
+          {allowedMenuItems.map((item: MenuItemType) => {
+            if (item.path === paths.dashboard) return null;
+            const Icon = iconMap[item.icon];
+            return (
+              <NavLink
+                to={item.path}
+                key={item.name}
+                className={({ isActive }) =>
+                  `flex p-4 gap-3 items-center rounded-md border-b  ${isActive ? 'bg-black-200' : 'hover:bg-black-100'}`
+                }
+              >
+                <Icon sx={{ fontSize: 24 }} />
+                <Typography variant="buttonM">{item.name}</Typography>
+              </NavLink>
+            );
+          })}
+        </Stack>
+
+        <IconButton
+          className="p-0 mb-4 ml-4"
+          onClick={() => setIsConfirmModalOpen(true)}
+        >
+          <Logout
+            sx={{ fontSize: 24 }}
+            className="hover:opacity-70 text-black-500"
+          />
+        </IconButton>
       </Stack>
 
-      <IconButton
-        className="absolute left-8 bottom-8 p-0"
-        onClick={() => setIsConfirmModalOpen(true)}
-      >
-        <Logout
-          sx={{ fontSize: 24 }}
-          className="hover:opacity-70 text-black-500"
-        />
-      </IconButton>
       <ConfirmModal
         open={isConfirmModalOpen}
         title="Log Out Confirmation"
