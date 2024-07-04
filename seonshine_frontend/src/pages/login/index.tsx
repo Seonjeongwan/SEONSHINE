@@ -54,10 +54,14 @@ const LoginPage = () => {
         setLoading(false);
         if (!data) return;
 
-        const { user_status, user } = data;
+        const { user_status, user, message } = data;
 
         if (Number(user_status) === UserStatusEnum.WAITING_CONFIRM) {
           setIsWaiting(true);
+        }
+
+        if (Number(user_status) === UserStatusEnum.DEACTIVATED || Number(user_status) === UserStatusEnum.CLOSE) {
+          toast.warning(message);
         }
 
         if (user) {

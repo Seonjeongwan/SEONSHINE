@@ -1,5 +1,6 @@
 import React, { ChangeEvent, ClipboardEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Button, FormHelperText, Stack, TextField, Typography } from '@mui/material';
@@ -7,6 +8,7 @@ import { Box, Button, FormHelperText, Stack, TextField, Typography } from '@mui/
 import AccountVerificationLayout from '@/components/organims/accountVerification/accountVerificationLayout';
 
 import { digitRegex } from '@/constants/regex';
+import { paths } from '@/routes/paths';
 
 import { OtpSchema, OtpSchemaType } from './schema';
 
@@ -17,6 +19,7 @@ type AccountVerificationProps = {
   handleSubmitOtp: (otp: string) => void;
   handleResendOtp: (resetTimer: () => void) => void;
   className?: string;
+  useBackToLogin?: boolean;
 };
 
 const AccountVerification = ({
@@ -26,6 +29,7 @@ const AccountVerification = ({
   secondsCountdown,
   handleResendOtp,
   className,
+  useBackToLogin,
 }: AccountVerificationProps) => {
   const {
     handleSubmit,
@@ -119,6 +123,14 @@ const AccountVerification = ({
       title={title}
       description={description}
     >
+      {useBackToLogin && (
+        <Link
+          to={paths.login}
+          className="text-blue-400 !underline absolute top-2 left-3 font-medium"
+        >
+          {'< Back to Login'}
+        </Link>
+      )}
       <Stack
         direction="column"
         gap="8px"

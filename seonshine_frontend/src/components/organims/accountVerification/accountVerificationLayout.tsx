@@ -21,7 +21,7 @@ const AccountVerificationLayout = ({
     <Stack
       alignItems="center"
       justifyContent="center"
-      className={`min-h-screen ${className}`}
+      className={`min-h-screen relative ${className}`}
     >
       <Stack
         direction="column"
