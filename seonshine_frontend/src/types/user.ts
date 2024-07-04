@@ -191,9 +191,9 @@ export type GetWaitingUserListApiPropsType = {
 export type UpdateUserPayloadType = {
   username: string;
   branch_id: number;
-  address: string;
+  address: string | null;
   phone_number: string;
-  birth_date: string;
+  birth_date: string | null;
 };
 
 export type UpdateUserResponseType = {
@@ -202,7 +202,7 @@ export type UpdateUserResponseType = {
 
 export type UpdateRestaurantPayloadType = {
   username: string;
-  address: string;
+  address: string | null;
   phone_number: string;
 };
 
