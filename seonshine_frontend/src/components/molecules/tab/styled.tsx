@@ -34,7 +34,7 @@ export const StyledTab = styled((props: TabProps & { tabcount?: number }) => (
 ))(({ theme, tabcount }) => ({
   textTransform: 'none',
   width: `calc(100% / ${tabcount})`,
-  maxWidth: '240px',
+  maxWidth: `${tabcount! > 2 ? '240px' : '320px'}`,
   minHeight: '40px',
   fontWeight: theme.typography.fontWeightBold,
   fontSize: '14px',

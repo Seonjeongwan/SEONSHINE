@@ -29,7 +29,7 @@ const OrderManagement = () => {
           <StyledTab label="Order History" />
         </StyledTabs>
       </Box>
-      <Box className="px-4 md:px-8 mt-8">
+      <Box className="px-4 md:px-8 mt-4">
         <TabPanel
           value={value}
           index={0}

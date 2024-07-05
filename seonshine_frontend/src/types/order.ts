@@ -22,6 +22,7 @@ export type GetOrderPeriodResponseType = {
 
 export type GetOrderListSummaryApiPropsType = {
   date?: string;
+  branch_id?: number;
 };
 
 export type GetOrderListSummaryResponseType = {
@@ -60,6 +61,7 @@ export type OrderListHistoryItemType = {
 };
 export type GetOrderListDetailApiPropsType = {
   date?: string;
+  branch_id?: number;
 };
 
 export type GetOrderListDetailResponseType = { data: OrderListDetailItemType[]; date: string; total: number };

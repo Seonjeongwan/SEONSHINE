@@ -49,7 +49,7 @@ const DatePicker = <T extends FieldValues>({
           const dateValue = value ? (typeof value === 'string' ? parseISO(value) : value) : null;
 
           return (
-            <Box>
+            <Box className="w-full">
               <XDatePicker
                 value={dateValue}
                 onChange={(date) => {
@@ -72,7 +72,7 @@ const DatePicker = <T extends FieldValues>({
                           fontSize: '20px',
                           lineHeight: '24px',
                           height: '18px',
-                          paddingBottom: '15px',
+                          paddingBottom: '14px',
                           color: theme.palette.black[300],
                         },
                         fieldset: {
@@ -98,7 +98,7 @@ const DatePicker = <T extends FieldValues>({
                         },
                       };
                 }}
-                className="bg-white max-w-96 rounded-full"
+                className="bg-white w-full max-w-80 rounded-full"
               />
               {error && <FormHelperText color="error">{error.message}</FormHelperText>}
             </Box>
