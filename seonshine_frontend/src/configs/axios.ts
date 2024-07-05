@@ -37,7 +37,7 @@ axiosInstance.interceptors.response.use(
       clearUserFromCache();
       clearAccessToken();
       SessionCache.remove(USER_INFO_KEY);
-      toast.info('You are logged out. Please login again.', {
+      toast.warning('You are logged out. Please login again.', {
         autoClose: 2000,
         onClose: () => {
           window.location.href = paths.login;

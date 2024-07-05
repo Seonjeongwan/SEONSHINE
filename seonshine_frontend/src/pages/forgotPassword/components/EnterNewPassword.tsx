@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
@@ -8,6 +9,8 @@ import { Button, IconButton, Stack, Typography } from '@mui/material';
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
 import AccountVerificationLayout from '@/components/organims/accountVerification/accountVerificationLayout';
+
+import { paths } from '@/routes/paths';
 
 import { PasswordSchema, PasswordSchemaType } from '../schema';
 import { EnterNewPasswordPropsType } from '../types';
@@ -39,6 +42,12 @@ const EnterNewPassword = ({ handleSubmitPassword }: EnterNewPasswordPropsType) =
       title="Reset Password"
       description="Change your password"
     >
+      <Link
+        to={paths.login}
+        className="text-blue-400 !underline absolute top-2 left-3 font-medium"
+      >
+        {'< Back to Login'}
+      </Link>
       <form
         onSubmit={handleSubmit(onSubmit)}
         noValidate
