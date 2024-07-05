@@ -238,6 +238,7 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
       <Stack
         direction={isMobile ? 'column' : 'row'}
         gap={8}
+        alignItems="flex-start"
       >
         <Table<OrderListType>
           data={data}
