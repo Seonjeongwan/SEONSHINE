@@ -14,8 +14,6 @@ import DatePicker from '@/components/molecules/datePicker';
 import {
   approvalImageDelete,
   approvalImageDeleteDescription,
-  approvalUserDescription,
-  approvalUserTitle,
 } from '@/pages/userManagement/components/ApprovalTab/constants';
 
 import { avatarBaseURL } from '@/constants/image';
@@ -84,7 +82,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
     handleSubmit,
     reset,
     formState: { isDirty },
-  } = useForm({
+  } = useForm<UserInfoSchemaType>({
     defaultValues: {
       username: user?.username || '',
       birth_date: user?.birth_date || '',
@@ -119,9 +117,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
 
   const handleCancel = () => {
     setIsEditing(false);
-    reset({
-      ...(user as UserInfoSchemaType),
-    });
+    reset();
   };
 
   const handleClose = () => {
@@ -163,7 +159,10 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
     setIsAvatarDeleted(true);
     const emptyFilePayload: UploadImagePayloadType = { file: new File([], '') };
     changeUserAvatar(emptyFilePayload, {
-      onSuccess: () => queryClient.invalidateQueries({ queryKey: ['getUserDetail'] }),
+      onSuccess: (data) => {
+        toast.success(data.message);
+        queryClient.invalidateQueries({ queryKey: ['getUserDetail'] });
+      },
       onError: () => setUploadError('Cannot delete avatar.'),
     });
     setIsConfirmModalOpen(false);
@@ -177,6 +176,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
     user &&
       reset({
         ...(user as UserInfoSchemaType),
+        birth_date: user.birth_date,
       });
     setIsAvatarDeleted(false);
   }, [user]);
@@ -193,17 +193,13 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
           <Box className="w-full md:w-1/4 bg-black-100 flex flex-col items-center rounded-lg p-4 md:p-0 relative">
             <div className="relative">
               {isLoading ? (
-                <Skeleton
-                  height={84}
-                  width={84}
-                  className="mt-4 md:mt-12"
-                />
+                <Skeleton className="w-36 h-36 mt-4 md:mt-12" />
               ) : (
                 <Avatar
                   src={
                     isAvatarDeleted || !user?.profile_picture_url ? '' : `${avatarBaseURL}${user?.profile_picture_url}`
                   }
-                  className="w-24 h-24 mt-4 md:mt-12"
+                  className="w-36 h-36 mt-4 md:mt-12"
                 />
               )}
               {isEditing && user?.profile_picture_url && (
@@ -222,14 +218,16 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
               type="file"
               onChange={handleImageChange}
             />
-            <label htmlFor="upload-photo">
-              <Button
-                component="span"
-                className="hover:bg-green-300 hover:text-white hover:outline-green-300 bg-white text-green-200 font-bold outline outline-2 outline-green-200 mx-4 mt-4 md:mt-8 rounded-xl"
-              >
-                Select Photo
-              </Button>
-            </label>
+            {isEditing && (
+              <label htmlFor="upload-photo">
+                <Button
+                  component="span"
+                  className="hover:bg-green-300 hover:text-white hover:outline-green-300 bg-white text-green-200 font-bold outline outline-2 outline-green-200 mx-4 mt-4 md:mt-8 rounded-xl"
+                >
+                  Select Photo
+                </Button>
+              </label>
+            )}
             {uploadError && <p className="text-red-500 text-xs m-2">{uploadError}</p>}
           </Box>
           <Box className="w-full md:w-3/4 p-4 md:p-16 relative">
@@ -328,8 +326,8 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
                       Save
                     </Button>
                     <Button
-                      variant="contained"
-                      color="secondary"
+                      variant="outlined"
+                      color="primary"
                       onClick={handleCancel}
                       className="ml-2"
                     >
