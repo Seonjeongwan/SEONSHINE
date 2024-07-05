@@ -52,6 +52,7 @@ export type GetOrderListHistoryResponseType = {
 export type OrderListHistoryItemType = {
   order_id: string;
   branch_id: number;
+  branch_name: string;
   restaurant_id: string;
   order_date: string;
   total_amount: number;

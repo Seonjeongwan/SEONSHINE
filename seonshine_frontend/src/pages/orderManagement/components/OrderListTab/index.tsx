@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useLocation } from 'react-router-dom';
 
@@ -29,6 +29,7 @@ import { RoleEnum } from '@/types/user';
 
 import { useGetOrderListDetailApi, useGetOrderListSummaryApi } from '@/apis/hooks/orderListApi.hook';
 import { useGetBranches } from '@/apis/hooks/userApi.hook';
+import { BranchResponseType } from '@/apis/user';
 import useAuthStore from '@/store/auth.store';
 
 import { OrderListRestaurantTableHeader } from './OrderListRestaurantTableHeader';
@@ -41,18 +42,20 @@ const today = format(new Date(), dateFormat);
 
 type OrderListTabPropsType = {
   orderDate?: string;
+  branchId?: number;
+  branchList: BranchResponseType[];
 };
 
-const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
+const OrderListTab = ({ orderDate, branchId, branchList }: OrderListTabPropsType) => {
   const { currentUser } = useAuthStore();
   const location = useLocation();
   const localState = location.state;
   const [viewMode, setViewMode] = useState<ViewModeType>(localState?.viewMode || 'summary');
   const isAdmin = currentUser?.role_id === RoleEnum.ADMIN;
 
-  const { control, watch } = useForm<DateSchemaType>({
+  const { control, watch, reset } = useForm<DateSchemaType>({
     resolver: zodResolver(DateSchema),
-    defaultValues: { date: orderDate ? orderDate : today, branch_id: 1 },
+    values: { date: orderDate ? orderDate : today, branch_id: branchId || 0 },
   });
 
   const { isMobile } = useDeviceType();
@@ -74,8 +77,6 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
     params: { date: watchedDate, branch_id: watchedBranchId },
     enabled: viewMode === 'detail',
   });
-
-  const { data: branchData = [] } = useGetBranches({ enabled: true });
 
   const columns = viewMode === 'summary' ? OrderListRestaurantTableHeader : OrderListTableHeader;
 
@@ -142,7 +143,7 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
           container
           spacing={4}
           alignItems="center"
-          className="max-w-fit"
+          className="w-max md:w-3/5 lg:w-2/5"
         >
           <Grid
             item
@@ -192,7 +193,14 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
                       })}
                       className="bg-white w-full max-w-80 rounded-full"
                     >
-                      {branchData.map((branch) => (
+                      <MenuItem
+                        key="default_key_branch"
+                        value={0}
+                        hidden
+                      >
+                        Select branch
+                      </MenuItem>
+                      {branchList.map((branch) => (
                         <MenuItem
                           key={branch.branch_id}
                           value={branch.branch_id}
@@ -271,12 +279,15 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
             <Typography className="text-3xl font-bold">Billing Information</Typography>
             <Typography className="text-2xl flex items-center flex-wrap">
               Restaurant:&nbsp;
-              <Typography className="text-2xl font-bold whitespace-nowrap">
+              <Typography
+                component="span"
+                className="text-2xl font-bold whitespace-nowrap"
+              >
                 {orderListSummary?.restaurant_name || '...'}
               </Typography>
             </Typography>
-            <Typography className="text-lg">{`Order Amount: ${orderListSummary?.total}`}</Typography>
-            <Typography className="text-lg">{`Branch: ${branchData.find((branch) => branch.branch_id === watchedBranchId)?.branch_name}`}</Typography>
+            <Typography className="text-lg">{`Order Amount: ${orderListSummary?.total || 0}`}</Typography>
+            <Typography className="text-lg">{`Branch: ${branchList.find((branch) => branch.branch_id === watchedBranchId)?.branch_name}`}</Typography>
           </Stack>
         )}
       </Stack>

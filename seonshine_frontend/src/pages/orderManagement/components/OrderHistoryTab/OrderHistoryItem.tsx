@@ -8,15 +8,23 @@ import { OrderListHistoryItemType } from '@/types/order';
 
 type OrderHistoryItemPropsType = {
   item: OrderListHistoryItemType;
-  handleViewDetail?: (orderDate: string) => void;
+  handleViewDetail?: (orderDate: string, branchId: number) => void;
 };
 
 const OrderHistoryItem = ({ item, handleViewDetail }: OrderHistoryItemPropsType) => {
-  const { order_date, restaurant_image_url, restaurant_name, restaurant_address, total_amount, branch_id } = item;
+  const {
+    order_date,
+    restaurant_image_url,
+    restaurant_name,
+    restaurant_address,
+    total_amount,
+    branch_id,
+    branch_name,
+  } = item;
 
   const { isMobile } = useDeviceType();
   const onClickDetail = () => {
-    handleViewDetail?.(order_date);
+    handleViewDetail?.(order_date, branch_id);
   };
 
   return (
@@ -33,7 +41,7 @@ const OrderHistoryItem = ({ item, handleViewDetail }: OrderHistoryItemPropsType)
       >
         <Avatar
           src={!restaurant_image_url ? '' : `${avatarBaseURL}${restaurant_image_url}`}
-          className="w-28 h-28 hidden sm:flex"
+          className="w-28 h-28 hidden sm:flex mr-2"
         />
         <Stack
           direction="column"
@@ -42,7 +50,7 @@ const OrderHistoryItem = ({ item, handleViewDetail }: OrderHistoryItemPropsType)
           className="w-full sm:w-3/5"
         >
           <Typography className="text-4xl font-bold">{restaurant_name}</Typography>
-          <Typography className="text-lg font-normal">Branch {branch_id}</Typography>
+          <Typography className="text-lg font-normal">{branch_name}</Typography>
           <Typography className="text-lg font-normal">{restaurant_address}</Typography>
         </Stack>
         <Stack
