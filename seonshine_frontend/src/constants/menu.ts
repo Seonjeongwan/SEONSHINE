@@ -9,6 +9,12 @@ export const menuItems: MenuItemType[] = [
     permission: [RoleEnum.ADMIN, RoleEnum.USER, RoleEnum.RESTAURANT],
   },
   {
+    name: 'Profile Management',
+    icon: 'profileIcon',
+    path: '/profile',
+    permission: [RoleEnum.RESTAURANT, RoleEnum.USER],
+  },
+  {
     name: 'User Management',
     icon: 'userIcon',
     path: '/user',
@@ -41,11 +47,5 @@ export const menuItems: MenuItemType[] = [
     icon: 'orderIcon',
     path: '/order-menu',
     permission: [RoleEnum.USER],
-  },
-  {
-    name: 'Profile Management',
-    icon: 'profileIcon',
-    path: '/profile',
-    permission: [RoleEnum.RESTAURANT, RoleEnum.USER],
   },
 ];

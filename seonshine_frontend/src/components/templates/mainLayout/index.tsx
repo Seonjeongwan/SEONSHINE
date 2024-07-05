@@ -100,7 +100,7 @@ const MainLayout = ({ children, role }: MainLayoutPropsType) => {
       <Stack
         direction="column"
         gap={4}
-        className="flex-1 overflow-hidden py-8"
+        className="flex-1 overflow-hidden pt-8"
       >
         <IconButton
           ref={iconRef}

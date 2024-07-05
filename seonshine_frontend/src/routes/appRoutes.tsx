@@ -6,9 +6,11 @@ import LoginPage from '@/pages/login';
 import MenuManagement from '@/pages/menuManagement';
 import OrderManagement from '@/pages/orderManagement';
 import PageNotFound from '@/pages/pageNotFound';
+import ProfileManagemant from '@/pages/profileManagement';
 import RestaurantAssignment from '@/pages/restaurantAssignment';
 import SignUpPage from '@/pages/signUp';
 import UserManagement from '@/pages/userManagement';
+import UserOrder from '@/pages/userOrder';
 
 import { RoleEnum } from '@/types/user';
 
@@ -17,7 +19,6 @@ import useAuthStore from '@/store/auth.store';
 import AuthenticateLayout from './guards/AuthenticateLayout';
 import ProtectedLayout from './guards/ProtectedLayout';
 import { paths } from './paths';
-import UserOrder from '@/pages/userOrder';
 
 const AppRoutes = () => {
   const { isAuthenticated } = useAuthStore();
@@ -120,6 +121,15 @@ const AppRoutes = () => {
           <Route
             index
             element={<UserOrder />}
+          />
+        </Route>
+        <Route
+          path={paths.profile}
+          element={<ProtectedLayout allowedRoles={[RoleEnum.USER, RoleEnum.RESTAURANT]} />}
+        >
+          <Route
+            index
+            element={<ProfileManagemant />}
           />
         </Route>
       </Routes>
