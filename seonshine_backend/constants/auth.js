@@ -2,7 +2,7 @@ export const UserStatus = {
   waitingConfirm: 0,
   active: 1,
   inactive: 2,
-  deleted: 9
+  inactiveByAdmin: 9
 }
 
 export const UserRole = {

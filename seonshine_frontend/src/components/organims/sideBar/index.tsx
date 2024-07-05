@@ -159,6 +159,15 @@ const Sidebar = ({ role }: SidebarPropsType) => {
         </IconButton>
       </Stack>
 
+      <IconButton
+        className="absolute left-8 bottom-8 p-0"
+        onClick={() => setIsConfirmModalOpen(true)}
+      >
+        <Logout
+          sx={{ fontSize: 24 }}
+          className="hover:opacity-70 text-black-500"
+        />
+      </IconButton>
       <ConfirmModal
         open={isConfirmModalOpen}
         title="Log Out Confirmation"
