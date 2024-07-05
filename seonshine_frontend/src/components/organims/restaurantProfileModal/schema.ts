@@ -6,7 +6,7 @@ import { phoneNumberRegex } from '@/constants/regex';
 
 export const restaurantInfoSchema = zod.object({
   username: zod.string().min(1, { message: errorMessages.require }),
-  address: zod.string().min(1, { message: errorMessages.require }),
+  address: zod.string().nullable(),
   phone_number: zod
     .string()
     .min(1, { message: errorMessages.require })

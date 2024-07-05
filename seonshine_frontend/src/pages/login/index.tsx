@@ -14,6 +14,7 @@ import loginBanner from '@/assets/images/login-banner.png';
 import logo from '@/assets/images/logo.png';
 import { useAuth } from '@/hooks/useAuth';
 import { paths } from '@/routes/paths';
+import { IErrorResponse } from '@/types/common';
 import { UserStatusEnum } from '@/types/user';
 
 import { useLoginApi } from '@/apis/hooks/authApi.hook';
@@ -69,8 +70,8 @@ const LoginPage = () => {
           navigate(paths.index);
         }
       },
-      onError: () => {
-        toast.error('Login failed!');
+      onError: (err: IErrorResponse) => {
+        toast.error(err.response.data.message);
       },
     });
   };
