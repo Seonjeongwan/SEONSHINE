@@ -2,7 +2,7 @@ import React from 'react';
 
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import FoodBankIcon from '@mui/icons-material/FoodBank';
-import { Box, Button, Stack, Typography, useMediaQuery } from '@mui/material';
+import { Box, Button, Link, Stack, Typography, useMediaQuery } from '@mui/material';
 
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { RoleEnum } from '@/types/user';
@@ -16,8 +16,14 @@ const ChooseUserType = ({ handleSubmitUserType }: EnterUserTypePropsType) => {
       direction="column"
       gap="24px"
       alignItems="center"
-      className="w-full p-24 bg-white rounded-lg shadow-md md:w-240 xl:w-240 max-w-screen"
+      className="w-full pt-12 p-24 bg-white rounded-lg shadow-md md:w-240 xl:w-240 max-w-screen"
     >
+      <Link
+        className="cursor-pointer !underline self-start"
+        href="/login"
+      >
+        Back to Login
+      </Link>
       <Typography
         variant="heading2"
         component="h2"

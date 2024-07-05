@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
-import { Box, Stack, Step, StepLabel, Stepper } from '@mui/material';
+import { ArrowBack } from '@mui/icons-material';
+import { Box, Button, Stack, Step, StepLabel, Stepper } from '@mui/material';
 
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { RoleEnum } from '@/types/user';
@@ -20,7 +21,7 @@ import {
 import AccountVerificationPage from './components/VerificationAccount';
 import { SignUpStepsType } from './types';
 
-const steps = ['Select User Type', 'Enter User Information', 'Verify OTP', 'Pending Approval'];
+const steps = ['Select User Type', 'User Information', 'Verify OTP', 'Pending Approval'];
 
 const secondsCountdown = 120;
 const SignUpPage = () => {
@@ -50,6 +51,17 @@ const SignUpPage = () => {
   const nextStep = () => {
     setStep((prev) => nextStepMap[prev]);
   };
+
+  // const previousStepMap: Record<SignUpStepsType, SignUpStepsType> = {
+  //   select_user_type: 'pending_approval',
+  //   enter_user_information: 'select_user_type',
+  //   verify_otp: 'enter_user_information',
+  //   pending_approval: 'verify_otp',
+  // };
+
+  // const previousStep = () => {
+  //   setStep((prev) => previousStepMap[prev]);
+  // };
 
   const handleSubmitUserType = (user_type: RoleEnum) => {
     setUserType(user_type);
@@ -109,9 +121,18 @@ const SignUpPage = () => {
   const { isMobile } = useDeviceType();
   return (
     <Box className="w-full min-h-screen h-full">
+      {/* {step !== 'select_user_type' && (
+        <Button
+          startIcon={<ArrowBack />}
+          // onClick={previousStep}
+          className="ml-4"
+        >
+          Back
+        </Button>
+      )} */}
       {!isMobile && (
         <Stepper
-          className="pt-20 w-1/3 flex justify-center mx-auto"
+          className="pt-8 w-1/4 flex justify-center mx-auto"
           activeStep={stepIndexMap[step]}
           alternativeLabel
         >
@@ -135,7 +156,7 @@ const SignUpPage = () => {
         <Stack
           alignItems="center"
           justifyContent="center"
-          className="py-12"
+          className="pt-8 pb-16"
         >
           <ProfileRegistration
             handleSubmitInformation={handleSubmitInformation}
@@ -147,7 +168,7 @@ const SignUpPage = () => {
         <Stack
           alignItems="center"
           justifyContent="center"
-          className="pt-12"
+          className="pt-8 pb-16"
         >
           <AccountVerificationPage
             title="Account Verification"
@@ -164,7 +185,7 @@ const SignUpPage = () => {
         <Stack
           alignItems="center"
           justifyContent="center"
-          className="pt-12"
+          className="pt-8 pb-16"
         >
           <PendingApprovalPage />
         </Stack>

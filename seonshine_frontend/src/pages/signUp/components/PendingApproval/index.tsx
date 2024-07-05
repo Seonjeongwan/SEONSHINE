@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Button, Link, Stack, Typography } from '@mui/material';
 
 import { paths } from '@/routes/paths';
 
@@ -28,16 +28,20 @@ const PendingApprovalPage = ({ className, handleGotoLogin }: PendingApprovalPage
     handleGotoLogin?.();
   };
   return (
-    <Stack
-      justifyContent="center"
-    >
+    <Stack justifyContent="center">
       <Stack
         direction="column"
         justifyContent="center"
         gap={6}
         alignItems="center"
-        className="w-full h-screen p-24 bg-white rounded-lg shadow-md max-w-screen relative md:h-171 md:w-240 sm:h-131 sm:w-200"
+        className="w-full h-screen pt-12 p-24 bg-white rounded-lg shadow-md max-w-screen relative md:h-171 md:w-240 sm:h-131 sm:w-200"
       >
+        <Link
+          className="cursor-pointer !underline self-start"
+          href="/login"
+        >
+          Back to Login
+        </Link>
         <Typography
           variant="heading2"
           component="h2"

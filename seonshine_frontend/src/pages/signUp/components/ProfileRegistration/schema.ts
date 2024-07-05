@@ -7,13 +7,7 @@ import { RoleEnum } from '@/types/user';
 export const SignUpSchema = zod
   .object({
     userType: zod.nativeEnum(RoleEnum),
-    employeeId: zod
-      .string()
-      .trim()
-      .min(1, { message: errorMessages.require })
-      .refine((value) => employeeIdRegex.test(value), {
-        message: errorMessages.employeeIdInvalid,
-      }),
+    employeeId: zod.string().trim().min(1, { message: errorMessages.require }),
     password: zod
       .string()
       .min(1, { message: errorMessages.require })
@@ -33,17 +27,41 @@ export const SignUpSchema = zod
     address: zod.string(),
   })
   .refine((data) => data.userType !== RoleEnum.USER || (data.userType === RoleEnum.USER && data.branch_id), {
-    message: 'Branch field is required',
+    message: 'This field is required',
     path: ['branch_id'],
   })
   .refine((data) => data.userType !== RoleEnum.RESTAURANT || (data.userType === RoleEnum.RESTAURANT && data.address), {
-    message: 'Address field is required',
+    message: 'This field is required',
     path: ['address'],
   })
   .refine((values) => values.password === values.confirmPassword, {
     message: errorMessages.passwordNotMatch,
     path: ['confirmPassword'],
   })
+  .refine(
+    (data) => {
+      if (data.userType === RoleEnum.RESTAURANT) {
+        return employeeIdRegex.test(data.employeeId);
+      }
+      return true;
+    },
+    {
+      message: errorMessages.idInvalid,
+      path: ['employeeId'],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.userType === RoleEnum.USER) {
+        return employeeIdRegex.test(data.employeeId);
+      }
+      return true;
+    },
+    {
+      message: errorMessages.employeeIdInvalid,
+      path: ['employeeId'],
+    },
+  )
   .refine(
     (data) => {
       if (data.userType === RoleEnum.USER) {

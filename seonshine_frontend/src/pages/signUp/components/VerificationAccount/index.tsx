@@ -2,7 +2,7 @@ import React, { ChangeEvent, ClipboardEvent, KeyboardEvent, useEffect, useRef, u
 import { Controller, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box, Button, FormHelperText, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, FormHelperText, Link, Stack, TextField, Typography } from '@mui/material';
 
 import { digitRegex } from '@/constants/regex';
 
@@ -114,14 +114,18 @@ const AccountVerificationPage = ({
   }, [isActive, seconds]);
 
   return (
-    <Stack
-      justifyContent="center"
-    >
+    <Stack justifyContent="center">
       <form
         onSubmit={handleSubmit(submitForm)}
         noValidate
-        className="w-full h-screen p-24 bg-white rounded-lg shadow-md max-w-screen relative md:h-171 md:w-240 sm:h-131 sm:w-200 flex flex-col justify-center items-center gap-6"
+        className="w-full h-screen pt-12 p-24 bg-white rounded-lg shadow-md max-w-screen relative md:h-171 md:w-240 sm:h-131 sm:w-200 flex flex-col justify-center items-center gap-6"
       >
+        <Link
+          className="cursor-pointer !underline self-start"
+          href="/login"
+        >
+          Back to Login
+        </Link>
         <Typography
           variant="heading2"
           component="h2"
@@ -139,7 +143,7 @@ const AccountVerificationPage = ({
           direction="column"
           gap="8px"
           alignItems="center"
-          className="w-screen md:w-auto"
+          className="w-screen md:w-auto "
         >
           <Controller
             name="code"

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { Box, Button, FormControl, IconButton, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { ArrowBack, ArrowForward, Visibility, VisibilityOff } from '@mui/icons-material';
+import { Box, Button, FormControl, IconButton, Link, MenuItem, Select, Stack, Typography } from '@mui/material';
 
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
@@ -60,11 +60,17 @@ const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInf
       alignItems="center"
       className="w-full px-4 sm:px-8 md:px-12 lg:px-12 bg-white rounded-lg shadow-md max-w-2xl"
     >
+      <Link
+        className="cursor-pointer !underline self-start pt-12"
+        href="/login"
+      >
+        Back to Login
+      </Link>
       <Box className="grid w-full h-full grid-cols-1 lg:grid-cols-1">
         <Typography
           variant="heading2"
           component="h2"
-          className="text-center pt-20 pb-4"
+          className="text-center pt-8 pb-4"
         >
           Sign Up
         </Typography>
@@ -82,7 +88,7 @@ const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInf
               flexDirection="column"
               className="h-full"
             >
-              <Box className="grid gap-2 mt-4">
+              <Box className="grid gap-8 mt-4">
                 <Stack direction="column">
                   <FormLabel
                     title={
@@ -234,6 +240,15 @@ const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInf
                       <Stack
                         direction="column"
                         className="w-1/2"
+                        sx={{
+                          '& .MuiTypography-root': {
+                            fontSize: '12px',
+                            color: '#FE0000',
+                            marginTop: '4px',
+                            fontFamily: 'Roboto',
+                            lineHeight: '1.66',
+                          },
+                        }}
                       >
                         <FormLabel
                           title="Branch name"
@@ -297,8 +312,8 @@ const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInf
               <Stack className="pb-10 pt-10">
                 <Button
                   variant="contained"
-                  fullWidth
                   className="text-lg"
+                  fullWidth
                   type="submit"
                 >
                   Next
