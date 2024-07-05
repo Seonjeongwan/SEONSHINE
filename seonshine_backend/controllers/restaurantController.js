@@ -18,10 +18,11 @@ export const getRestaurantList = async (req, res) => {
   const select =
     "SELECT u.user_id, u.username, u.user_status, GROUP_CONCAT(r.weekday ORDER BY r.weekday ASC SEPARATOR ', ') AS weekday FROM user_db.users u LEFT JOIN restaurant_db.restaurant_assigned r ON u.user_id = r.restaurant_id";
   const where =
-    "WHERE user_status IN(:user_status) AND role_id = 2 AND user_id LIKE :user_id AND username LIKE :username GROUP BY user_id";
+    "WHERE user_status IN(:user_status) AND role_id = 2 AND user_id LIKE :user_id AND username LIKE :username";
+  const groupBy = "GROUP BY user_id";
   const sorting = `ORDER BY ${sort_key} ${sort_type.toUpperCase()}`;
   const paging = "LIMIT :page_size OFFSET :offset";
-  const query = `${select} ${where} ${sorting} ${paging}`;
+  const query = `${select} ${where} ${groupBy} ${sorting} ${paging}`;
 
   const countSelect = `SELECT COUNT(*) AS total FROM user_db.users`;
   const countQuery = `${countSelect} ${where}`;
@@ -30,7 +31,11 @@ export const getRestaurantList = async (req, res) => {
     offset: Number(offset),
     user_id: `%${user_id}%`,
     username: `%${username}%`,
-    user_status: [UserStatus.active, UserStatus.inactive, UserStatus.inactiveByAdmin],
+    user_status: [
+      UserStatus.active,
+      UserStatus.inactive,
+      UserStatus.inactiveByAdmin,
+    ],
   };
 
   try {

@@ -1,11 +1,13 @@
-import React from 'react';
 import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Stack, Typography } from '@mui/material';
 
 import FormInput from '@/components/molecules/formEntity/input';
 import AccountVerificationLayout from '@/components/organims/accountVerification/accountVerificationLayout';
+
+import { paths } from '@/routes/paths';
 
 import { EmailSchema, EmailSchemaType } from '../schema';
 import { EnterEmailPropsType } from '../types';
@@ -29,6 +31,12 @@ const EnterEmail = ({ handleSubmitEmail }: EnterEmailPropsType) => {
       title="Forgot your password?"
       description="Don’t worry. Please enter your email address to reset your password"
     >
+      <Link
+        to={paths.login}
+        className="text-blue-400 !underline absolute top-2 left-3 font-medium"
+      >
+        {'< Back to Login'}
+      </Link>
       <form
         onSubmit={handleSubmit(onSubmit)}
         noValidate
