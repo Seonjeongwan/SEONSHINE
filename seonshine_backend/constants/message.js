@@ -12,4 +12,5 @@ export const messageErrors = {
   verifyCodeIncorrect: "Incorrect verification code",
   verifyCodeExpires:
     "The verification code has expired. Please re-send the verification code to try again",
+  incorrectIdPassword: "Incorrect id or password",
 };
