@@ -8,7 +8,6 @@ export const userInfoSchema = zod.object({
   username: zod.string().min(1, { message: errorMessages.require }),
   birth_date: zod
     .string()
-    .min(1, { message: errorMessages.require })
     .refine(
       (value) => {
         const date = parseISO(value);
@@ -17,9 +16,10 @@ export const userInfoSchema = zod.object({
       {
         message: 'Invalid date format',
       },
-    ),
+    )
+    .nullable(),
   branch_id: zod.number(),
-  address: zod.string().min(1, { message: errorMessages.require }),
+  address: zod.string().nullable(),
   phone_number: zod
     .string()
     .min(1, { message: errorMessages.require })

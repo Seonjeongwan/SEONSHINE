@@ -14,6 +14,7 @@ import loginBanner from '@/assets/images/login-banner.png';
 import logo from '@/assets/images/logo.png';
 import { useAuth } from '@/hooks/useAuth';
 import { paths } from '@/routes/paths';
+import { IErrorResponse } from '@/types/common';
 import { UserStatusEnum } from '@/types/user';
 
 import { useLoginApi } from '@/apis/hooks/authApi.hook';
@@ -54,10 +55,14 @@ const LoginPage = () => {
         setLoading(false);
         if (!data) return;
 
-        const { user_status, user } = data;
+        const { user_status, user, message } = data;
 
         if (Number(user_status) === UserStatusEnum.WAITING_CONFIRM) {
           setIsWaiting(true);
+        }
+
+        if (Number(user_status) === UserStatusEnum.DEACTIVATED || Number(user_status) === UserStatusEnum.CLOSE) {
+          toast.warning(message);
         }
 
         if (user) {
@@ -65,8 +70,8 @@ const LoginPage = () => {
           navigate(paths.index);
         }
       },
-      onError: () => {
-        toast.error('Login failed!');
+      onError: (err: IErrorResponse) => {
+        toast.error(err.response.data.message);
       },
     });
   };

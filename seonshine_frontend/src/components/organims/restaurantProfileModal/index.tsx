@@ -82,7 +82,7 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
     handleSubmit,
     reset,
     formState: { isDirty },
-  } = useForm({
+  } = useForm<RestaurantInfoSchemaType>({
     defaultValues: {
       username: restaurant?.username || '',
       address: restaurant?.address || '',
@@ -113,9 +113,7 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
 
   const handleCancel = () => {
     setIsEditing(false);
-    reset({
-      ...(restaurant as RestaurantInfoSchemaType),
-    });
+    reset();
   };
 
   const handleClose = () => {
@@ -157,7 +155,10 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
     setIsAvatarDeleted(true);
     const emptyFilePayload: UploadImagePayloadType = { file: new File([], '') };
     changeUserAvatar(emptyFilePayload, {
-      onSuccess: () => queryClient.invalidateQueries({ queryKey: ['getRestaurantDetail'] }),
+      onSuccess: (data) => {
+        toast.success(data.message);
+        queryClient.invalidateQueries({ queryKey: ['getRestaurantDetail'] });
+      },
       onError: () => setUploadError('Cannot delete avatar.'),
     });
     setIsConfirmModalOpen(false);
@@ -186,11 +187,7 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
           <Box className="w-full md:w-1/4 bg-black-100 flex flex-col items-center rounded-lg p-4 md:p-0">
             <div className="relative">
               {isLoading ? (
-                <Skeleton
-                  height={84}
-                  width={84}
-                  className="mt-4 md:mt-12"
-                />
+                <Skeleton className="w-36 h-36 mt-4 md:mt-12" />
               ) : (
                 <Avatar
                   src={
@@ -198,7 +195,7 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
                       ? ''
                       : `${avatarBaseURL}${restaurant?.profile_picture_url}`
                   }
-                  className="w-24 h-24 mt-4 md:mt-12"
+                  className="w-36 h-36 mt-4 md:mt-12"
                 />
               )}
               {isEditing && restaurant?.profile_picture_url && (
@@ -217,14 +214,16 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
               type="file"
               onChange={handleImageChange}
             />
-            <label htmlFor="upload-photo">
-              <Button
-                component="span"
-                className="hover:bg-green-300 hover:text-white hover:outline-green-300 bg-white text-green-200 font-bold outline outline-2 outline-green-200 mx-4 mt-4 md:mt-8 rounded-xl"
-              >
-                Select Photo
-              </Button>
-            </label>
+            {isEditing && (
+              <label htmlFor="upload-photo">
+                <Button
+                  component="span"
+                  className="hover:bg-green-300 hover:text-white hover:outline-green-300 bg-white text-green-200 font-bold outline outline-2 outline-green-200 mx-4 mt-4 md:mt-8 rounded-xl"
+                >
+                  Select Photo
+                </Button>
+              </label>
+            )}
             {uploadError && <p className="text-red-500 text-xs m-2">{uploadError}</p>}
           </Box>
           <Box className="w-full md:w-3/4 p-4 md:p-16 relative">
@@ -238,7 +237,10 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
             <form onSubmit={handleSubmit(handleSave)}>
               {fields.map((field) => {
                 return isLoading || isPending ? (
-                  <Skeleton height={30} />
+                  <Skeleton
+                    height={35}
+                    key={field.name}
+                  />
                 ) : (
                   <Box
                     key={field.name}
@@ -286,8 +288,8 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
                       Save
                     </Button>
                     <Button
-                      variant="contained"
-                      color="secondary"
+                      variant="outlined"
+                      color="primary"
                       onClick={handleCancel}
                       className="ml-2"
                     >
