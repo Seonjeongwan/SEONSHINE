@@ -1,16 +1,21 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { Box } from '@mui/material';
 
 import { StyledTab, StyledTabs } from '@/components/molecules/tab/styled';
 import TabPanel from '@/components/molecules/tab/TabPannel';
 
+import { UserManagementTabEnum } from '@/types/user';
+
 import ApprovalTab from './components/ApprovalTab';
 import RestaurantManagementTab from './components/RestaurantManagementTab';
 import UserManagementTab from './components/UserManagementTab';
 
 const UserManagement = () => {
-  const [value, setValue] = useState<number>(0);
+  const location = useLocation();
+  const localState = location.state;
+  const [value, setValue] = useState<number>(localState?.tab || UserManagementTabEnum.USER_MANAGEMENT);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);

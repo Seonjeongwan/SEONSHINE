@@ -8,7 +8,13 @@ import { Box, FormControl, InputAdornment, MenuItem, Select, Stack, TextField, T
 import { avatarBaseURL } from '@/constants/image';
 import { GetMenuListResponseType, RoleEnum } from '@/types/user';
 
-import { useGetAllRestaurantsApi, useGetMenuListlApi, useUpdateMenuItemApi } from '@/apis/hooks/userApi.hook';
+import {
+  useGetAllRestaurantsApi,
+  useGetDashBoardSummary,
+  useGetMenuListlApi,
+  useGetTodayMenuListApi,
+  useUpdateMenuItemApi,
+} from '@/apis/hooks/userApi.hook';
 import useAuthStore from '@/store/auth.store';
 
 import ModalMenuItem from './components/ModalMenuItem';
@@ -16,8 +22,12 @@ import ModalMenuItem from './components/ModalMenuItem';
 const MenuManagement = () => {
   const [query, setQuery] = useState('');
   const { currentUser } = useAuthStore();
+  const { data: dashboardSummary } = useGetDashBoardSummary({ enabled: true });
+
   const [restaurantQuery, setRestaurantQuery] = useState(
-    currentUser?.role_id == RoleEnum.ADMIN ? '' : (currentUser?.user_id as string),
+    currentUser?.role_id == RoleEnum.ADMIN
+      ? (dashboardSummary?.today_restaurant_id as string)
+      : (currentUser?.user_id as string),
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { data: allRestaurants = [] } = useGetAllRestaurantsApi({ enabled: true });
