@@ -6,18 +6,19 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Avatar, Box, Button, FormHelperText, Skeleton, Stack, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 
-import DatePicker from '@/components/molecules/datePicker';
 import ConfirmModal from '@/components/organims/confirmModal';
-import { userInfoSchema, UserInfoSchemaType } from '@/components/organims/userProfileModal/schema';
+import { restaurantInfoSchema, RestaurantInfoSchemaType } from '@/components/organims/restaurantProfileModal/schema';
 
 import { avatarBaseURL } from '@/constants/image';
 import { useAuth } from '@/hooks/useAuth';
 import {
+  dayByWeekday,
+  DayEnum,
   labelRoleById,
   labelUserStatus,
+  RestaurantDetailType,
   RoleEnum,
   UploadImagePayloadType,
-  UserDetailType,
   UserStatusEnum,
 } from '@/types/user';
 import { isValidImageFile } from '@/utils/file';
@@ -25,9 +26,8 @@ import { isValidImageFile } from '@/utils/file';
 import {
   useChangeStatusApi,
   useChangeUserAvatarApi,
-  useGetBranches,
-  useGetUserDetailApi,
-  useUpdateUserApi,
+  useGetRestaurantDetailApi,
+  useUpdateRestaurantApi,
 } from '@/apis/hooks/userApi.hook';
 
 import {
@@ -37,16 +37,11 @@ import {
   profileImageDeleteTitle,
 } from '../contants';
 
-type UserProfilePropsType = {
+type RestaurantProfilePropsType = {
   userId: string;
 };
 
-const fields: Array<{
-  name: keyof UserDetailType;
-  label: string;
-  disabled: boolean;
-  useLabel?: (id: string) => string;
-}> = [
+const fields = [
   { name: 'user_id', label: 'ID', disabled: true },
   {
     name: 'role_id',
@@ -56,8 +51,12 @@ const fields: Array<{
   },
   { name: 'username', label: 'Full name', disabled: false },
   { name: 'email', label: 'Email', disabled: true },
-  { name: 'branch_name', label: 'Branch', disabled: false },
-  { name: 'birth_date', label: 'Birth Date', disabled: false },
+  {
+    name: 'weekday',
+    label: 'Assigned date',
+    disabled: true,
+    useLabel: (weekday: string) => dayByWeekday[Number(weekday) as DayEnum] || 'None',
+  },
   { name: 'address', label: 'Address', disabled: false },
   { name: 'phone_number', label: 'Phone Number', disabled: false },
   {
@@ -68,18 +67,17 @@ const fields: Array<{
   },
 ];
 
-const UserProfile = ({ userId }: UserProfilePropsType) => {
+const RestaurantProfile = ({ userId }: RestaurantProfilePropsType) => {
   const [isAvatarDeleted, setIsAvatarDeleted] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isDeleteAvatarModalOpen, setIsDeleteAvatarModalOpen] = useState(false);
   const [isDeactiveModalOpen, setIsDeactivateModalOpen] = useState(false);
 
-  const { data: user, isLoading } = useGetUserDetailApi({ params: { user_id: userId } });
+  const { data: restaurant, isLoading } = useGetRestaurantDetailApi({ params: { restaurant_id: userId } });
 
-  const { mutate: updateUser, isPending } = useUpdateUserApi({ userId });
+  const { mutate: updateUser, isPending } = useUpdateRestaurantApi({ userId });
   const { mutate: changeUserAvatar } = useChangeUserAvatarApi(userId);
-  const { data: branchData } = useGetBranches({ enabled: true });
   const { mutate: changeStatus } = useChangeStatusApi();
 
   const {
@@ -87,15 +85,13 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
     handleSubmit,
     reset,
     formState: { isDirty },
-  } = useForm<UserInfoSchemaType>({
+  } = useForm<RestaurantInfoSchemaType>({
     values: {
-      username: user?.username || '',
-      birth_date: user?.birth_date as string | null,
-      branch_id: user?.branch_id as number,
-      address: user?.address || '',
-      phone_number: user?.phone_number || '',
+      username: restaurant?.username || '',
+      address: restaurant?.address || '',
+      phone_number: restaurant?.phone_number || '',
     },
-    resolver: zodResolver(userInfoSchema),
+    resolver: zodResolver(restaurantInfoSchema),
   });
 
   const queryClient = useQueryClient();
@@ -119,7 +115,7 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
         try {
           changeUserAvatar(imagePayload, {
             onSuccess: () => {
-              queryClient.invalidateQueries({ queryKey: ['getUserDetail'] });
+              queryClient.invalidateQueries({ queryKey: ['getRestaurantDetail'] });
               toast.success('Your profile image has been updated.');
             },
             onError: () => setUploadError('Cannot upload image.'),
@@ -137,7 +133,7 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
     changeUserAvatar(emptyFilePayload, {
       onSuccess: (data) => {
         toast.success(data.message);
-        queryClient.invalidateQueries({ queryKey: ['getUserDetail'] });
+        queryClient.invalidateQueries({ queryKey: ['getRestaurantDetail'] });
       },
       onError: () => setUploadError('Cannot delete avatar.'),
     });
@@ -148,19 +144,19 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
     setIsDeleteAvatarModalOpen(true);
   };
 
-  const handleSave = (data: UserInfoSchemaType) => {
+  const handleSave = (data: RestaurantInfoSchemaType) => {
     updateUser(
       {
         ...data,
       },
       {
         onSuccess: (res) => {
-          queryClient.invalidateQueries({ queryKey: ['getUserDetail'] });
+          queryClient.invalidateQueries({ queryKey: ['getRestaurantDetail'] });
           toast.success(res.message);
           setIsEditing(false);
         },
         onError: () => {
-          toast.error('Update user failed!');
+          toast.error('Update restaurant failed!');
         },
       },
     );
@@ -173,7 +169,7 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
   const handleDeactivateAccount = () => {
     changeStatus(
       {
-        user_id: user?.user_id as string,
+        user_id: restaurant?.user_id as string,
         status: UserStatusEnum.CLOSE,
       },
       {
@@ -226,7 +222,9 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
               ) : (
                 <Avatar
                   src={
-                    isAvatarDeleted || !user?.profile_picture_url ? '' : `${avatarBaseURL}${user?.profile_picture_url}`
+                    isAvatarDeleted || !restaurant?.profile_picture_url
+                      ? ''
+                      : `${avatarBaseURL}${restaurant?.profile_picture_url}`
                   }
                   className="w-44 h-44 bg-white text-black-500"
                 />
@@ -257,7 +255,7 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
               </label>
               <button
                 className="text-center text-lg font-bold hover:opacity-70 disabled:opacity-70"
-                disabled={!user?.profile_picture_url}
+                disabled={!restaurant?.profile_picture_url}
                 onClick={onClickRemoveAvatar}
               >
                 Remove
@@ -273,51 +271,15 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
                     key={field.name}
                   />
                 ) : (
-                  <Stack
+                  <Box
                     key={field.name}
-                    justifyContent="center"
-                    gap={2}
-                    className="mb-4"
+                    className="flex items-center mb-4"
                   >
-                    <div className="w-1/2 text-lg font-bold">{field.label}</div>
+                    <div className="w-1/2 font-bold">{field.label}</div>
                     <div className="w-1/2">
-                      {isEditing && field.name === 'birth_date' && !field.disabled ? (
-                        <DatePicker
-                          name={field.name}
-                          control={control}
-                          disabled={field.disabled}
-                          varirant="small"
-                        />
-                      ) : isEditing && field.name === 'branch_name' && !field.disabled ? (
+                      {isEditing && !field.disabled ? (
                         <Controller
-                          name="branch_id"
-                          control={control}
-                          render={({ field, fieldState: { error } }) => (
-                            <>
-                              <select
-                                {...field}
-                                onChange={(e) => field.onChange(Number(e.target.value))}
-                                className={`bg-white w-full outline-none border-b-2 border-black ${
-                                  !!error ? 'border-red-500' : 'border-black'
-                                }`}
-                              >
-                                {Array.isArray(branchData) &&
-                                  branchData.map((branch) => (
-                                    <option
-                                      key={branch.branch_id}
-                                      value={branch.branch_id}
-                                    >
-                                      {branch.branch_name}
-                                    </option>
-                                  ))}
-                              </select>
-                              {error && <p className="text-red-500 text-xs">{error.message}</p>}
-                            </>
-                          )}
-                        />
-                      ) : isEditing && !field.disabled ? (
-                        <Controller
-                          name={field.name as keyof UserInfoSchemaType}
+                          name={field.name as keyof RestaurantInfoSchemaType}
                           control={control}
                           render={({ field, fieldState: { error } }) => (
                             <>
@@ -335,12 +297,12 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
                           )}
                         />
                       ) : !!field.useLabel ? (
-                        <span>{field.useLabel(user?.[field.name] as string)}</span>
+                        <span>{field.useLabel(restaurant?.[field.name as keyof RestaurantDetailType] as string)}</span>
                       ) : (
-                        <span>{user?.[field.name as keyof UserDetailType]}</span>
+                        <span>{restaurant?.[field.name as keyof RestaurantDetailType]}</span>
                       )}
                     </div>
-                  </Stack>
+                  </Box>
                 );
               })}
               <Box className="flex justify-center">
@@ -422,4 +384,4 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
   );
 };
 
-export default UserProfile;
+export default RestaurantProfile;
