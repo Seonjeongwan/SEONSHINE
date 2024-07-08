@@ -14,6 +14,20 @@ CREATE TABLE branch_info (
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '변경일자'
 ) COMMENT '부서 정보 테이블';
 
+-- common_db.uploads definition
+
+CREATE TABLE `uploads` (
+  `file_id` int NOT NULL AUTO_INCREMENT COMMENT 'File Id',
+  `original_name` varchar(200) DEFAULT NULL COMMENT 'Original name',
+  `type` varchar(100) DEFAULT NULL COMMENT 'File type',
+  `filename` varchar(50) DEFAULT NULL COMMENT 'File name',
+  `full_path` varchar(200) DEFAULT NULL COMMENT 'File full path',
+  `size` int DEFAULT NULL COMMENT 'Size of file',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '변경일자',
+  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '변경일자',
+  PRIMARY KEY (`file_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 -- user database: user_db
 CREATE DATABASE user_db;
 
@@ -52,7 +66,8 @@ CREATE TABLE IF NOT EXISTS verification (
     email VARCHAR(255) NOT NULL COMMENT '인증 이메일',
     code VARCHAR(10) NOT NULL COMMENT '인증번호',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expiration BIGINT NOT NULL COMMENT '만료시간'
+    expiration BIGINT NOT NULL COMMENT '만료시간',
+    type varchar(50) NOT NULL
 ) COMMENT '이메일 인증 테이블';
 
 -- 사용자 활동 로그 테이블
@@ -72,7 +87,7 @@ USE restaurant_db;
 
 -- 요일별 식당정보 테이블
 CREATE TABLE restaurant_assigned (
-  weekday VARCHAR(20) PRIMARY KEY COMMENT '요일 정보: 월화수목금',
+  weekday int PRIMARY KEY COMMENT '요일 정보: 월화수목금',
   restaurant_id VARCHAR(20) NOT NULL COMMENT '식당 ID',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '생성일자',
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '변경일자',
@@ -89,6 +104,7 @@ CREATE TABLE menu_items (
   price INT COMMENT '가격',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  image_url varchar(255) DEFAULT NULL,
   UNIQUE (restaurant_id, item_id),
   FOREIGN KEY (restaurant_id) REFERENCES user_db.users(user_id) ON DELETE NO ACTION
 ) COMMENT '음식 메뉴 항목 테이블';
@@ -121,7 +137,7 @@ CREATE TABLE order_items (
   user_id VARCHAR(20) COMMENT '이용자 ID',
   branch_id INT COMMENT '부서번호',
   restaurant_id VARCHAR(20) NOT NULL COMMENT '식당 ID',
-  item_id INT NOT NULL,
+  item_name varchar(100) NOT NULL,
   quantity INT COMMENT '갯수인데 확장성 위해 보류',
   price INT COMMENT '가격처리 확장성 위해 보류',
   cancel_yn VARCHAR(10) COMMENT '주문 취소 여부 취소 0 재주문 1',

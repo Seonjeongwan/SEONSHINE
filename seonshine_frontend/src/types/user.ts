@@ -313,3 +313,9 @@ export type GetDashboardSummaryResponseType = {
   today_order_users_count: number;
   assigned_weekdays: number[];
 };
+
+export enum UserManagementTabEnum {
+  USER_MANAGEMENT = 0,
+  RESTAURANT_MANAGEMENT = 1,
+  USER_APPROVAL = 2,
+}
