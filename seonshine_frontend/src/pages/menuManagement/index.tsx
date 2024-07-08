@@ -1,14 +1,36 @@
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 
-import { RestaurantRounded } from '@mui/icons-material';
+import {
+  Close,
+  Delete as DeleteIcon,
+  HighlightOff,
+  HighlightOffOutlined,
+  RestaurantRounded,
+} from '@mui/icons-material';
 import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
 import SearchIcon from '@mui/icons-material/Search';
-import { Box, FormControl, InputAdornment, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  FormControl,
+  Icon,
+  IconButton,
+  InputAdornment,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { useQueryClient } from '@tanstack/react-query';
+
+import ConfirmModal from '@/components/organims/confirmModal';
 
 import { avatarBaseURL } from '@/constants/image';
 import { GetMenuListResponseType, RoleEnum } from '@/types/user';
 
 import {
+  useDeleteMenuItemApi,
   useGetAllRestaurantsApi,
   useGetDashBoardSummary,
   useGetMenuListlApi,
@@ -17,6 +39,7 @@ import {
 } from '@/apis/hooks/userApi.hook';
 import useAuthStore from '@/store/auth.store';
 
+import { approvalItemDelete, approvalItemleteDescription } from './components/constant';
 import ModalMenuItem from './components/ModalMenuItem';
 
 const MenuManagement = () => {
@@ -26,12 +49,13 @@ const MenuManagement = () => {
 
   const [restaurantQuery, setRestaurantQuery] = useState(
     currentUser?.role_id == RoleEnum.ADMIN
-      ? (dashboardSummary?.today_restaurant_id as string)
+      ? (dashboardSummary?.today_restaurant_id as string) || ''
       : (currentUser?.user_id as string),
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { data: allRestaurants = [] } = useGetAllRestaurantsApi({ enabled: true });
   const [selectedItem, setSelectedItem] = useState<GetMenuListResponseType | null>(null);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
 
   const {
     data: menuList,
@@ -40,6 +64,8 @@ const MenuManagement = () => {
   } = useGetMenuListlApi({
     restaurant_id: restaurantQuery,
   });
+
+  const { mutate: deleteMenuItem, isPending: isLoadingDelete } = useDeleteMenuItemApi(selectedItem?.item_id as number);
 
   const [filteredDishes, setFilteredDishes] = useState(menuList);
 
@@ -66,15 +92,34 @@ const MenuManagement = () => {
     setIsModalOpen(true);
   };
 
+  const queryClient = useQueryClient();
+
+  const handleDeleteItem = () => {
+    deleteMenuItem(undefined, {
+      onSuccess: (data) => {
+        toast.success(data.message);
+        queryClient.invalidateQueries({ queryKey: ['getMenuList'] });
+      },
+      onError: () => {
+        toast.error('Delete menu item failed!');
+      },
+    });
+    setIsConfirmModalOpen(false);
+  };
+
+  const handleClickAction = () => {
+    setIsConfirmModalOpen(true);
+  };
+
   return (
     <Box className="px-4 md:px-8">
       <Stack direction="column">
         <Box className="sticky top-0 z-10 h-full w-full bg-black-100">
-          <Stack className="h-full">
+          <Stack className="h-full flex-col md:flex-row">
             {currentUser?.role_id == RoleEnum.ADMIN && (
               <FormControl
                 variant="outlined"
-                className="w-1/2 md:w-1/4 rounded-xl mr-4"
+                className="w-full md:w-1/4 rounded-xl mb-4 md:mr-4 md:mb-0"
               >
                 <Select
                   displayEmpty
@@ -110,30 +155,33 @@ const MenuManagement = () => {
                 </Select>
               </FormControl>
             )}
-            <TextField
-              value={query}
-              placeholder="Search For Menu Item"
-              onChange={(e) => setQuery(e.target.value)}
-              variant="outlined"
-              className="bg-white rounded-xl h-full w-1/2"
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  height: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  '& fieldset': {
-                    border: 'none',
+            {restaurantQuery && (
+              <TextField
+                value={query}
+                placeholder="Search for menu item"
+                onChange={(e) => setQuery(e.target.value)}
+                variant="outlined"
+                className="bg-white rounded-xl h-full w-full md:w-1/2"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    '& fieldset': {
+                      border: 'none',
+                    },
+                    paddingY: '12,5',
                   },
-                },
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            )}
           </Stack>
           <Typography
             variant="h4"
@@ -143,15 +191,26 @@ const MenuManagement = () => {
             Menu List
           </Typography>
         </Box>
-        <Stack className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <Stack className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredDishes?.map((dish, index) => (
             <Stack
               key={dish.name + index}
-              className="rounded-md p-6 m-2 box-border cursor-pointer bg-white transition-transform transform hover:scale-105 hover:shadow-lg"
+              className="relative rounded-md p-6 m-2 box-border cursor-pointer bg-white transition-transform transform hover:scale-105 hover:shadow-lg min-w-fit"
               direction="column"
               gap={2}
               onClick={() => handleOpenModal(dish)}
             >
+              <IconButton
+                disabled={isLoadingDelete}
+                className="absolute top-0 left-0 m-8 bg-white hover:bg-black-100 hover:text-black-500 transition-colors"
+                onClick={(e) => {
+                  setSelectedItem(dish);
+                  e.stopPropagation();
+                  handleClickAction();
+                }}
+              >
+                <Close sx={{ fontSize: 16 }} />
+              </IconButton>
               <Box className="w-full h-48 md:h-64 bg-gray-200 flex items-center justify-center overflow-hidden rounded-md">
                 {dish.image_url ? (
                   <img
@@ -171,21 +230,23 @@ const MenuManagement = () => {
               <Typography className="font-bold">{dish.name}</Typography>
             </Stack>
           ))}
-          <Stack
-            className="rounded-md p-6 m-2 box-border bg-gray-200 cursor-pointer opacity-50 transition-transform transform hover:scale-105 hover:shadow-lg"
-            direction="column"
-            justifyContent="center"
-            alignItems="center"
-            gap={2}
-            onClick={handleOpenCreateModal}
-          >
-            <Box className="w-full h-48 md:h-64 flex items-center justify-center overflow-hidden rounded-md">
-              <AddCircleRoundedIcon
-                className="w-1/2 h-1/2 opacity-30"
-                fontSize="large"
-              />
-            </Box>
-          </Stack>
+          {restaurantQuery && (
+            <Stack
+              className="rounded-md p-6 m-2 box-border bg-gray-200 cursor-pointer opacity-50 transition-transform transform hover:scale-105 hover:shadow-lg"
+              direction="column"
+              justifyContent="center"
+              alignItems="center"
+              gap={2}
+              onClick={handleOpenCreateModal}
+            >
+              <Box className="w-full h-48 md:h-64 flex items-center justify-center overflow-hidden rounded-md">
+                <AddCircleRoundedIcon
+                  className="w-1/2 h-1/2 opacity-30"
+                  fontSize="large"
+                />
+              </Box>
+            </Stack>
+          )}
         </Stack>
       </Stack>
       {isModalOpen && (
@@ -196,6 +257,13 @@ const MenuManagement = () => {
           onClose={handleCloseModal}
         />
       )}
+      <ConfirmModal
+        open={isConfirmModalOpen}
+        title={approvalItemDelete}
+        description={approvalItemleteDescription}
+        handleClose={() => setIsConfirmModalOpen(false)}
+        handleConfirm={handleDeleteItem}
+      />
     </Box>
   );
 };
