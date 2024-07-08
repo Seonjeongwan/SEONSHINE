@@ -152,17 +152,13 @@ export const login = async (req, res) => {
           const token = generateToken(user);
           response.user = { ...user, token };
         }
-        res.status(httpStatusCodes.success).send(response);
-      } else {
-        res
-          .status(httpStatusCodes.unauthorized)
-          .send({ message: "Invalid credentials", status: 401 });
+        return res.status(httpStatusCodes.success).send(response);
       }
-    } else {
-      res
-        .status(httpStatusCodes.badRequest)
-        .json({ message: "User not exist" });
     }
+    return res.status(httpStatusCodes.badRequest).send({
+      message: messageErrors.incorrectIdPassword,
+      errorCode: errorCodes.incorrectIdAndPassword,
+    });
   } catch (error) {
     res
       .status(httpStatusCodes.internalServerError)
@@ -300,7 +296,7 @@ export const changePassword = async (req, res) => {
       },
     });
 
-    console.log('user :>> ', user);
+    console.log("user :>> ", user);
 
     if (!user) {
       return res.status(400).send("User not found");

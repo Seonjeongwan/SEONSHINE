@@ -3,39 +3,43 @@ import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import CloseIcon from '@mui/icons-material/Close';
-import EditIcon from '@mui/icons-material/Edit';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import { Avatar, Box, Button, IconButton, Modal, Skeleton } from '@mui/material';
+import { Avatar, Box, Button, FormHelperText, Skeleton, Stack, Typography } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 
 import DatePicker from '@/components/molecules/datePicker';
-
-import {
-  approvalImageDelete,
-  approvalImageDeleteDescription,
-} from '@/pages/userManagement/components/ApprovalTab/constants';
+import ConfirmModal from '@/components/organims/confirmModal';
+import { userInfoSchema, UserInfoSchemaType } from '@/components/organims/userProfileModal/schema';
 
 import { avatarBaseURL } from '@/constants/image';
-import { labelRoleById, labelUserStatus, RoleEnum, UploadImagePayloadType, UserStatusEnum } from '@/types/user';
-import { UserDetailType } from '@/types/user';
+import { useAuth } from '@/hooks/useAuth';
+import {
+  labelRoleById,
+  labelUserStatus,
+  RoleEnum,
+  UploadImagePayloadType,
+  UserDetailType,
+  UserStatusEnum,
+} from '@/types/user';
 import { isValidImageFile } from '@/utils/file';
 
 import {
+  useChangeStatusApi,
   useChangeUserAvatarApi,
   useGetBranches,
   useGetUserDetailApi,
   useUpdateUserApi,
 } from '@/apis/hooks/userApi.hook';
 
-import ConfirmModal from '../confirmModal';
-import { userInfoSchema, UserInfoSchemaType } from './schema';
+import {
+  deactivateAccountDescription,
+  deactivateAccountTitle,
+  profileImageDeleteDescription,
+  profileImageDeleteTitle,
+} from '../contants';
 
-interface UserProfileModalProps {
+type UserProfilePropsType = {
   userId: string;
-  isOpen: boolean;
-  onClose: () => void;
-}
+};
 
 const fields: Array<{
   name: keyof UserDetailType;
@@ -64,18 +68,19 @@ const fields: Array<{
   },
 ];
 
-const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onClose }) => {
-  const { data: user, isLoading } = useGetUserDetailApi({ params: { user_id: userId } });
-  const { mutate: changeUserAvatar } = useChangeUserAvatarApi(userId);
-
-  const { data: branchData } = useGetBranches({ enabled: true });
-
-  const { mutate: updateUser, isPending } = useUpdateUserApi({ userId });
-
+const UserProfile = ({ userId }: UserProfilePropsType) => {
+  const [isAvatarDeleted, setIsAvatarDeleted] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [isAvatarDeleted, setIsAvatarDeleted] = useState(false);
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
+  const [isDeleteAvatarModalOpen, setIsDeleteAvatarModalOpen] = useState(false);
+  const [isDeactiveModalOpen, setIsDeactivateModalOpen] = useState(false);
+
+  const { data: user, isLoading } = useGetUserDetailApi({ params: { user_id: userId } });
+
+  const { mutate: updateUser, isPending } = useUpdateUserApi({ userId });
+  const { mutate: changeUserAvatar } = useChangeUserAvatarApi(userId);
+  const { data: branchData } = useGetBranches({ enabled: true });
+  const { mutate: changeStatus } = useChangeStatusApi();
 
   const {
     control,
@@ -85,7 +90,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
   } = useForm<UserInfoSchemaType>({
     defaultValues: {
       username: user?.username || '',
-      birth_date: user?.birth_date || '',
+      birth_date: user?.birth_date as string | null,
       branch_id: user?.branch_id as number,
       address: user?.address || '',
       phone_number: user?.phone_number || '',
@@ -94,36 +99,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
   });
 
   const queryClient = useQueryClient();
-
-  const handleEditToggle = () => setIsEditing(!isEditing);
-
-  const handleSave = (data: UserInfoSchemaType) => {
-    updateUser(
-      {
-        ...data,
-      },
-      {
-        onSuccess: (res) => {
-          queryClient.invalidateQueries({ queryKey: ['getUserDetail'] });
-          toast.success(res.message);
-          setIsEditing(false);
-        },
-        onError: () => {
-          toast.error('Update user failed!');
-        },
-      },
-    );
-  };
-
-  const handleCancel = () => {
-    setIsEditing(false);
-    reset();
-  };
-
-  const handleClose = () => {
-    onClose();
-    setIsEditing(false);
-  };
+  const { logout } = useAuth();
 
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     setUploadError(null);
@@ -167,11 +143,60 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
       },
       onError: () => setUploadError('Cannot delete avatar.'),
     });
-    setIsConfirmModalOpen(false);
+    setIsDeleteAvatarModalOpen(false);
   };
 
-  const handleClickAction = () => {
-    setIsConfirmModalOpen(true);
+  const onClickRemoveAvatar = () => {
+    setIsDeleteAvatarModalOpen(true);
+  };
+
+  const handleSave = (data: UserInfoSchemaType) => {
+    updateUser(
+      {
+        ...data,
+      },
+      {
+        onSuccess: (res) => {
+          queryClient.invalidateQueries({ queryKey: ['getUserDetail'] });
+          toast.success(res.message);
+          setIsEditing(false);
+        },
+        onError: () => {
+          toast.error('Update user failed!');
+        },
+      },
+    );
+  };
+
+  const onClickDeactivateButton = () => {
+    setIsDeactivateModalOpen(true);
+  };
+
+  const handleDeactivateAccount = () => {
+    changeStatus(
+      {
+        user_id: user?.user_id as string,
+        status: UserStatusEnum.CLOSE,
+      },
+      {
+        onSuccess: () => {
+          toast.success('This account has been deactivated. Please contact admin to reactivate account.', {
+            autoClose: 2000,
+            onClose: () => {
+              logout();
+            },
+          });
+        },
+        onError: () => {
+          toast.error("Can't deactivate this account!");
+        },
+      },
+    );
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    reset();
   };
 
   useEffect(() => {
@@ -184,62 +209,73 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
   }, [user]);
 
   return (
-    <Modal
-      open={isOpen}
-      onClose={handleClose}
-      aria-labelledby="user-profile-modal-title"
-      aria-describedby="user-profile-modal-description"
+    <Stack
+      direction="column"
+      className="w-full md:w-150"
     >
-      <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full md:w-2/3 lg:w-2/5 bg-white shadow-xl rounded-lg">
-        <Box className="flex flex-col md:flex-row">
-          <Box className="w-full md:w-1/4 bg-black-100 flex flex-col items-center rounded-lg p-4 md:p-0 relative">
-            <div className="relative">
+      <Stack direction="column">
+        <Typography
+          variant="heading4"
+          component="h3"
+          className="my-4"
+        >
+          User List
+        </Typography>
+        <Stack
+          className="bg-white w-full"
+          direction="column"
+        >
+          <Stack
+            alignItems="center"
+            justifyContent="center"
+            gap={12}
+            className="w-full bg-gray-200 px-12 py-8"
+          >
+            <Box className="relative">
               {isLoading ? (
-                <Skeleton className="w-36 h-36 mt-4 md:mt-12" />
+                <Skeleton className="w-44 h-44" />
               ) : (
                 <Avatar
                   src={
                     isAvatarDeleted || !user?.profile_picture_url ? '' : `${avatarBaseURL}${user?.profile_picture_url}`
                   }
-                  className="w-36 h-36 mt-4 md:mt-12"
+                  className="w-44 h-44 bg-white text-black-500"
                 />
               )}
-              {isEditing && user?.profile_picture_url && (
-                <IconButton
-                  className="absolute top-7 md:top-14 right-0 bg-red-500 text-white p-0.5 hover:bg-red-500"
-                  onClick={handleClickAction}
-                >
-                  <CloseIcon sx={{ fontSize: 16 }} />
-                </IconButton>
-              )}
-            </div>
-            <input
-              accept="image/*"
-              className="hidden"
-              id="upload-photo"
-              type="file"
-              onChange={handleImageChange}
-            />
-            {isEditing && (
+              {uploadError && <FormHelperText className="text-red-500 text-xs m-2">{uploadError}</FormHelperText>}
+            </Box>
+            <Stack
+              direction="column"
+              justifyContent="center"
+              alignItems="center"
+              gap={4}
+              className="px-4"
+            >
+              <input
+                accept="image/*"
+                className="hidden"
+                id="upload-photo"
+                type="file"
+                onChange={handleImageChange}
+              />
               <label htmlFor="upload-photo">
                 <Button
                   component="span"
-                  className="hover:bg-green-300 hover:text-white hover:outline-green-300 bg-white text-green-200 font-bold outline outline-2 outline-green-200 mx-4 mt-4 md:mt-8 rounded-xl"
+                  className="hover:bg-green-300 hover:text-white hover:outline-green-300 bg-white text-green-200 outline outline-2 outline-green-200 rounded-xl"
                 >
-                  Select Photo
+                  <Typography className="text-lg font-bold text-center">Select Photo</Typography>
                 </Button>
               </label>
-            )}
-            {uploadError && <p className="text-red-500 text-xs m-2">{uploadError}</p>}
-          </Box>
-          <Box className="w-full md:w-3/4 p-4 md:p-16 relative">
-            <IconButton
-              className="absolute top-6 right-6"
-              onClick={handleEditToggle}
-            >
-              {!isEditing ? <EditOutlinedIcon /> : <EditIcon />}
-            </IconButton>
-
+              <button
+                className="text-center text-lg font-bold hover:opacity-70 disabled:opacity-70"
+                disabled={!user?.profile_picture_url}
+                onClick={onClickRemoveAvatar}
+              >
+                Remove
+              </button>
+            </Stack>
+          </Stack>
+          <Box className="w-full py-8 px-16">
             <form onSubmit={handleSubmit(handleSave)}>
               {fields.map((field) => {
                 return isLoading || isPending ? (
@@ -248,11 +284,13 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
                     key={field.name}
                   />
                 ) : (
-                  <Box
+                  <Stack
                     key={field.name}
-                    className="flex items-center mb-4"
+                    justifyContent="center"
+                    gap={2}
+                    className="mb-4"
                   >
-                    <div className="w-1/2 font-bold">{field.label}</div>
+                    <div className="w-1/2 text-lg font-bold">{field.label}</div>
                     <div className="w-1/2">
                       {isEditing && field.name === 'birth_date' && !field.disabled ? (
                         <DatePicker
@@ -313,10 +351,10 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
                         <span>{user?.[field.name as keyof UserDetailType]}</span>
                       )}
                     </div>
-                  </Box>
+                  </Stack>
                 );
               })}
-              <Box className="flex justify-end">
+              <Box className="flex justify-center">
                 {isEditing ? (
                   <>
                     <Button
@@ -337,22 +375,62 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
                     </Button>
                   </>
                 ) : (
-                  <Button onClick={handleClose}>OK</Button>
+                  <Button
+                    className="text-base font-bold uppercase bg-blue-400 px-8 py-1"
+                    onClick={() => setIsEditing(!isEditing)}
+                  >
+                    Edit
+                  </Button>
                 )}
               </Box>
             </form>
           </Box>
-          <ConfirmModal
-            open={isConfirmModalOpen}
-            title={approvalImageDelete}
-            description={approvalImageDeleteDescription}
-            handleClose={() => setIsConfirmModalOpen(false)}
-            handleConfirm={handleAvatarDelete}
-          />
-        </Box>
-      </Box>
-    </Modal>
+        </Stack>
+      </Stack>
+      <Stack direction="column">
+        <Typography
+          variant="heading4"
+          component="h3"
+          className="my-4"
+        >
+          Activity
+        </Typography>
+        <Stack
+          className="bg-white w-full py-6"
+          direction="column"
+          alignItems="center"
+          gap={4}
+        >
+          <Typography
+            variant="heading4"
+            component="h4"
+          >
+            Deactivate your account?
+          </Typography>
+          <Button
+            className="bg-red-300 hover:bg-red-500 rounded-full"
+            onClick={onClickDeactivateButton}
+          >
+            Deactivate
+          </Button>
+        </Stack>
+      </Stack>
+      <ConfirmModal
+        open={isDeleteAvatarModalOpen}
+        title={profileImageDeleteTitle}
+        description={profileImageDeleteDescription}
+        handleClose={() => setIsDeleteAvatarModalOpen(false)}
+        handleConfirm={handleAvatarDelete}
+      />
+      <ConfirmModal
+        open={isDeactiveModalOpen}
+        title={deactivateAccountTitle}
+        description={deactivateAccountDescription}
+        handleClose={() => setIsDeactivateModalOpen(false)}
+        handleConfirm={handleDeactivateAccount}
+      />
+    </Stack>
   );
 };
 
-export default UserProfileModal;
+export default UserProfile;

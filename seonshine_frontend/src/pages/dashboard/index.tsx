@@ -15,16 +15,15 @@ import Table from '@/components/organims/table';
 
 import { days } from '@/constants/date';
 import { avatarBaseURL } from '@/constants/image';
-import useTable from '@/hooks/useTable';
 import { OrderListType, UserOrderTabEnum } from '@/types/order';
-import { RoleEnum } from '@/types/user';
+import { RoleEnum, UserManagementTabEnum } from '@/types/user';
 
 import {
   useGetOrderListDetailApi,
   useGetOrderListSummaryApi,
   useGetOrderPeriodApi,
 } from '@/apis/hooks/orderListApi.hook';
-import { useGetDashBoardSummary, useGetTodayMenuListApi } from '@/apis/hooks/userApi.hook';
+import { useGetDashBoardSummary, useGetMenuListlApi, useGetTodayMenuListApi } from '@/apis/hooks/userApi.hook';
 import useAuthStore from '@/store/auth.store';
 
 import { DateSchema, DateSchemaType } from '../orderManagement/components/OrderListTab/schema';
@@ -39,6 +38,7 @@ const Dashboard = () => {
     centerPadding: '60px',
     slidesToShow: 5,
     swipeToSlide: true,
+    scrollToSlide: true,
     afterChange: function (index: number) {},
     responsive: [
       {
@@ -58,8 +58,8 @@ const Dashboard = () => {
     ],
   };
 
+  const todayIndex = new Date().getDay();
   const ITEMS_PER_PAGE = 10;
-
   const today = format(new Date(), 'yyyy-MM-dd');
   const queryClient = useQueryClient();
   const {
@@ -103,6 +103,9 @@ const Dashboard = () => {
   }, [currentUser, orderListSummary, orderList]);
 
   const { data: todayMenuList } = useGetTodayMenuListApi({ enabled: true });
+  const { data: restaurantSelfMenuList } = useGetMenuListlApi({
+    restaurant_id: currentUser?.user_id || '',
+  });
   const { data: dashboardSummary } = useGetDashBoardSummary({ enabled: true });
   const { data: orderPeriod } = useGetOrderPeriodApi();
 
@@ -134,21 +137,46 @@ const Dashboard = () => {
     return days[dayNumber];
   };
 
+  const restaurantIsAssigned = () => {
+    return dashboardSummary?.assigned_weekdays?.includes(todayIndex);
+  };
+
+  const menuList = currentUser?.role_id === RoleEnum.RESTAURANT ? restaurantSelfMenuList : todayMenuList?.menu_list;
   const renderAdminBoxes = () => (
     <>
-      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+      <Box
+        className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4 cursor-pointer"
+        onClick={() => {
+          navigate('/restaurant-assign');
+        }}
+      >
         <Stack className="flex-grow">Today's Restaurant</Stack>
         <Stack className="font-bold text-2xl">{dashboardSummary?.today_restaurant_name}</Stack>
       </Box>
-      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+      <Box
+        className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4 cursor-pointer"
+        onClick={() => {
+          navigate('/order');
+        }}
+      >
         <Stack className="flex-grow">Ordered Users</Stack>
         <Stack className="self-end font-bold text-2xl">{dashboardSummary?.ordered_users_count}</Stack>
       </Box>
-      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+      <Box
+        className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4 cursor-pointer"
+        onClick={() => {
+          navigate('/user');
+        }}
+      >
         <Stack className="flex-grow">Active Users</Stack>
         <Stack className="self-end font-bold text-2xl">{dashboardSummary?.active_users_count}</Stack>
       </Box>
-      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+      <Box
+        className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4 cursor-pointer"
+        onClick={() => {
+          navigate('/user', { state: { tab: UserManagementTabEnum.USER_APPROVAL } });
+        }}
+      >
         <Stack className="flex-grow">Waiting for Approval</Stack>
         <Stack className="self-end font-bold text-2xl">{dashboardSummary?.waiting_approval_users_count}</Stack>
       </Box>
@@ -157,21 +185,42 @@ const Dashboard = () => {
 
   const renderUserBoxes = () => (
     <>
-      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+      <Box
+        className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4 cursor-pointer"
+        onClick={() => {
+          navigate('/order-menu', { state: { tab: UserOrderTabEnum.ORDER_MENU } });
+        }}
+      >
         <Stack className="flex-grow">Today's Restaurant</Stack>
         <Stack className="font-bold text-2xl">{dashboardSummary?.today_restaurant_name}</Stack>
       </Box>
-      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+
+      <Box
+        className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4 cursor-pointer"
+        onClick={() => {
+          navigate('/order-menu', { state: { tab: UserOrderTabEnum.ORDER_MENU } });
+        }}
+      >
         <Stack className="flex-grow">Order Status</Stack>
         <Stack className="self-end font-bold text-2xl">
           {dashboardSummary?.current_order_status == 1 ? 'Ordered' : 'Not Ordered'}
         </Stack>
       </Box>
-      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+      <Box
+        className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4 cursor-pointer"
+        onClick={() => {
+          navigate('/order-menu', { state: { tab: UserOrderTabEnum.ORDER_MENU } });
+        }}
+      >
         <Stack className="flex-grow">Ordered Item</Stack>
-        <Stack className="self-end font-bold text-2xl">{dashboardSummary?.current_order_item_name}</Stack>
+        <Stack className="self-end font-bold text-2xl">{dashboardSummary?.current_order_item_name || 'None'}</Stack>
       </Box>
-      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+      <Box
+        className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4 cursor-pointer"
+        onClick={() => {
+          navigate('/order-menu', { state: { tab: UserOrderTabEnum.ORDER_LIST } });
+        }}
+      >
         <Stack className="flex-grow">Ordered Users</Stack>
         <Stack className="self-end font-bold text-2xl">{dashboardSummary?.today_order_users_count}</Stack>
       </Box>
@@ -186,10 +235,12 @@ const Dashboard = () => {
           {dashboardSummary?.assigned_weekdays?.map((day) => dayMapper(day)).join(', ')}
         </Stack>
       </Box>
-      <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
-        <Stack className="flex-grow">Order Status</Stack>
-        <Stack className="self-end font-bold text-2xl">{isOrderEnabled() ? 'Waiting' : 'Ordered'}</Stack>
-      </Box>
+      {restaurantIsAssigned() && (
+        <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+          <Stack className="flex-grow">Order Status</Stack>
+          <Stack className="self-end font-bold text-2xl">{isOrderEnabled() ? 'Waiting' : 'Ordered'}</Stack>
+        </Box>
+      )}
     </>
   );
   const renderHeaderSummaryBoxesBasedRole = (role_id: RoleEnum | undefined) => {
@@ -210,9 +261,13 @@ const Dashboard = () => {
             alignItems="center"
             justifyContent="space-between"
           >
-            <h2 className="text-2xl font-bold">Today's Menu</h2>
+            {currentUser?.role_id == RoleEnum.RESTAURANT ? (
+              <h2 className="text-2xl font-bold">Menu List</h2>
+            ) : (
+              <h2 className="text-2xl font-bold">Today's Menu</h2>
+            )}
             <Link
-              to="/menu"
+              to={currentUser?.role_id === RoleEnum.USER ? '/order-menu' : '/menu'}
               className="text-blue-500 !underline"
             >
               View more
@@ -227,7 +282,7 @@ const Dashboard = () => {
             }}
           >
             <Slider {...settings}>
-              {todayMenuList?.menu_list.map((dish, index) => (
+              {menuList?.map((dish, index) => (
                 <Box
                   key={index}
                   className="p-2 md:p-4 outline-none"

@@ -193,13 +193,14 @@ export const discardCurrentOrderItem = async (req, res) => {
 };
 
 export const getOrderListSummary = async (req, res) => {
-  const { date = "" } = req.query;
+  const { date = "", branch_id } = req.query;
   const currentUser = req.user;
   const { user_id, role_id } = currentUser;
 
   try {
     let condition = {
       order_date: date,
+      branch_id,
       [Op.or]: [
         {
           cancel_yn: {
@@ -256,13 +257,13 @@ export const getOrderListSummary = async (req, res) => {
 };
 
 export const getOrderListDetail = async (req, res) => {
-  const { date = "" } = req.query;
+  const { date = "", branch_id } = req.query;
 
   const select =
     "SELECT o.user_id, o.restaurant_id, o.item_id, o.item_name, u.username, u2.username as restaurant_name, o.updated_at as submitted_time FROM order_db.order_items o JOIN user_db.users u ON o.user_id = u.user_id JOIN user_db.users u2 ON o.restaurant_id = u2.user_id";
 
   const where =
-    "WHERE (o.order_date = :date) AND (o.cancel_yn != 0 OR o.cancel_yn is null)";
+    "WHERE (o.branch_id = :branch_id) AND (o.order_date = :date) AND (o.cancel_yn != 0 OR o.cancel_yn is null)";
 
   const query = `${select} ${where}`;
 
@@ -270,6 +271,7 @@ export const getOrderListDetail = async (req, res) => {
     const rows = await sequelizeOrderDb.query(query, {
       replacements: {
         date,
+        branch_id,
       },
       type: QueryTypes.SELECT,
     });
@@ -301,8 +303,8 @@ export const getOrderHistory = async (req, res) => {
     const { from, to } = req.query;
     const currentUser = req.user;
     const { user_id, role_id } = currentUser;
-    const select = `SELECT o.order_id, o.branch_id, o.restaurant_id, o.order_date, o.total_amount, u.username as restaurant_name, p.address as restaurant_address, p.profile_picture_url as restaurant_image_url 
-    FROM order_db.order_history o JOIN user_db.users u ON o.restaurant_id = u.user_id LEFT JOIN user_db.user_profiles p ON p.user_id = o.restaurant_id`;
+    const select = `SELECT o.order_id, o.branch_id, o.restaurant_id, o.order_date, o.total_amount, u.username as restaurant_name, p.address as restaurant_address, p.profile_picture_url as restaurant_image_url, b.branch_name 
+    FROM order_db.order_history o JOIN user_db.users u ON o.restaurant_id = u.user_id LEFT JOIN user_db.user_profiles p ON p.user_id = o.restaurant_id JOIN common_db.branch_info b ON b.branch_id = o.branch_id`;
 
     let where = "WHERE order_date between :from AND :to";
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Menu } from '@mui/icons-material';
 import { Box, Drawer, IconButton, Stack } from '@mui/material';
@@ -15,10 +15,71 @@ type MainLayoutPropsType = {
 
 const MainLayout = ({ children, role }: MainLayoutPropsType) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const iconRef = useRef<HTMLButtonElement>(null);
+  const startPositionRef = useRef({ startY: 0, startTop: 0 });
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
+
+  const handleDragMove = (moveEvent: MouseEvent | TouchEvent) => {
+    const icon = iconRef.current;
+    if (!icon) return;
+
+    const moveY = 'touches' in moveEvent ? moveEvent.touches[0].clientY : moveEvent.clientY;
+    const deltaY = moveY - startPositionRef.current.startY;
+    let newTop = startPositionRef.current.startTop + deltaY;
+
+    const minTop = 0;
+    const maxTop = window.innerHeight - icon.offsetHeight;
+    newTop = Math.max(minTop, Math.min(newTop, maxTop));
+
+    if (icon.style.top !== `${newTop}px`) {
+      icon.style.top = `${newTop}px`;
+      icon.style.transform = 'translateY(0)';
+    }
+  };
+
+  const handleDragEnd = () => {
+    window.removeEventListener('mousemove', handleDragMove);
+    window.removeEventListener('mouseup', handleDragEnd);
+    window.removeEventListener('touchmove', handleDragMove);
+    window.removeEventListener('touchend', handleDragEnd);
+  };
+
+  const handleDragStart = (event: MouseEvent | TouchEvent) => {
+    const icon = iconRef.current;
+    if (!icon) return;
+
+    const startY = 'touches' in event ? event.touches[0].clientY : event.clientY;
+
+    const startTop = icon.getBoundingClientRect().top;
+
+    startPositionRef.current = { startY, startTop };
+
+    window.addEventListener('mousemove', handleDragMove);
+    window.addEventListener('mouseup', handleDragEnd);
+    window.addEventListener('touchmove', handleDragMove);
+    window.addEventListener('touchend', handleDragEnd);
+  };
+
+  useEffect(() => {
+    const icon = iconRef.current;
+    if (icon) {
+      icon.style.position = 'absolute';
+      icon.style.top = '50%';
+      icon.style.left = '-8px';
+      icon.style.transform = 'translateY(-50%)';
+
+      icon.addEventListener('mousedown', handleDragStart);
+      icon.addEventListener('touchstart', handleDragStart);
+
+      return () => {
+        icon.removeEventListener('mousedown', handleDragStart);
+        icon.removeEventListener('touchstart', handleDragStart);
+      };
+    }
+  }, []);
 
   return (
     <Stack className="h-screen bg-black-100 overflow-hidden">
@@ -39,13 +100,15 @@ const MainLayout = ({ children, role }: MainLayoutPropsType) => {
       <Stack
         direction="column"
         gap={4}
-        className="flex-1 overflow-hidden py-8"
+        className="flex-1 overflow-hidden pt-8"
       >
         <IconButton
-          className="md:hidden absolute top-1/2 -left-2 -translate-y-1/2 bg-gray-200 rounded-md w-12 h-14 opacity-60 hover:opacity-100"
+          ref={iconRef}
+          className="md:hidden bg-black-400 rounded-md w-12 h-14 opacity-60 z-50 hover:bg-black-500"
           onClick={toggleSidebar}
+          style={{ top: '50%', left: '0' }}
         >
-          <Menu />
+          <Menu sx={{ color: 'white' }} />
         </IconButton>
         <Header />
         <Box className="flex-1 overflow-auto scroll-smooth">{children}</Box>

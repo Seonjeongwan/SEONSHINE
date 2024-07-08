@@ -55,6 +55,9 @@ const FormInput = ({
           '.MuiInputBase-root': {
             backgroundColor: palette.black[100],
           },
+          'input::placeholder': {
+            fontSize: '14px',
+          },
         })}
         InputProps={{
           startAdornment: startAdornment ? (
