@@ -158,7 +158,7 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
       onSuccess: (data) => {
         toast.success(data.message);
         queryClient.invalidateQueries({ queryKey: ['getRestaurantDetail'] });
-        let photoInput = document.getElementById('upload-photo') as HTMLInputElement;
+        const photoInput = document.getElementById('upload-photo') as HTMLInputElement;
         photoInput.value = '';
       },
       onError: () => setUploadError('Cannot delete avatar.'),

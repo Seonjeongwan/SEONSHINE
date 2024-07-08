@@ -162,7 +162,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
       onSuccess: (data) => {
         toast.success(data.message);
         queryClient.invalidateQueries({ queryKey: ['getUserDetail'] });
-        let photoInput = document.getElementById('upload-photo') as HTMLInputElement;
+        const photoInput = document.getElementById('upload-photo') as HTMLInputElement;
         photoInput.value = '';
       },
       onError: () => setUploadError('Cannot delete avatar.'),
