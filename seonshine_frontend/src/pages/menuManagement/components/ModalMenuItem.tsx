@@ -147,14 +147,14 @@ const ModalMenuItem = ({ selectedItem, onClose, item_id = 0, restaurant_id = '' 
       open={true}
       onClose={onClose}
     >
-      <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3/5 md:w-1/3 lg:w-1/5 bg-white shadow-xl rounded-lg outline-none">
+      <Box className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3/5 md:w-1/3 lg:w-1/5 bg-white shadow-xl rounded-lg outline-none min-w-fit">
         <Box className="h-full flex flex-col justify-between">
           <form
             onSubmit={!selectedItem ? handleSubmit(handleCreate) : handleSubmit(handleSave)}
             className="h-full"
           >
             <Stack
-              className="rounded-md p-8 box-border cursor-pointer bg-black-100 flex flex-col items-center"
+              className="rounded-md p-8 box-border bg-black-100 flex flex-col items-center"
               direction="column"
               gap={2}
             >
@@ -220,15 +220,14 @@ const ModalMenuItem = ({ selectedItem, onClose, item_id = 0, restaurant_id = '' 
                     control={control}
                     render={({ field, fieldState: { error } }) => (
                       <>
-                        {' '}
                         <input
                           {...field}
                           value={field.value || ''}
                           type="text"
-                          className={`mt-6 text-center text-xl mx-auto bg-white w-max outline-none border-b-2 border-black ${errors.name ? 'border-red-500' : 'border-black'}`}
-                          placeholder="Menu Item Name"
+                          className={`mt-8 text-center text-xl mx-auto bg-white w-max outline-none border-b-2 border-black ${errors.name ? 'border-red-500' : 'border-black'}`}
+                          placeholder="Menu item name"
                         />
-                        {error && <p className="text-red-500 text-xs">{error.message}</p>}
+                        {error && <p className="text-red-500 text-xs mt-4">{error.message}</p>}
                       </>
                     )}
                   />
@@ -240,7 +239,7 @@ const ModalMenuItem = ({ selectedItem, onClose, item_id = 0, restaurant_id = '' 
                     {selectedItem?.name}
                   </Typography>
                 )}
-                <Box className="flex self-end m-4">
+                <Box className="flex self-end m-8">
                   {!selectedItem ? (
                     <Button
                       type="submit"
@@ -262,7 +261,7 @@ const ModalMenuItem = ({ selectedItem, onClose, item_id = 0, restaurant_id = '' 
                       </Button>
                       <Button
                         variant="contained"
-                        color="secondary"
+                        color="error"
                         onClick={handleCancel}
                         className="ml-2"
                       >
