@@ -11,4 +11,5 @@ export const paths = {
   restaurantAssignment: { index: 'restaurant-assign' },
   menu: { index: 'menu' },
   order: { index: 'order', menu: 'order-menu' },
+  profile: '/profile',
 };
