@@ -33,12 +33,14 @@ export const RestaurantTableHeader = (
     accessorKey: 'weekday',
     header: 'Assigned to',
     cell: (user) => {
+      const weekdayArr = user.row.original.weekday?.split(', ').map((day) => dayByWeekday[Number(day) as DayEnum]);
+      const weekdays = weekdayArr?.join(', ') || 'None';
       return (
         <Typography
           variant="bodyS"
           className="text-black-300"
         >
-          {dayByWeekday[Number(user.row.original.weekday) as DayEnum] || 'None'}
+          {weekdays}
         </Typography>
       );
     },

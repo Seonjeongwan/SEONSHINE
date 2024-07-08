@@ -13,16 +13,16 @@ import OrderHistoryItem from './OrderHistoryItem';
 import { FromToDateSchema, FromToDateSchemaType } from './schema';
 
 const today = format(new Date(), 'yyyy-MM-dd');
-const sevenDaysAgo = format(subDays(new Date(), 7), 'yyyy-MM-dd');
+const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
 
 type OrderHistoryTabPropsStyle = {
-  handleViewDetail: (orderDate: string) => void;
+  handleViewDetail: (orderDate: string, branchId: number) => void;
 };
 
 const OrderHistoryTab = ({ handleViewDetail }: OrderHistoryTabPropsStyle) => {
   const { control, handleSubmit, watch } = useForm<FromToDateSchemaType>({
     resolver: zodResolver(FromToDateSchema),
-    defaultValues: { fromDate: sevenDaysAgo, toDate: today },
+    defaultValues: { fromDate: yesterday, toDate: today },
   });
 
   const queryClient = useQueryClient();

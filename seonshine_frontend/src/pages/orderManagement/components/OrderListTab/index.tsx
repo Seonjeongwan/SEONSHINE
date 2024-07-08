@@ -1,21 +1,35 @@
-import { useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useMemo, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { useLocation } from 'react-router-dom';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormatListBulletedOutlined, SummarizeOutlined } from '@mui/icons-material';
-import { Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import {
+  Box,
+  FormControl,
+  FormHelperText,
+  Grid,
+  MenuItem,
+  Select,
+  Stack,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from '@mui/material';
 import { format } from 'date-fns';
 
 import DatePicker from '@/components/molecules/datePicker';
 import Table from '@/components/organims/table';
 
 import { dateFormat } from '@/constants/date';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import useTable from '@/hooks/useTable';
 import { OrderListType, ViewModeType } from '@/types/order';
 import { RoleEnum } from '@/types/user';
 
 import { useGetOrderListDetailApi, useGetOrderListSummaryApi } from '@/apis/hooks/orderListApi.hook';
+import { useGetBranches } from '@/apis/hooks/userApi.hook';
+import { BranchResponseType } from '@/apis/user';
 import useAuthStore from '@/store/auth.store';
 
 import { OrderListRestaurantTableHeader } from './OrderListRestaurantTableHeader';
@@ -28,19 +42,23 @@ const today = format(new Date(), dateFormat);
 
 type OrderListTabPropsType = {
   orderDate?: string;
+  branchId?: number;
+  branchList: BranchResponseType[];
 };
 
-const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
+const OrderListTab = ({ orderDate, branchId, branchList }: OrderListTabPropsType) => {
   const { currentUser } = useAuthStore();
   const location = useLocation();
   const localState = location.state;
   const [viewMode, setViewMode] = useState<ViewModeType>(localState?.viewMode || 'summary');
   const isAdmin = currentUser?.role_id === RoleEnum.ADMIN;
 
-  const { control, watch } = useForm<DateSchemaType>({
+  const { control, watch, reset } = useForm<DateSchemaType>({
     resolver: zodResolver(DateSchema),
-    defaultValues: { date: orderDate ? orderDate : today },
+    values: { date: orderDate ? orderDate : today, branch_id: branchId || 0 },
   });
+
+  const { isMobile } = useDeviceType();
 
   const { currentPage, handleSortingChange, sortKey, sortType } = useTable({
     initPageSize: ITEMS_PER_PAGE,
@@ -48,14 +66,15 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
   });
 
   const watchedDate = watch('date');
+  const watchedBranchId = watch('branch_id');
 
   const { data: orderListSummary, isFetching: isFetchingOrderListSummary } = useGetOrderListSummaryApi({
-    params: { date: watchedDate },
+    params: { date: watchedDate, branch_id: watchedBranchId },
     enabled: viewMode === 'summary',
   });
 
   const { data: orderListDetail, isFetching: isFetchingOrderListDetail } = useGetOrderListDetailApi({
-    params: { date: watchedDate },
+    params: { date: watchedDate, branch_id: watchedBranchId },
     enabled: viewMode === 'detail',
   });
 
@@ -114,16 +133,91 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
   return (
     <Stack
       direction="column"
-      className="w-full lg:w-240"
+      className="w-full"
     >
       <Stack
         justifyContent="space-between"
         gap={4}
       >
-        <DatePicker<DateSchemaType>
-          name="date"
-          control={control}
-        />
+        <Grid
+          container
+          spacing={4}
+          alignItems="center"
+          className="w-max md:w-3/5 lg:w-2/5"
+        >
+          <Grid
+            item
+            xs={12}
+            sm={6}
+          >
+            <DatePicker<DateSchemaType>
+              name="date"
+              control={control}
+            />
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            sm={6}
+            className="w-full"
+          >
+            <Controller
+              name="branch_id"
+              control={control}
+              render={({ field: { onChange, value }, fieldState: { error } }) => {
+                return (
+                  <FormControl fullWidth>
+                    <Select
+                      displayEmpty
+                      inputProps={{ 'aria-label': 'Without label' }}
+                      value={value}
+                      onChange={onChange}
+                      size="small"
+                      sx={(theme) => ({
+                        '.MuiInputBase-root': {
+                          paddingRight: '24px',
+                        },
+                        '.MuiSelect-select': {
+                          textAlign: 'center',
+                          fontWeight: theme.typography.fontWeightBold,
+                          fontSize: '20px',
+                          height: '18px',
+                          minHeight: '18px !important',
+                          paddingLeft: '32px',
+                          paddingBottom: '14px',
+                          color: theme.palette.black[300],
+                        },
+                        fieldset: {
+                          border: 'none',
+                        },
+                      })}
+                      className="bg-white w-full max-w-80 rounded-full"
+                    >
+                      <MenuItem
+                        key="default_key_branch"
+                        value={0}
+                        hidden
+                      >
+                        Select branch
+                      </MenuItem>
+                      {branchList.map((branch) => (
+                        <MenuItem
+                          key={branch.branch_id}
+                          value={branch.branch_id}
+                          className="text-xl"
+                        >
+                          {branch.branch_name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {error && <FormHelperText color="error">{error.message}</FormHelperText>}
+                  </FormControl>
+                );
+              }}
+            />
+          </Grid>
+        </Grid>
+
         {isAdmin && (
           <ToggleButtonGroup
             value={viewMode}
@@ -131,6 +225,9 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
             onChange={onChangeViewMode}
             aria-label="view mode"
             className="bg-white"
+            sx={{
+              maxHeight: '46px',
+            }}
           >
             <ToggleButton
               value="summary"
@@ -149,17 +246,8 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
           </ToggleButtonGroup>
         )}
       </Stack>
-      {viewMode === 'summary' && (
-        <Typography
-          variant="heading4"
-          component="h3"
-          className="mt-8 text-3xl font-bold"
-        >
-          {orderListSummary?.restaurant_name}
-        </Typography>
-      )}
       <Stack
-        className="my-8"
+        className="my-4"
         justifyContent="space-between"
         alignItems="center"
       >
@@ -167,20 +255,42 @@ const OrderListTab = ({ orderDate }: OrderListTabPropsType) => {
           component="h4"
           className="text-2xl font-bold"
         >{`Order of ${watchedDate}`}</Typography>
-        <Typography className="text-lg font-normal">
-          {viewMode === 'summary'
-            ? `Order amount: ${orderListSummary?.total}`
-            : `Order Users: ${orderListDetail?.total}`}
-        </Typography>
+        {viewMode === 'detail' && (
+          <Typography className="text-lg font-normal">{`Order Users: ${orderListDetail?.total}`}</Typography>
+        )}
       </Stack>
-
-      <Table<OrderListType>
-        data={data}
-        columns={columns}
-        isFetching={isFetchingOrderListSummary || isFetchingOrderListDetail}
-        onSortingChange={handleSortingChange}
-        currentPage={currentPage}
-      />
+      <Stack
+        direction={isMobile ? 'column' : 'row'}
+        gap={8}
+        alignItems="flex-start"
+      >
+        <Table<OrderListType>
+          data={data}
+          columns={columns}
+          isFetching={isFetchingOrderListSummary || isFetchingOrderListDetail}
+          onSortingChange={handleSortingChange}
+          currentPage={currentPage}
+        />
+        {viewMode === 'summary' && (
+          <Stack
+            className={`${isMobile ? 'w-full' : 'w-2/3'} bg-white py-6 px-8 rounded-md gap-2`}
+            direction="column"
+          >
+            <Typography className="text-3xl font-bold">Billing Information</Typography>
+            <Typography className="text-2xl flex items-center flex-wrap">
+              Restaurant:&nbsp;
+              <Typography
+                component="span"
+                className="text-2xl font-bold whitespace-nowrap"
+              >
+                {orderListSummary?.restaurant_name || '...'}
+              </Typography>
+            </Typography>
+            <Typography className="text-lg">{`Order Amount: ${orderListSummary?.total || 0}`}</Typography>
+            <Typography className="text-lg">{`Branch: ${branchList.find((branch) => branch.branch_id === watchedBranchId)?.branch_name}`}</Typography>
+          </Stack>
+        )}
+      </Stack>
     </Stack>
   );
 };
