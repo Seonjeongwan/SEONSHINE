@@ -158,6 +158,8 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
       onSuccess: (data) => {
         toast.success(data.message);
         queryClient.invalidateQueries({ queryKey: ['getRestaurantDetail'] });
+        let photoInput = document.getElementById('upload-photo') as HTMLInputElement;
+        photoInput.value = '';
       },
       onError: () => setUploadError('Cannot delete avatar.'),
     });
@@ -173,6 +175,7 @@ const RestaurantProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpe
       reset({
         ...(restaurant as RestaurantInfoSchemaType),
       });
+    setIsAvatarDeleted(false);
   }, [restaurant]);
 
   return (

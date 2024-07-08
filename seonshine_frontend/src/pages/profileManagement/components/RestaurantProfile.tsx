@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
@@ -86,7 +86,7 @@ const RestaurantProfile = ({ userId }: RestaurantProfilePropsType) => {
     reset,
     formState: { isDirty },
   } = useForm<RestaurantInfoSchemaType>({
-    values: {
+    defaultValues: {
       username: restaurant?.username || '',
       address: restaurant?.address || '',
       phone_number: restaurant?.phone_number || '',
@@ -134,6 +134,8 @@ const RestaurantProfile = ({ userId }: RestaurantProfilePropsType) => {
       onSuccess: (data) => {
         toast.success(data.message);
         queryClient.invalidateQueries({ queryKey: ['getRestaurantDetail'] });
+        let photoInput = document.getElementById('upload-photo') as HTMLInputElement;
+        photoInput.value = '';
       },
       onError: () => setUploadError('Cannot delete avatar.'),
     });
@@ -193,6 +195,14 @@ const RestaurantProfile = ({ userId }: RestaurantProfilePropsType) => {
     reset();
   };
 
+  useEffect(() => {
+    restaurant &&
+      reset({
+        ...(restaurant as RestaurantInfoSchemaType),
+      });
+    setIsAvatarDeleted(false);
+  }, [restaurant]);
+
   return (
     <Stack
       direction="column"
@@ -250,7 +260,7 @@ const RestaurantProfile = ({ userId }: RestaurantProfilePropsType) => {
                   component="span"
                   className="hover:bg-green-300 hover:text-white hover:outline-green-300 bg-white text-green-200 outline outline-2 outline-green-200 rounded-xl"
                 >
-                  <Typography className="text-lg font-bold">Select Photo</Typography>
+                  <Typography className="text-lg font-bold text-center">Select Photo</Typography>
                 </Button>
               </label>
               <button

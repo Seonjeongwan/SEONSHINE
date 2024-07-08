@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 
@@ -88,7 +88,7 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
     reset,
     formState: { isDirty },
   } = useForm<UserInfoSchemaType>({
-    values: {
+    defaultValues: {
       username: user?.username || '',
       birth_date: user?.birth_date as string | null,
       branch_id: user?.branch_id as number,
@@ -138,6 +138,8 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
       onSuccess: (data) => {
         toast.success(data.message);
         queryClient.invalidateQueries({ queryKey: ['getUserDetail'] });
+        let photoInput = document.getElementById('upload-photo') as HTMLInputElement;
+        photoInput.value = '';
       },
       onError: () => setUploadError('Cannot delete avatar.'),
     });
@@ -197,6 +199,15 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
     reset();
   };
 
+  useEffect(() => {
+    user &&
+      reset({
+        ...(user as UserInfoSchemaType),
+        birth_date: user.birth_date,
+      });
+    setIsAvatarDeleted(false);
+  }, [user]);
+
   return (
     <Stack
       direction="column"
@@ -252,7 +263,7 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
                   component="span"
                   className="hover:bg-green-300 hover:text-white hover:outline-green-300 bg-white text-green-200 outline outline-2 outline-green-200 rounded-xl"
                 >
-                  <Typography className="text-lg font-bold">Select Photo</Typography>
+                  <Typography className="text-lg font-bold text-center">Select Photo</Typography>
                 </Button>
               </label>
               <button
