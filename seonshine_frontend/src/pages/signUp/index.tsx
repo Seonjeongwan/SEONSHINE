@@ -120,16 +120,17 @@ const SignUpPage = () => {
 
   const { isMobile } = useDeviceType();
   return (
-    <Box className="w-full min-h-screen h-full">
-      {/* {step !== 'select_user_type' && (
-        <Button
-          startIcon={<ArrowBack />}
-          // onClick={previousStep}
-          className="ml-4"
-        >
-          Back
-        </Button>
-      )} */}
+    // <Box className="w-full min-h-screen h-full">
+    //   {step !== 'select_user_type' && (
+    //     <Button
+    //       startIcon={<ArrowBack />}
+    //       // onClick={previousStep}
+    //       className="ml-4"
+    //     >
+    //       Back
+    //     </Button>
+    //   )}
+    <Box className="h-full min-h-screen">
       {!isMobile && (
         <Stepper
           className="pt-8 w-1/4 flex justify-center mx-auto"
@@ -147,7 +148,7 @@ const SignUpPage = () => {
         <Stack
           alignItems="center"
           justifyContent="center"
-          className="pt-12"
+          className="md:pt-12"
         >
           <ChooseUserType handleSubmitUserType={handleSubmitUserType} />
         </Stack>
@@ -156,7 +157,7 @@ const SignUpPage = () => {
         <Stack
           alignItems="center"
           justifyContent="center"
-          className="pt-8 pb-16"
+          className="md:pt-8 md:pb-16"
         >
           <ProfileRegistration
             handleSubmitInformation={handleSubmitInformation}
@@ -168,7 +169,7 @@ const SignUpPage = () => {
         <Stack
           alignItems="center"
           justifyContent="center"
-          className="pt-8 pb-16"
+          className="md:pt-8 md:pb-16"
         >
           <AccountVerificationPage
             title="Account Verification"
@@ -185,7 +186,7 @@ const SignUpPage = () => {
         <Stack
           alignItems="center"
           justifyContent="center"
-          className="pt-8 pb-16"
+          className="md:pt-8 md:pb-16"
         >
           <PendingApprovalPage />
         </Stack>

@@ -16,7 +16,7 @@ const ChooseUserType = ({ handleSubmitUserType }: EnterUserTypePropsType) => {
       direction="column"
       gap="24px"
       alignItems="center"
-      className="w-full pt-12 p-24 bg-white rounded-lg shadow-md md:w-240 xl:w-240 max-w-screen"
+      className="w-full h-screen md:h-full md:pt-12 p-24 bg-white rounded-lg shadow-md md:w-240 xl:w-240 max-w-screen"
     >
       <Link
         className="cursor-pointer !underline self-start"
