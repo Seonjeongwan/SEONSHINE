@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { Menu } from '@mui/icons-material';
 import { Box, Drawer, IconButton, Stack } from '@mui/material';
@@ -17,12 +18,16 @@ const MainLayout = ({ children, role }: MainLayoutPropsType) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const iconRef = useRef<HTMLButtonElement>(null);
   const startPositionRef = useRef({ startY: 0, startTop: 0 });
+  const isDraggingRef = useRef(false);
 
   const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+    setSidebarOpen((prev) => !prev);
   };
 
+  const location = useLocation();
+
   const handleDragMove = (moveEvent: MouseEvent | TouchEvent) => {
+    isDraggingRef.current = true;
     const icon = iconRef.current;
     if (!icon) return;
 
@@ -45,14 +50,20 @@ const MainLayout = ({ children, role }: MainLayoutPropsType) => {
     window.removeEventListener('mouseup', handleDragEnd);
     window.removeEventListener('touchmove', handleDragMove);
     window.removeEventListener('touchend', handleDragEnd);
+
+    if (!isDraggingRef.current) {
+      toggleSidebar();
+    }
+    isDraggingRef.current = false;
   };
 
   const handleDragStart = (event: MouseEvent | TouchEvent) => {
+    event.preventDefault();
+    isDraggingRef.current = false;
     const icon = iconRef.current;
     if (!icon) return;
 
     const startY = 'touches' in event ? event.touches[0].clientY : event.clientY;
-
     const startTop = icon.getBoundingClientRect().top;
 
     startPositionRef.current = { startY, startTop };
@@ -81,6 +92,10 @@ const MainLayout = ({ children, role }: MainLayoutPropsType) => {
     }
   }, []);
 
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location]);
+
   return (
     <Stack className="h-screen bg-black-100 overflow-hidden">
       <Drawer
@@ -105,7 +120,6 @@ const MainLayout = ({ children, role }: MainLayoutPropsType) => {
         <IconButton
           ref={iconRef}
           className="md:hidden bg-black-400 rounded-md w-12 h-14 opacity-60 z-50 hover:bg-black-500"
-          onClick={toggleSidebar}
           style={{ top: '50%', left: '0' }}
         >
           <Menu sx={{ color: 'white' }} />
