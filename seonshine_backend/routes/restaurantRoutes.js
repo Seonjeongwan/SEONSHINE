@@ -1,5 +1,5 @@
-import express from "express";
-import { UserRole } from "../constants/auth.js";
+import express from 'express';
+import { UserRole } from '../constants/auth.js';
 import {
   assignRestaurantDate,
   getAllRestaurant,
@@ -7,9 +7,10 @@ import {
   getRestaurantDetail,
   getRestaurantList,
   updateRestaurant,
-} from "../controllers/restaurantController.js";
-import { authenticateToken } from "../middleware/auth.js";
-import { endpoints } from "./endpoints.js";
+} from '../controllers/restaurantController.js';
+import { authenticateToken } from '../middleware/auth.js';
+import { endpoints } from './endpoints.js';
+import { validateAssignRestaurantDate } from '../middleware/validation/restaurantValidate.js';
 
 const restaurantRouter = express.Router();
 
@@ -31,7 +32,6 @@ restaurantRouter.get(
   getRestaurantAssignList
 );
 
-
 restaurantRouter.get(
   endpoints.restaurant.detail,
   authenticateToken({ role: UserRole.admin }),
@@ -47,6 +47,7 @@ restaurantRouter.put(
 restaurantRouter.post(
   endpoints.restaurant.assignDate,
   authenticateToken({ role: UserRole.admin }),
+  validateAssignRestaurantDate,
   assignRestaurantDate
 );
 
