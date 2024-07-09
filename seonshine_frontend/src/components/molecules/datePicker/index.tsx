@@ -93,12 +93,15 @@ const DatePicker = <T extends FieldValues>({
                           paddingLeft: '0',
                           paddingBlock: '0 !important',
                         },
+                        '.MuiButtonBase-root': {
+                          padding: 0,
+                        },
                         fieldset: {
                           border: 'none',
                         },
                       };
                 }}
-                className="bg-white w-full max-w-80 rounded-full"
+                className={`bg-white w-full rounded-full ${varirant === 'small' ? 'max-w-full' : 'max-w-80'}`}
               />
               {error && <FormHelperText color="error">{error.message}</FormHelperText>}
             </Box>

@@ -217,14 +217,14 @@ const RestaurantProfile = ({ userId }: RestaurantProfilePropsType) => {
           User List
         </Typography>
         <Stack
-          className="bg-white w-full"
+          className="bg-white w-full rounded-md"
           direction="column"
         >
           <Stack
             alignItems="center"
             justifyContent="center"
             gap={12}
-            className="w-full bg-gray-200 px-12 py-8"
+            className="w-full bg-gray-200 px-12 py-8 rounded-t-md"
           >
             <Box className="relative">
               {isLoading ? (
@@ -241,36 +241,38 @@ const RestaurantProfile = ({ userId }: RestaurantProfilePropsType) => {
               )}
               {uploadError && <FormHelperText className="text-red-500 text-xs m-2">{uploadError}</FormHelperText>}
             </Box>
-            <Stack
-              direction="column"
-              justifyContent="center"
-              alignItems="center"
-              gap={4}
-              className="px-4"
-            >
-              <input
-                accept="image/*"
-                className="hidden"
-                id="upload-photo"
-                type="file"
-                onChange={handleImageChange}
-              />
-              <label htmlFor="upload-photo">
-                <Button
-                  component="span"
-                  className="hover:bg-green-300 hover:text-white hover:outline-green-300 bg-white text-green-200 outline outline-2 outline-green-200 rounded-xl"
-                >
-                  <Typography className="text-lg font-bold text-center">Select Photo</Typography>
-                </Button>
-              </label>
-              <button
-                className="text-center text-lg font-bold hover:opacity-70 disabled:opacity-70"
-                disabled={!restaurant?.profile_picture_url}
-                onClick={onClickRemoveAvatar}
+            {isEditing && (
+              <Stack
+                direction="column"
+                justifyContent="center"
+                alignItems="center"
+                gap={4}
+                className="px-4"
               >
-                Remove
-              </button>
-            </Stack>
+                <input
+                  accept="image/*"
+                  className="hidden"
+                  id="upload-photo"
+                  type="file"
+                  onChange={handleImageChange}
+                />
+                <label htmlFor="upload-photo">
+                  <Button
+                    component="span"
+                    className="hover:bg-green-300 hover:text-white hover:outline-green-300 bg-white text-green-200 outline outline-2 outline-green-200 rounded-xl"
+                  >
+                    <Typography className="text-lg font-bold text-center">Select Photo</Typography>
+                  </Button>
+                </label>
+                <button
+                  className="text-center text-lg font-bold hover:opacity-70 disabled:opacity-70"
+                  disabled={!restaurant?.profile_picture_url}
+                  onClick={onClickRemoveAvatar}
+                >
+                  Remove
+                </button>
+              </Stack>
+            )}
           </Stack>
           <Box className="w-full py-8 px-16">
             <form onSubmit={handleSubmit(handleSave)}>
@@ -357,7 +359,7 @@ const RestaurantProfile = ({ userId }: RestaurantProfilePropsType) => {
           Activity
         </Typography>
         <Stack
-          className="bg-white w-full py-6"
+          className="bg-white w-full py-6 rounded-md"
           direction="column"
           alignItems="center"
           gap={4}
