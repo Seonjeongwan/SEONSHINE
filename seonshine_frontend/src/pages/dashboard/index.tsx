@@ -8,6 +8,7 @@ import { RestaurantRounded } from '@mui/icons-material';
 import { Box, Stack } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
+import { before } from 'node:test';
 import 'slick-carousel/slick/slick-theme.css';
 import 'slick-carousel/slick/slick.css';
 
@@ -15,6 +16,7 @@ import Table from '@/components/organims/table';
 
 import { days } from '@/constants/date';
 import { avatarBaseURL } from '@/constants/image';
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { OrderListType, UserOrderTabEnum } from '@/types/order';
 import { RoleEnum, UserManagementTabEnum } from '@/types/user';
 
@@ -31,7 +33,85 @@ import { OrderListHeader } from './OrderListHeader';
 import { OrderListRestaurantTableHeader } from './OrderListRestaurantTableHeader';
 
 const Dashboard = () => {
+  const { isMobile } = useDeviceType();
   const { currentUser } = useAuthStore();
+  function SampleNextArrow(props: any) {
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={className}
+        style={{
+          ...style,
+          right: '0',
+          zIndex: '10',
+          background: '#D9D9D966',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: `${isMobile ? '24px' : '40px'}`,
+          opacity: '1',
+        }}
+        onClick={onClick}
+      >
+        <svg
+          width="14"
+          height="51"
+          viewBox="0 0 14 51"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M1.25 1.875L12.3333 25.5L1.25 49.125"
+            stroke="#B1B6B9"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+    );
+  }
+
+  function SamplePrevArrow(props: any) {
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={className}
+        style={{
+          ...style,
+          left: '0',
+          zIndex: '10',
+          background: '#D9D9D966',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: `${isMobile ? '24px' : '40px'}`,
+          opacity: '1',
+        }}
+        onClick={onClick}
+      >
+        <svg
+          width="14"
+          height="51"
+          viewBox="0 0 14 51"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M12.75 1.875L1.6667 25.5L12.75 49.125"
+            stroke="#B1B6B9"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+    );
+  }
   const settings = {
     className: 'center',
     infinite: true,
@@ -39,6 +119,10 @@ const Dashboard = () => {
     slidesToShow: 5,
     swipeToSlide: true,
     scrollToSlide: true,
+    autoplay: true,
+    speed: 1500,
+    autoplaySpeed: 5000,
+    pauseOnHover: true,
     afterChange: function (index: number) {},
     responsive: [
       {
@@ -56,6 +140,8 @@ const Dashboard = () => {
         },
       },
     ],
+    nextArrow: <SampleNextArrow />,
+    prevArrow: <SamplePrevArrow />,
   };
 
   const todayIndex = new Date().getDay();
@@ -277,7 +363,7 @@ const Dashboard = () => {
             className="flex flex-col bg-white rounded-md mt-2"
             sx={{
               '.slick-prev:before, .slick-next:before': {
-                color: 'grey',
+                color: 'transparent',
               },
             }}
           >
@@ -309,7 +395,7 @@ const Dashboard = () => {
           </Box>
         </Box>
       </Stack>
-      <Stack className="flex-1 mt-6">
+      <Stack className="flex-1 mt-6 min-h-fit">
         <Box className="w-full">
           <Stack
             direction="row"
@@ -329,6 +415,7 @@ const Dashboard = () => {
             data={data}
             columns={columns}
             isFetching={isFetching}
+            size="small"
             currentPage={0}
             onPageChange={() => {}}
           />
