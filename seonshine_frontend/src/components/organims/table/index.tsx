@@ -93,7 +93,7 @@ const Table = <T extends object>({
     };
 
     window.addEventListener('resize', handleResize);
-    handleResize();
+    size === 'normal' && handleResize();
 
     return () => {
       window.removeEventListener('resize', handleResize);
