@@ -17,6 +17,10 @@ UpdateUser.init(
         notEmpty: {
           msg: 'Username cannot be empty.',
         },
+        len: {
+          args: [8, 20],
+          msg: 'Username must be between 8 and 20 characters long',
+        },
       },
     },
     birth_date: {
