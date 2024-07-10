@@ -1,6 +1,6 @@
-import express from "express";
-import { upload } from "../config/storage.js";
-import { UserRole } from "../constants/auth.js";
+import express from 'express';
+import { upload } from '../config/storage.js';
+import { UserRole } from '../constants/auth.js';
 import {
   changeUserAvatar,
   changeUserStatus,
@@ -8,10 +8,13 @@ import {
   getUserList,
   getUserWaitingConfirmList,
   updateUser,
-} from "../controllers/userController.js";
-import { authenticateToken } from "../middleware/auth.js";
-import { validateChangeStatus } from "../middleware/validation/userValidate.js";
-import { endpoints } from "./endpoints.js";
+} from '../controllers/userController.js';
+import { authenticateToken } from '../middleware/auth.js';
+import {
+  validateChangeStatus,
+  validateUpdateUser,
+} from '../middleware/validation/userValidate.js';
+import { endpoints } from './endpoints.js';
 
 const userRouter = express.Router();
 
@@ -48,6 +51,7 @@ userRouter.post(
 userRouter.put(
   endpoints.users.edit,
   authenticateToken(),
+  validateUpdateUser,
   updateUser
 );
 
