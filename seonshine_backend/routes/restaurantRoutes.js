@@ -10,7 +10,10 @@ import {
 } from '../controllers/restaurantController.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { endpoints } from './endpoints.js';
-import { validateAssignRestaurantDate } from '../middleware/validation/restaurantValidate.js';
+import {
+  validateAssignRestaurantDate,
+  validateUpdateRestaurant,
+} from '../middleware/validation/restaurantValidate.js';
 
 const restaurantRouter = express.Router();
 
@@ -41,6 +44,7 @@ restaurantRouter.get(
 restaurantRouter.put(
   endpoints.restaurant.edit,
   authenticateToken(),
+  validateUpdateRestaurant,
   updateRestaurant
 );
 
