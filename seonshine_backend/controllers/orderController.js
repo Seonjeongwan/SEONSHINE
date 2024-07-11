@@ -192,6 +192,7 @@ export const discardCurrentOrderItem = async (req, res) => {
   }
 };
 
+//TODO: Return restaurant name by specific date, refer getMenuListByCurrentDay
 export const getOrderListSummary = async (req, res) => {
   const { date = "", branch_id } = req.query;
   const currentUser = req.user;
@@ -200,7 +201,6 @@ export const getOrderListSummary = async (req, res) => {
   try {
     let condition = {
       order_date: date,
-      branch_id,
       [Op.or]: [
         {
           cancel_yn: {
@@ -216,6 +216,10 @@ export const getOrderListSummary = async (req, res) => {
     };
     if (Number(role_id) === Number(UserRole.restaurant)) {
       condition.restaurant_id = user_id;
+    }
+
+    if(branch_id) {
+      condition.branch_id = branch_id;
     }
 
     const totalCount = await OrderItem.count({
@@ -256,14 +260,20 @@ export const getOrderListSummary = async (req, res) => {
   }
 };
 
+//TODO: Check current user cannot get other branch and all, just admin can get all
 export const getOrderListDetail = async (req, res) => {
   const { date = "", branch_id } = req.query;
 
   const select =
-    "SELECT o.user_id, o.restaurant_id, o.item_id, o.item_name, u.username, u2.username as restaurant_name, o.updated_at as submitted_time FROM order_db.order_items o JOIN user_db.users u ON o.user_id = u.user_id JOIN user_db.users u2 ON o.restaurant_id = u2.user_id";
+    `SELECT o.user_id, o.restaurant_id, o.item_id, o.item_name, u.username, u2.username as restaurant_name, o.updated_at as submitted_time, b.branch_name 
+    FROM order_db.order_items o 
+    JOIN user_db.users u ON o.user_id = u.user_id 
+    JOIN user_db.users u2 ON o.restaurant_id = u2.user_id 
+    JOIN common_db.branch_info b ON o.branch_id = b.branch_id`;
 
-  const where =
-    "WHERE (o.branch_id = :branch_id) AND (o.order_date = :date) AND (o.cancel_yn != 0 OR o.cancel_yn is null)";
+  const where = `WHERE (o.order_date = :date) AND (o.cancel_yn != 0 OR o.cancel_yn is null) ${
+    branch_id ? "AND (o.branch_id = :branch_id)" : ""
+  }  `;
 
   const query = `${select} ${where}`;
 
