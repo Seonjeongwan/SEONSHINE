@@ -127,7 +127,7 @@ const MenuManagement = () => {
                   value={restaurantQuery}
                   onChange={(e) => setRestaurantQuery(e.target.value)}
                   size="small"
-                  className="rounded-xl bg-white font-bold h-full"
+                  className="rounded-xl bg-white font-bold h-full md:max-w-full"
                   sx={{
                     '& .MuiSelect-select': {
                       display: 'flex',
@@ -183,35 +183,29 @@ const MenuManagement = () => {
               />
             )}
           </Stack>
-          <Typography
-            variant="h4"
-            component="h3"
-            className="my-8"
-          >
-            Menu List
-          </Typography>
+          {restaurantQuery && <h2 className="text-2xl font-bold">Menu List</h2>}
         </Box>
-        <Stack className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <Stack className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 md:gap-4">
           {filteredDishes?.map((dish, index) => (
             <Stack
               key={dish.name + index}
-              className="relative rounded-md p-6 m-2 box-border cursor-pointer bg-white transition-transform transform hover:scale-105 hover:shadow-lg min-w-fit"
+              className="relative rounded-md pb-2 p-0 md:p-6 m-2 box-border cursor-pointer bg-white transition-transform transform hover:scale-105 hover:shadow-lg min-w-fit text-center"
               direction="column"
               gap={2}
               onClick={() => handleOpenModal(dish)}
             >
               <IconButton
                 disabled={isLoadingDelete}
-                className="absolute top-0 left-0 m-8 bg-white hover:bg-black-100 hover:text-black-500 transition-colors"
+                className="absolute top-0 left-0 m-2 md:m-8 bg-white hover:bg-black-100 hover:text-black-500 transition-colors p-1"
                 onClick={(e) => {
                   setSelectedItem(dish);
                   e.stopPropagation();
                   handleClickAction();
                 }}
               >
-                <Close sx={{ fontSize: 16 }} />
+                <Close className="text-sm" />
               </IconButton>
-              <Box className="w-full h-48 md:h-64 bg-gray-200 flex items-center justify-center overflow-hidden rounded-md">
+              <Box className="w-full h-36 md:h-64 bg-gray-200 flex items-center justify-center overflow-hidden rounded-md">
                 {dish.image_url ? (
                   <img
                     src={`${avatarBaseURL}${dish.image_url}`}
@@ -239,7 +233,7 @@ const MenuManagement = () => {
               gap={2}
               onClick={handleOpenCreateModal}
             >
-              <Box className="w-full h-48 md:h-64 flex items-center justify-center overflow-hidden rounded-md">
+              <Box className="w-full h-36 md:h-64 flex items-center justify-center overflow-hidden rounded-md">
                 <AddCircleRoundedIcon
                   className="w-1/2 h-1/2 opacity-30"
                   fontSize="large"

@@ -4,6 +4,7 @@ export type OrderListType = {
   ordered_items?: string;
   amount?: number;
   date?: string;
+  branch_name?: string;
 };
 
 export type GetOrderListApiPropsType = {};
@@ -75,6 +76,7 @@ export type OrderListDetailItemType = {
   username: string;
   restaurant_name: string;
   submitted_time: string;
+  branch_name: string;
 };
 
 export type ViewModeType = 'summary' | 'detail';

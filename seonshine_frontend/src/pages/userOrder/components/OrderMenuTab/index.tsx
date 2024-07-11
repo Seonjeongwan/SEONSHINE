@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 
 import { RestaurantRounded } from '@mui/icons-material';
 import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import SearchIcon from '@mui/icons-material/Search';
 import {
   Box,
@@ -133,6 +134,12 @@ const OrderMenuTab = () => {
     return `${year}.${month}.${day} - ${hours}:${minutes}`;
   }
 
+  const searchGoogleMaps = () => {
+    const searchQuery = todayMenuList?.restaurant_address;
+    const url = `https://www.google.com/maps/search/?api=1&query=${searchQuery}`;
+    window.open(url);
+  };
+
   return (
     <Box className="px-2 md:px-4">
       <Stack
@@ -198,18 +205,24 @@ const OrderMenuTab = () => {
         <Box className="px-2">
           <Typography className="font-bold text-2xl">
             Menu list of {todayMenuList?.current_day.replace(/-/g, '.')} - {todayMenuList?.restaurant_name}
+            <LocationOnIcon
+              className="ml-2 cursor-pointer text-[28px]"
+              onClick={() => {
+                searchGoogleMaps();
+              }}
+            />
           </Typography>
         </Box>
-        <Stack className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <Stack className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 md:gap-4">
           {todayMenuList?.menu_list.map((dish, index) => (
             <Stack
               key={dish.name + index}
-              className="rounded-md p-6 m-2 box-border cursor-pointer bg-white transition-transform transform hover:scale-105 hover:shadow-lg"
+              className="rounded-md p-0 pb-2 md:p-6 m-2 box-border cursor-pointer bg-white transition-transform transform hover:scale-105 hover:shadow-lg text-center"
               direction="column"
               gap={2}
               onClick={() => handleClickOrderButton(dish)}
             >
-              <Box className="w-full h-48 md:h-64 bg-gray-200 flex items-center justify-center overflow-hidden rounded-md">
+              <Box className="w-full h-36 md:h-64 bg-gray-200 flex items-center justify-center overflow-hidden rounded-md">
                 {dish.image_url ? (
                   <img
                     src={`${avatarBaseURL}${dish.image_url}`}
