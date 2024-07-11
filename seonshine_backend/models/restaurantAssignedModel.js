@@ -11,7 +11,7 @@ RestaurantAssigned.init(
       allowNull: false,
     },
     restaurant_id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
     },
   },

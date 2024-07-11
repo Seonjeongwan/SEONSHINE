@@ -7,6 +7,7 @@ import { orderItemCancelStatus, orderStatus } from "../constants/order.js";
 import { sequelizeOrderDb } from "../db/dbConfig.js";
 import { OrderHistory, OrderItem, User } from "../models/index.js";
 import MenuItem from "../models/menuItemModel.js";
+import RestaurantAssigned from "../models/restaurantAssignedModel.js";
 
 export const orderItemCurrentDay = async (req, res) => {
   const transactionOrderDb = await sequelizeOrderDb.transaction();
@@ -192,7 +193,6 @@ export const discardCurrentOrderItem = async (req, res) => {
   }
 };
 
-//TODO: Return restaurant name by specific date, refer getMenuListByCurrentDay
 export const getOrderListSummary = async (req, res) => {
   const { date = "", branch_id } = req.query;
   const currentUser = req.user;
@@ -218,7 +218,7 @@ export const getOrderListSummary = async (req, res) => {
       condition.restaurant_id = user_id;
     }
 
-    if(branch_id) {
+    if (branch_id) {
       condition.branch_id = branch_id;
     }
 
@@ -243,6 +243,24 @@ export const getOrderListSummary = async (req, res) => {
       restaurantId = rows[0].restaurant_id;
       const restaurant = await User.findByPk(restaurantId, { raw: true });
       restaurantName = restaurant.username;
+    } else {
+      //TODO: After restaurant assign history done, please use history table. And remove restaurant id with normal user call
+      const weekday = dayjs(date).day();
+      const restaurantAssign = await RestaurantAssigned.findOne({
+        attributes: ["restaurant_id"],
+        where: {
+          weekday: weekday,
+        },
+        raw: true,
+      });
+      if (restaurantAssign) {
+        const restaurant = await User.findByPk(restaurantAssign.restaurant_id, {
+          attributes: ["username"],
+          raw: true,
+        });
+        restaurantId = restaurantAssign?.restaurant_id || "";
+        restaurantName = restaurant?.username || "";
+      }
     }
 
     res.status(httpStatusCodes.success).send({
@@ -264,8 +282,7 @@ export const getOrderListSummary = async (req, res) => {
 export const getOrderListDetail = async (req, res) => {
   const { date = "", branch_id } = req.query;
 
-  const select =
-    `SELECT o.user_id, o.restaurant_id, o.item_id, o.item_name, u.username, u2.username as restaurant_name, o.updated_at as submitted_time, b.branch_name 
+  const select = `SELECT o.user_id, o.restaurant_id, o.item_id, o.item_name, u.username, u2.username as restaurant_name, o.updated_at as submitted_time, b.branch_name 
     FROM order_db.order_items o 
     JOIN user_db.users u ON o.user_id = u.user_id 
     JOIN user_db.users u2 ON o.restaurant_id = u2.user_id 
@@ -293,10 +310,38 @@ export const getOrderListDetail = async (req, res) => {
       };
     });
 
+    let restaurantId = null;
+    let restaurantName = null;
+    if (rows?.length) {
+      restaurantId = rows[0].restaurant_id;
+      const restaurant = await User.findByPk(restaurantId, { raw: true });
+      restaurantName = restaurant.username;
+    } else {
+      //TODO: After restaurant assign history done, please use history table. And remove restaurant id with normal user call
+      const weekday = dayjs(date).day();
+      const restaurantAssign = await RestaurantAssigned.findOne({
+        attributes: ["restaurant_id"],
+        where: {
+          weekday: weekday,
+        },
+        raw: true,
+      });
+      if (restaurantAssign) {
+        const restaurant = await User.findByPk(restaurantAssign.restaurant_id, {
+          attributes: ["username"],
+          raw: true,
+        });
+        restaurantId = restaurantAssign?.restaurant_id || "";
+        restaurantName = restaurant?.username || "";
+      }
+    }
+
     const totalCount = rowsConvertedDate.length;
 
     res.status(httpStatusCodes.success).send({
       data: rowsConvertedDate,
+      restaurant_id: restaurantId,
+      restaurant_name: restaurantName,
       date,
       total: totalCount,
     });
