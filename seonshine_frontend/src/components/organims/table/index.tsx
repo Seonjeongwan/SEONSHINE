@@ -104,7 +104,7 @@ const Table = <T extends object>({
     <Box className="bg-white px-4 pb-4 w-full rounded-md">
       <TableContainer
         ref={tableContainerRef}
-        className="overflow-auto min-h-60"
+        className={`overflow-auto ${tableData.length > 5 || noDataFound ? 'min-h-60' : ''}`}
       >
         <MuiTable stickyHeader>
           {!showSkeleton && (

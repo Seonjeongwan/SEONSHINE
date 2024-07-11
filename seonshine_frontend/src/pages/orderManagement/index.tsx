@@ -13,7 +13,7 @@ import OrderListTab from './components/OrderListTab';
 const OrderManagement = () => {
   const [value, setValue] = useState<number>(0);
   const [orderDate, setOrderDate] = useState<string>('');
-  const [branchId, setBranchId] = useState<number>(0);
+  const [branchId, setBranchId] = useState<number>(-1);
 
   const { data: branchData = [] } = useGetBranches({ enabled: true });
 

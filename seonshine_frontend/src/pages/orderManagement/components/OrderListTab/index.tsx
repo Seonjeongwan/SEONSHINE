@@ -10,6 +10,7 @@ import {
   FormHelperText,
   MenuItem,
   Select,
+  Skeleton,
   Stack,
   ToggleButton,
   ToggleButtonGroup,
@@ -51,9 +52,9 @@ const OrderListTab = ({ orderDate, branchId, branchList }: OrderListTabPropsType
   const [viewMode, setViewMode] = useState<ViewModeType>(localState?.viewMode || 'summary');
   const isAdmin = currentUser?.role_id === RoleEnum.ADMIN;
 
-  const { control, watch, reset } = useForm<DateSchemaType>({
+  const { control, watch } = useForm<DateSchemaType>({
     resolver: zodResolver(DateSchema),
-    values: { date: orderDate ? orderDate : today, branch_id: branchId || 0 },
+    values: { date: orderDate ? orderDate : today, branch_id: branchId || -1 },
   });
 
   const { isMobile } = useDeviceType();
@@ -67,12 +68,12 @@ const OrderListTab = ({ orderDate, branchId, branchList }: OrderListTabPropsType
   const watchedBranchId = watch('branch_id');
 
   const { data: orderListSummary, isFetching: isFetchingOrderListSummary } = useGetOrderListSummaryApi({
-    params: { date: watchedDate, branch_id: watchedBranchId },
+    params: { date: watchedDate, ...(watchedBranchId >= 0 && { branch_id: watchedBranchId }) },
     enabled: viewMode === 'summary',
   });
 
   const { data: orderListDetail, isFetching: isFetchingOrderListDetail } = useGetOrderListDetailApi({
-    params: { date: watchedDate, branch_id: watchedBranchId },
+    params: { date: watchedDate, ...(watchedBranchId >= 0 && { branch_id: watchedBranchId }) },
     enabled: viewMode === 'detail',
   });
 
@@ -93,6 +94,7 @@ const OrderListTab = ({ orderDate, branchId, branchList }: OrderListTabPropsType
         restaurant_name: order.restaurant_name,
         employee_name: order.username,
         ordered_items: order.item_name,
+        branch: order.branch_name,
         date: order.submitted_time,
       })) || []
     );
@@ -182,11 +184,11 @@ const OrderListTab = ({ orderDate, branchId, branchList }: OrderListTabPropsType
                     className="bg-white w-full max-w-80 rounded-full"
                   >
                     <MenuItem
-                      key="default_key_branch"
-                      value={0}
-                      hidden
+                      key="all_branch"
+                      value={-1}
+                      className="text-lg"
                     >
-                      Select branch
+                      All
                     </MenuItem>
                     {branchList.map((branch) => (
                       <MenuItem
@@ -211,7 +213,7 @@ const OrderListTab = ({ orderDate, branchId, branchList }: OrderListTabPropsType
           className="ml-auto mb-4"
         >
           {viewMode === 'detail' && (
-            <Typography className="text-lg font-normal">{`Order Users: ${orderListDetail?.total}`}</Typography>
+            <Typography className="text-lg font-normal">{`Order Users: ${orderListDetail?.total || 0}`}</Typography>
           )}
           {isAdmin && (
             <ToggleButtonGroup
@@ -256,22 +258,28 @@ const OrderListTab = ({ orderDate, branchId, branchList }: OrderListTabPropsType
         />
         {viewMode === 'summary' && (
           <Stack
-            className={`${isMobile ? 'w-full' : 'w-2/3'} bg-white py-4 px-8 rounded-md gap-2`}
+            className={`${isMobile ? 'w-full' : 'w-2/3 min-h-64'} bg-white py-6 px-8 rounded-md gap-2`}
             direction="column"
+            justifyContent="space-evenly"
           >
-            <Typography className="text-3xl font-bold">Billing Information</Typography>
-            <Typography className="text-2xl flex items-center flex-wrap">
+            <Typography
+              height={31}
+              className="text-2xl font-bold"
+            >
+              Billing Information
+            </Typography>
+            <Typography className="text-xl flex items-center flex-wrap">
               Restaurant:&nbsp;
               <Typography
                 component="span"
-                className="text-2xl font-bold whitespace-nowrap"
+                className="text-xl font-bold whitespace-nowrap"
               >
                 {orderListSummary?.restaurant_name || '...'}
               </Typography>
             </Typography>
             <Typography className="text-lg">{`Order Amount: ${orderListSummary?.total || 0}`}</Typography>
             <Typography className="text-lg">{`Branch: ${
-              branchList.find((branch) => branch.branch_id === watchedBranchId)?.branch_name
+              branchList.find((branch) => branch.branch_id === watchedBranchId)?.branch_name || 'All'
             }`}</Typography>
             <Typography className="text-lg">{`Order Amount: ${orderListSummary?.total || 0}`}</Typography>
           </Stack>

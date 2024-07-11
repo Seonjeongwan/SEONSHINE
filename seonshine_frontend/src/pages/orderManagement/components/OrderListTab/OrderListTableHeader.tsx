@@ -32,6 +32,13 @@ export const OrderListTableHeader: CustomColumnDef<OrderListType>[] = [
     },
   },
   {
+    accessorKey: 'branch',
+    header: 'Branch',
+    cell: (order) => {
+      return order.row.original.branch || '...';
+    },
+  },
+  {
     accessorKey: 'date',
     header: 'Order Submitted Date',
     cell: (order) => {
