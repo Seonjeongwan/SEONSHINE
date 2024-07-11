@@ -1,7 +1,8 @@
-import { ValidationError } from "sequelize";
-import { UserStatus } from "../../constants/auth.js";
-import { httpStatusCodes } from "../../constants/http.js";
-import User from "../../models/userModel.js";
+import { ValidationError } from 'sequelize';
+import { UserStatus } from '../../constants/auth.js';
+import { httpStatusCodes } from '../../constants/http.js';
+import User from '../../models/userModel.js';
+import UpdateUser from '../../models/updateUserModel.js';
 
 export const validateChangeStatus = (req, res, next) => {
   const { status } = req.body;
@@ -9,13 +10,13 @@ export const validateChangeStatus = (req, res, next) => {
   if (!status) {
     return res
       .status(httpStatusCodes.badRequest)
-      .json({ error: "Status is required" });
+      .json({ error: 'Status is required' });
   }
 
   if (!Object.values(UserStatus).includes(Number(status))) {
     return res
       .status(httpStatusCodes.badRequest)
-      .json({ error: "Invalid status" });
+      .json({ error: 'Invalid status' });
   }
 
   next();
@@ -36,5 +37,21 @@ export const validateUser = async (req, res, next) => {
         .json({ errors: validationErrors });
     }
     next(error);
+  }
+};
+
+export const validateUpdateUser = async (req, res, next) => {
+  const dataUpdateUser = UpdateUser.build(req.body);
+
+  try {
+    await dataUpdateUser.validate();
+    next();
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      const validationErrors = error.errors.map((err) => err.message);
+      return res
+        .status(httpStatusCodes.badRequest)
+        .json({ errors: validationErrors });
+    }
   }
 };
