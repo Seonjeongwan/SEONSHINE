@@ -94,7 +94,7 @@ const OrderListTab = ({ orderDate, branchId, branchList }: OrderListTabPropsType
         restaurant_name: order.restaurant_name,
         employee_name: order.username,
         ordered_items: order.item_name,
-        branch: order.branch_name,
+        branch_name: order.branch_name,
         date: order.submitted_time,
       })) || []
     );

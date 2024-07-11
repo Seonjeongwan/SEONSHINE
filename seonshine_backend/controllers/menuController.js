@@ -4,6 +4,7 @@ import MenuItem from "../models/menuItemModel.js";
 import RestaurantAssigned from "../models/restaurantAssignedModel.js";
 import Upload from "../models/uploadModel.js";
 import User from "../models/userModel.js";
+import UserProfile from "../models/userProfileModel.js";
 import { requestUploadFile } from "../utils/file.js";
 
 export const getMenuList = async (req, res) => {
@@ -170,6 +171,7 @@ export const getMenuListByCurrentDay = async (req, res) => {
 
     const response = {
       restaurant_name: "",
+      restaurant_address: "",
       current_day: dayjs().format("YYYY-MM-DD"),
       menu_list: [],
     };
@@ -186,11 +188,21 @@ export const getMenuListByCurrentDay = async (req, res) => {
     });
 
     const restaurant = await User.findByPk(restaurantAssign.restaurant_id, {
+      attributes: ["username"],
+      raw: true,
+    });
+
+    const restaurantProfile = await UserProfile.findOne({
+      attributes: ["address"],
+      where: {
+        user_id: restaurantAssign.restaurant_id,
+      },
       raw: true,
     });
 
     response.menu_list = menuItems || [];
-    response.restaurant_name = restaurant.username || "";
+    response.restaurant_name = restaurant?.username || "";
+    response.restaurant_address = restaurantProfile?.address || ""
 
     return res.status(httpStatusCodes.success).json(response);
   } catch (error) {

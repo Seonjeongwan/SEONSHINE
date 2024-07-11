@@ -182,6 +182,7 @@ const Dashboard = () => {
         employee_name: order.username,
         ordered_items: order.item_name,
         date: order.submitted_time,
+        branch_name: order.branch_name,
       }));
     }
 

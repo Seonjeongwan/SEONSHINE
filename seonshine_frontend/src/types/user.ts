@@ -270,6 +270,7 @@ export type GetTodayMenuListResponseType = {
   restaurant_name: string;
   current_day: string;
   menu_list: GetMenuListResponseType[];
+  restaurant_address?: string;
 };
 
 export type OrderMenuItemPayloadType = {

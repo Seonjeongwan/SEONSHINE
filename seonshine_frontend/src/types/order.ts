@@ -4,7 +4,7 @@ export type OrderListType = {
   ordered_items?: string;
   amount?: number;
   date?: string;
-  branch?: string;
+  branch_name?: string;
 };
 
 export type GetOrderListApiPropsType = {};
