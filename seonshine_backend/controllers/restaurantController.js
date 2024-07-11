@@ -254,3 +254,5 @@ export const assignRestaurantDate = async (req, res) => {
       .json({ error: httpStatusErrors.internalServerError });
   }
 };
+
+//TODO: Run batch script every date for inserting current day to assign date history for tracking and return exact restaurant name for specific date in the past

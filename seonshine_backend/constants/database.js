@@ -12,6 +12,7 @@ export const tables = {
   userProfile: "user_profiles",
   userActivities: "user_activities",
   restaurantAssigned: "restaurant_assigned",
+  restaurantAssignedHistory: "restaurant_assigned_history",
   menuItems: "menu_items",
   orderHistory: "order_history",
   orderItems: "order_items",
