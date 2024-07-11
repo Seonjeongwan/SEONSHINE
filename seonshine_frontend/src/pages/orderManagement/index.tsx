@@ -27,10 +27,6 @@ const OrderManagement = () => {
     setBranchId(branchId);
   };
 
-  useEffect(() => {
-    branchData[0] && setBranchId(branchData[0].branch_id);
-  }, [branchData]);
-
   return (
     <Box className="w-full">
       <Box className="sticky top-0 z-10 bg-black-100">

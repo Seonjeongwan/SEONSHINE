@@ -35,7 +35,7 @@ const UserManagement = () => {
         <StyledTab label={isMobile ? 'Restaurant' : 'Restaurant Management'} />
         <StyledTab label="Approval" />
       </StyledTabs>
-      <Box className="px-4 md:px-8 mt-4">
+      <Box className="px-4 md:px-8 my-4">
         <TabPanel
           value={value}
           index={0}
