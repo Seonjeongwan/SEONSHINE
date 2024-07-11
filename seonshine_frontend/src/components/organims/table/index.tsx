@@ -104,7 +104,7 @@ const Table = <T extends object>({
     <Box className="bg-white px-4 pb-4 w-full rounded-md">
       <TableContainer
         ref={tableContainerRef}
-        className="overflow-auto"
+        className={`overflow-auto ${tableData.length >= 5 || noDataFound ? 'min-h-60' : ''}`}
       >
         <MuiTable stickyHeader>
           {!showSkeleton && (
@@ -114,9 +114,9 @@ const Table = <T extends object>({
                   {headerGroup.headers.map((header) => (
                     <TableCell
                       key={header.id}
-                      className={`font-bold text-md border-black-300 px-2 ${size === 'normal' ? 'py-5' : 'py-3'} ${
-                        header.column.getCanSort() ? 'cursor-pointer' : ''
-                      } whitespace-nowrap group`}
+                      className={`font-bold text-md border-black-300 px-2 ${size === 'normal' ? 'py-5' : 'py-3'} 
+                        ${(header.column.columnDef as CustomColumnDef<T>).align === 'center' && header.column.getCanSort() ? 'pl-7' : ''}
+                        ${header.column.getCanSort() ? 'cursor-pointer' : ''} whitespace-nowrap group`}
                       sx={{
                         textAlign: (header.column.columnDef as CustomColumnDef<T>).align || 'left',
                       }}

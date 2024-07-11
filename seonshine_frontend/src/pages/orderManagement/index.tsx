@@ -13,7 +13,7 @@ import OrderListTab from './components/OrderListTab';
 const OrderManagement = () => {
   const [value, setValue] = useState<number>(0);
   const [orderDate, setOrderDate] = useState<string>('');
-  const [branchId, setBranchId] = useState<number>(0);
+  const [branchId, setBranchId] = useState<number>(-1);
 
   const { data: branchData = [] } = useGetBranches({ enabled: true });
 
@@ -26,10 +26,6 @@ const OrderManagement = () => {
     setOrderDate(orderDate);
     setBranchId(branchId);
   };
-
-  useEffect(() => {
-    branchData[0] && setBranchId(branchData[0].branch_id);
-  }, [branchData]);
 
   return (
     <Box className="w-full">
@@ -44,7 +40,7 @@ const OrderManagement = () => {
           <StyledTab label="Order History" />
         </StyledTabs>
       </Box>
-      <Box className="px-4 md:px-8 mt-4">
+      <Box className="px-4 md:px-8 my-4">
         <TabPanel
           value={value}
           index={0}
