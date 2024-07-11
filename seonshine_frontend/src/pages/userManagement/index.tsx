@@ -6,6 +6,7 @@ import { Box } from '@mui/material';
 import { StyledTab, StyledTabs } from '@/components/molecules/tab/styled';
 import TabPanel from '@/components/molecules/tab/TabPannel';
 
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { UserManagementTabEnum } from '@/types/user';
 
 import ApprovalTab from './components/ApprovalTab';
@@ -16,6 +17,8 @@ const UserManagement = () => {
   const location = useLocation();
   const localState = location.state;
   const [value, setValue] = useState<number>(localState?.tab || UserManagementTabEnum.USER_MANAGEMENT);
+
+  const { isMobile } = useDeviceType();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -28,8 +31,8 @@ const UserManagement = () => {
         aria-label="management tabs"
         TabIndicatorProps={{ style: { display: 'none' } }}
       >
-        <StyledTab label="User Management" />
-        <StyledTab label="Restaurant Management" />
+        <StyledTab label={isMobile ? 'User' : 'User Management'} />
+        <StyledTab label={isMobile ? 'Restaurant' : 'Restaurant Management'} />
         <StyledTab label="Approval" />
       </StyledTabs>
       <Box className="px-4 md:px-8 mt-4">

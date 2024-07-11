@@ -69,9 +69,9 @@ const DatePicker = <T extends FieldValues>({
                         '.MuiInputBase-input': {
                           textAlign: 'center',
                           fontWeight: theme.typography.fontWeightBold,
-                          fontSize: '20px',
+                          fontSize: '16px',
                           lineHeight: '24px',
-                          height: '18px',
+                          height: '16px',
                           paddingBottom: '14px',
                           color: theme.palette.black[300],
                         },
