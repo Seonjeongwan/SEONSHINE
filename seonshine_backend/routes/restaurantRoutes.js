@@ -14,12 +14,14 @@ import {
   validateAssignRestaurantDate,
   validateUpdateRestaurant,
 } from '../middleware/validation/restaurantValidate.js';
+import { validateGetUserList } from '../middleware/validation/userValidate.js';
 
 const restaurantRouter = express.Router();
 
 restaurantRouter.get(
   endpoints.restaurant.list,
   authenticateToken({ role: UserRole.admin }),
+  validateGetUserList,
   getRestaurantList
 );
 
