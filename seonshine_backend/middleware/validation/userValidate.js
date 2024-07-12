@@ -4,6 +4,7 @@ import { httpStatusCodes } from '../../constants/http.js';
 import User from '../../models/userModel.js';
 import UpdateUser from '../../models/updateUserModel.js';
 import GetUserListValidationModel from '../../models/getUserListModel.js';
+import { userIdRegex } from '../../constants/regex.js';
 
 export const validateChangeStatus = (req, res, next) => {
   const { status } = req.body;
@@ -75,4 +76,26 @@ export const validateGetUserList = (sortableFields) => {
       next(error);
     }
   };
+};
+
+export const validateGetUserDetail = (req, res, next) => {
+  const { id } = req.params;
+  if (!id) {
+    return res
+      .status(httpStatusCodes.badRequest)
+      .json({ error: 'User id is required.' });
+  }
+
+  if (id.trim() === '') {
+    return res
+      .status(httpStatusCodes.badRequest)
+      .json({ error: 'User id cannot be empty.' });
+  }
+
+  if (!userIdRegex.test(id)) {
+    return res
+      .status(httpStatusCodes.badRequest)
+      .json({ error: 'Invalid User id' });
+  }
+  next();
 };

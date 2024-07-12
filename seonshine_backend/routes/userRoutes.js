@@ -12,6 +12,7 @@ import {
 import { authenticateToken } from '../middleware/auth.js';
 import {
   validateChangeStatus,
+  validateGetUserDetail,
   validateGetUserList,
   validateUpdateUser,
 } from '../middleware/validation/userValidate.js';
@@ -39,7 +40,12 @@ userRouter.get(
 );
 
 //TODO: Validate admin or current user can get detail
-userRouter.get(endpoints.users.detail, authenticateToken(), getUserDetail);
+userRouter.get(
+  endpoints.users.detail,
+  authenticateToken(),
+  validateGetUserDetail,
+  getUserDetail
+);
 
 userRouter.post(
   endpoints.users.changeStatus,
