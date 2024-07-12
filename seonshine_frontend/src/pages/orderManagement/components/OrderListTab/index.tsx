@@ -8,9 +8,9 @@ import {
   Box,
   FormControl,
   FormHelperText,
-  Grid,
   MenuItem,
   Select,
+  Skeleton,
   Stack,
   ToggleButton,
   ToggleButtonGroup,
@@ -28,7 +28,6 @@ import { OrderListType, ViewModeType } from '@/types/order';
 import { RoleEnum } from '@/types/user';
 
 import { useGetOrderListDetailApi, useGetOrderListSummaryApi } from '@/apis/hooks/orderListApi.hook';
-import { useGetBranches } from '@/apis/hooks/userApi.hook';
 import { BranchResponseType } from '@/apis/user';
 import useAuthStore from '@/store/auth.store';
 
@@ -53,9 +52,9 @@ const OrderListTab = ({ orderDate, branchId, branchList }: OrderListTabPropsType
   const [viewMode, setViewMode] = useState<ViewModeType>(localState?.viewMode || 'summary');
   const isAdmin = currentUser?.role_id === RoleEnum.ADMIN;
 
-  const { control, watch, reset } = useForm<DateSchemaType>({
+  const { control, watch } = useForm<DateSchemaType>({
     resolver: zodResolver(DateSchema),
-    values: { date: orderDate ? orderDate : today, branch_id: branchId || 0 },
+    values: { date: orderDate ? orderDate : today, branch_id: branchId || -1 },
   });
 
   const { isMobile } = useDeviceType();
@@ -69,12 +68,12 @@ const OrderListTab = ({ orderDate, branchId, branchList }: OrderListTabPropsType
   const watchedBranchId = watch('branch_id');
 
   const { data: orderListSummary, isFetching: isFetchingOrderListSummary } = useGetOrderListSummaryApi({
-    params: { date: watchedDate, branch_id: watchedBranchId },
+    params: { date: watchedDate, ...(watchedBranchId >= 0 && { branch_id: watchedBranchId }) },
     enabled: viewMode === 'summary',
   });
 
   const { data: orderListDetail, isFetching: isFetchingOrderListDetail } = useGetOrderListDetailApi({
-    params: { date: watchedDate, branch_id: watchedBranchId },
+    params: { date: watchedDate, ...(watchedBranchId >= 0 && { branch_id: watchedBranchId }) },
     enabled: viewMode === 'detail',
   });
 
@@ -95,6 +94,7 @@ const OrderListTab = ({ orderDate, branchId, branchList }: OrderListTabPropsType
         restaurant_name: order.restaurant_name,
         employee_name: order.username,
         ordered_items: order.item_name,
+        branch_name: order.branch_name,
         date: order.submitted_time,
       })) || []
     );
@@ -137,131 +137,116 @@ const OrderListTab = ({ orderDate, branchId, branchList }: OrderListTabPropsType
     >
       <Stack
         justifyContent="space-between"
-        gap={4}
+        flexWrap="wrap"
       >
-        <Grid
-          container
-          spacing={4}
+        <Stack
           alignItems="center"
-          className="w-max md:w-3/5 lg:w-2/5"
+          gap={4}
+          className="w-full sm:w-max md:w-3/5 lg:w-2/5 mx-auto sm:mx-0 mb-4"
         >
-          <Grid
-            item
-            xs={12}
-            sm={6}
-          >
+          <Box className="flex-1 w-1/2">
             <DatePicker<DateSchemaType>
               name="date"
               control={control}
             />
-          </Grid>
-          <Grid
-            item
-            xs={12}
-            sm={6}
-            className="w-full"
-          >
+          </Box>
+          <Box className="flex-1 w-1/2 sm:w-full">
             <Controller
               name="branch_id"
               control={control}
-              render={({ field: { onChange, value }, fieldState: { error } }) => {
-                return (
-                  <FormControl fullWidth>
-                    <Select
-                      displayEmpty
-                      inputProps={{ 'aria-label': 'Without label' }}
-                      value={value}
-                      onChange={onChange}
-                      size="small"
-                      sx={(theme) => ({
-                        '.MuiInputBase-root': {
-                          paddingRight: '24px',
-                        },
-                        '.MuiSelect-select': {
-                          textAlign: 'center',
-                          fontWeight: theme.typography.fontWeightBold,
-                          fontSize: '20px',
-                          height: '18px',
-                          minHeight: '18px !important',
-                          paddingLeft: '32px',
-                          paddingBottom: '14px',
-                          color: theme.palette.black[300],
-                        },
-                        fieldset: {
-                          border: 'none',
-                        },
-                      })}
-                      className="bg-white w-full max-w-80 rounded-full"
+              render={({ field: { onChange, value }, fieldState: { error } }) => (
+                <FormControl fullWidth>
+                  <Select
+                    displayEmpty
+                    inputProps={{ 'aria-label': 'Without label' }}
+                    value={value}
+                    onChange={onChange}
+                    size="small"
+                    sx={(theme) => ({
+                      '.MuiInputBase-root': {
+                        paddingRight: '24px',
+                      },
+                      '.MuiSelect-select': {
+                        textAlign: 'center',
+                        fontWeight: theme.typography.fontWeightBold,
+                        fontSize: '16px',
+                        height: '16px !important',
+                        minHeight: '16px !important',
+                        lineHeight: '16px',
+                        paddingLeft: '32px',
+                        paddingBottom: '14px',
+                        color: theme.palette.black[300],
+                      },
+                      fieldset: {
+                        border: 'none',
+                      },
+                    })}
+                    className="bg-white w-full max-w-80 rounded-full"
+                  >
+                    <MenuItem
+                      key="all_branch"
+                      value={-1}
+                      className="text-lg"
                     >
+                      All
+                    </MenuItem>
+                    {branchList.map((branch) => (
                       <MenuItem
-                        key="default_key_branch"
-                        value={0}
-                        hidden
+                        key={branch.branch_id}
+                        value={branch.branch_id}
+                        className="text-lg"
                       >
-                        Select branch
+                        {branch.branch_name}
                       </MenuItem>
-                      {branchList.map((branch) => (
-                        <MenuItem
-                          key={branch.branch_id}
-                          value={branch.branch_id}
-                          className="text-xl"
-                        >
-                          {branch.branch_name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {error && <FormHelperText color="error">{error.message}</FormHelperText>}
-                  </FormControl>
-                );
-              }}
+                    ))}
+                  </Select>
+                  {error && <FormHelperText color="error">{error.message}</FormHelperText>}
+                </FormControl>
+              )}
             />
-          </Grid>
-        </Grid>
+          </Box>
+        </Stack>
 
-        {isAdmin && (
-          <ToggleButtonGroup
-            value={viewMode}
-            exclusive
-            onChange={onChangeViewMode}
-            aria-label="view mode"
-            className="bg-white"
-            sx={{
-              maxHeight: '46px',
-            }}
-          >
-            <ToggleButton
-              value="summary"
-              aria-label="summary mode"
-              className="border-none"
+        <Stack
+          alignItems="flex-end"
+          gap={4}
+          className="ml-auto mb-4"
+        >
+          {viewMode === 'detail' && (
+            <Typography className="text-lg font-normal">{`Order Users: ${orderListDetail?.total || 0}`}</Typography>
+          )}
+          {isAdmin && (
+            <ToggleButtonGroup
+              value={viewMode}
+              exclusive
+              onChange={onChangeViewMode}
+              aria-label="view mode"
+              className="bg-white"
+              sx={{
+                maxHeight: '44px',
+              }}
             >
-              <SummarizeOutlined />
-            </ToggleButton>
-            <ToggleButton
-              value="detail"
-              aria-label="detail mode"
-              className="border-none"
-            >
-              <FormatListBulletedOutlined />
-            </ToggleButton>
-          </ToggleButtonGroup>
-        )}
+              <ToggleButton
+                value="summary"
+                aria-label="summary mode"
+                className="border-none"
+              >
+                <SummarizeOutlined />
+              </ToggleButton>
+              <ToggleButton
+                value="detail"
+                aria-label="detail mode"
+                className="border-none"
+              >
+                <FormatListBulletedOutlined />
+              </ToggleButton>
+            </ToggleButtonGroup>
+          )}
+        </Stack>
       </Stack>
       <Stack
-        className="my-4"
-        justifyContent="space-between"
-        alignItems="center"
-      >
-        <Typography
-          component="h4"
-          className="text-2xl font-bold"
-        >{`Order of ${watchedDate}`}</Typography>
-        {viewMode === 'detail' && (
-          <Typography className="text-lg font-normal">{`Order Users: ${orderListDetail?.total}`}</Typography>
-        )}
-      </Stack>
-      <Stack
-        direction={isMobile ? 'column' : 'row'}
-        gap={8}
+        direction={isMobile ? 'column-reverse' : 'row'}
+        gap={isMobile ? 4 : 8}
         alignItems="flex-start"
       >
         <Table<OrderListType>
@@ -273,21 +258,30 @@ const OrderListTab = ({ orderDate, branchId, branchList }: OrderListTabPropsType
         />
         {viewMode === 'summary' && (
           <Stack
-            className={`${isMobile ? 'w-full' : 'w-2/3'} bg-white py-6 px-8 rounded-md gap-2`}
+            className={`${isMobile ? 'w-full' : 'w-2/3 min-h-64'} bg-white py-6 px-8 rounded-md gap-2`}
             direction="column"
+            justifyContent="space-evenly"
           >
-            <Typography className="text-3xl font-bold">Billing Information</Typography>
-            <Typography className="text-2xl flex items-center flex-wrap">
+            <Typography
+              height={31}
+              className="text-2xl font-bold"
+            >
+              Billing Information
+            </Typography>
+            <Typography className="text-xl flex items-center flex-wrap">
               Restaurant:&nbsp;
               <Typography
                 component="span"
-                className="text-2xl font-bold whitespace-nowrap"
+                className="text-xl font-bold whitespace-nowrap"
               >
                 {orderListSummary?.restaurant_name || '...'}
               </Typography>
             </Typography>
             <Typography className="text-lg">{`Order Amount: ${orderListSummary?.total || 0}`}</Typography>
-            <Typography className="text-lg">{`Branch: ${branchList.find((branch) => branch.branch_id === watchedBranchId)?.branch_name}`}</Typography>
+            <Typography className="text-lg">{`Branch: ${
+              branchList.find((branch) => branch.branch_id === watchedBranchId)?.branch_name || 'All'
+            }`}</Typography>
+            <Typography className="text-lg">{`Order Amount: ${orderListSummary?.total || 0}`}</Typography>
           </Stack>
         )}
       </Stack>

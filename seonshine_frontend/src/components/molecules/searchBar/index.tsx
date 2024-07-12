@@ -57,7 +57,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           item
           xs={5}
           sm={3}
-          className="h-14"
+          className="h-14 w-5/12"
         >
           <FormControl
             variant="outlined"
@@ -98,7 +98,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <Grid
           item
           xs={7}
-          className="h-14"
+          className="h-14 w-7/12"
         >
           <TextField
             defaultValue={valueDefault}
@@ -135,7 +135,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           item
           xs={3}
           sm={2}
-          className="h-14"
+          className="h-14 ml-auto"
         >
           <Button
             variant="outlined"

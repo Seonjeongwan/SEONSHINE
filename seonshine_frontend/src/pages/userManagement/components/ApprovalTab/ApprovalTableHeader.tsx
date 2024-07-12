@@ -65,7 +65,8 @@ export const ApprovalTableHeader = (handleAction: (userId: string) => void): Cus
             backgroundColor: palette.green[300],
             fontSize: '14px',
             fontWeight: 400,
-            padding: '6px',
+            paddingBlock: '6px',
+            paddingInline: '12px',
             width: {
               xs: '80%',
               md: '50%',
@@ -80,7 +81,7 @@ export const ApprovalTableHeader = (handleAction: (userId: string) => void): Cus
             },
           })}
         >
-          Approval
+          Approve
         </Button>
       );
     },

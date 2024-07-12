@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 
 import { Logout, Notifications } from '@mui/icons-material';
 import { Avatar, Badge, Box, IconButton, Stack, Typography } from '@mui/material';
@@ -27,6 +27,8 @@ const Sidebar = ({ role }: SidebarPropsType) => {
 
   const { currentUser } = useAuthStore();
 
+  const navigate = useNavigate();
+
   const { data: userDetail } = useGetUserDetailApi({
     params: { user_id: currentUser?.user_id as string },
     enabled: currentUser?.role_id !== RoleEnum.RESTAURANT,
@@ -47,7 +49,7 @@ const Sidebar = ({ role }: SidebarPropsType) => {
 
   const allowedMenuItems = menuItems.filter((item) => item.permission.includes(role));
 
-  const handleOpenModal = () => role === RoleEnum.ADMIN && setIsModalOpen(true);
+  const handleOpenModal = () => (role === RoleEnum.ADMIN ? setIsModalOpen(true) : navigate(paths.profile));
   const handleCloseModal = () => setIsModalOpen(false);
 
   return (
