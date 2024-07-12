@@ -1,14 +1,14 @@
-import express from 'express';
-import { UserRole } from '../constants/auth.js';
+import express from "express";
+import { UserRole } from "../constants/auth.js";
 import {
   addBranch,
   getAllBranch,
   getBranchById,
   getCurrentProfile,
   getDashboardSummary,
-} from '../controllers/commonController.js';
-import { authenticateToken } from '../middleware/auth.js';
-import { endpoints } from './endpoints.js';
+} from "../controllers/commonController.js";
+import { authenticateToken } from "../middleware/auth.js";
+import { endpoints } from "./endpoints.js";
 
 const commonRouter = express.Router();
 
