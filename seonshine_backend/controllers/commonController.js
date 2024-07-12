@@ -233,7 +233,7 @@ const getAdminDashboardSummary = async () => {
 };
 
 export const getCurrentProfile = async (req, res) => {
-  const defaultUserAttributes = [
+  const userAttributes = [
     "user_id",
     "role_id",
     "username",
@@ -241,23 +241,17 @@ export const getCurrentProfile = async (req, res) => {
     "phone_number",
     "user_status",
   ];
+  const profileAttributes = ["address", "profile_picture_url"];
 
-  const defaultProfileAttributes = ["address", "profile_picture_url"];
+  const { user_id, role_id } = req.user;
+  const roleId = Number(role_id);
+
+  if (roleId !== UserRole.restaurant) {
+    userAttributes.push("branch_id");
+    profileAttributes.push("birth_date");
+  }
 
   try {
-    const { user_id, role_id } = req.user;
-    const roleId = Number(role_id);
-
-    const userAttributes =
-      roleId === UserRole.restaurant
-        ? defaultUserAttributes
-        : [...defaultUserAttributes, "branch_id"];
-
-    const profileAttributes =
-      roleId === UserRole.restaurant
-        ? defaultProfileAttributes
-        : [...defaultProfileAttributes, "birth_date"];
-
     const userProfile = await User.findOne({
       where: { user_id },
       attributes: userAttributes,
