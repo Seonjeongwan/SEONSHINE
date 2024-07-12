@@ -14,7 +14,10 @@ import {
   validateAssignRestaurantDate,
   validateUpdateRestaurant,
 } from '../middleware/validation/restaurantValidate.js';
-import { validateGetUserList } from '../middleware/validation/userValidate.js';
+import {
+  validateGetUserDetail,
+  validateGetUserList,
+} from '../middleware/validation/userValidate.js';
 import { restaurantListSortKeys } from '../constants/validation.js';
 
 const restaurantRouter = express.Router();
@@ -41,6 +44,7 @@ restaurantRouter.get(
 restaurantRouter.get(
   endpoints.restaurant.detail,
   authenticateToken({ role: UserRole.admin }),
+  validateGetUserDetail,
   getRestaurantDetail
 );
 
