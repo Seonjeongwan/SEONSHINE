@@ -9,6 +9,7 @@ import OrderItem from "../models/orderItemModel.js";
 import RestaurantAssigned from "../models/restaurantAssignedModel.js";
 import User from "../models/userModel.js";
 import { getResponseErrors } from "../utils/responseParser.js";
+import UserProfile from "../models/userProfileModel.js";
 
 export const getAllBranch = async (req, res) => {
   const branches = await Branch.findAll({
@@ -229,4 +230,74 @@ const getAdminDashboardSummary = async () => {
   response.ordered_users_count = orderUsersCount;
 
   return response;
+};
+
+export const getCurrentProfile = async (req, res) => {
+  const userAttributes = [
+    "user_id",
+    "role_id",
+    "username",
+    "email",
+    "phone_number",
+    "user_status",
+  ];
+  const profileAttributes = ["address", "profile_picture_url"];
+
+  const { user_id, role_id } = req.user;
+  const roleId = Number(role_id);
+
+  if (roleId !== UserRole.restaurant) {
+    userAttributes.push("branch_id");
+    profileAttributes.push("birth_date");
+  }
+
+  try {
+    const userProfile = await User.findOne({
+      where: { user_id },
+      attributes: userAttributes,
+
+      include: {
+        model: UserProfile,
+        as: "profile",
+        attributes: profileAttributes,
+      },
+      raw: true,
+      nest: true,
+    });
+
+    if (!userProfile) {
+      return res.status(httpStatusCodes.BAD_REQUEST).json({
+        message:
+          roleId === UserRole.restaurant
+            ? "Restaurant not found"
+            : "User not found",
+      });
+    }
+
+    const profileData = { ...userProfile, ...userProfile.profile };
+    delete profileData.profile;
+
+    if (roleId === UserRole.restaurant) {
+      const restaurantAssigned = await RestaurantAssigned.findOne({
+        attributes: ["weekday"],
+        where: { restaurant_id: user_id },
+        raw: true,
+      });
+      profileData.weekday = restaurantAssigned?.weekday || null;
+    } else {
+      const branchId = userProfile.branch_id;
+      if (branchId) {
+        const branch = await Branch.findByPk(branchId, { raw: true });
+        profileData.branch_name = branch?.branch_name || null;
+      } else {
+        profileData.branch_name = null;
+      }
+    }
+
+    res.status(httpStatusCodes.success).json(profileData);
+  } catch (error) {
+    res
+      .status(httpStatusCodes.internalServerError)
+      .json({ error: httpStatusErrors.internalServerError });
+  }
 };
