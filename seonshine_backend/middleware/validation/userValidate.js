@@ -3,7 +3,7 @@ import { UserStatus } from '../../constants/auth.js';
 import { httpStatusCodes } from '../../constants/http.js';
 import User from '../../models/userModel.js';
 import UpdateUser from '../../models/updateUserModel.js';
-import GetUserList from '../../models/getUserListModel.js';
+import GetUserListValidationModel from '../../models/getUserListModel.js';
 
 export const validateChangeStatus = (req, res, next) => {
   const { status } = req.body;
@@ -57,19 +57,22 @@ export const validateUpdateUser = async (req, res, next) => {
   }
 };
 
-export const validateGetUserList = async (req, res, next) => {
-  const getUserListParams = GetUserList.build(req.query);
+export const validateGetUserList = (sortableFields) => {
+  return async (req, res, next) => {
+    GetUserListValidationModel.setSortableFields(sortableFields);
+    const getUserListParams = GetUserListValidationModel.build(req.query);
 
-  try {
-    await getUserListParams.validate();
-    next();
-  } catch (error) {
-    if (error instanceof ValidationError) {
-      const validationErrors = error.errors.map((err) => err.message);
-      return res
-        .status(httpStatusCodes.badRequest)
-        .json({ errors: validationErrors });
+    try {
+      await getUserListParams.validate();
+      next();
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        const validationErrors = error.errors.map((err) => err.message);
+        return res
+          .status(httpStatusCodes.badRequest)
+          .json({ errors: validationErrors });
+      }
+      next(error);
     }
-    next(error);
-  }
+  };
 };

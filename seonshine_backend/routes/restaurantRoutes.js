@@ -15,13 +15,14 @@ import {
   validateUpdateRestaurant,
 } from '../middleware/validation/restaurantValidate.js';
 import { validateGetUserList } from '../middleware/validation/userValidate.js';
+import { restaurantListSortKeys } from '../constants/validation.js';
 
 const restaurantRouter = express.Router();
 
 restaurantRouter.get(
   endpoints.restaurant.list,
   authenticateToken({ role: UserRole.admin }),
-  validateGetUserList,
+  validateGetUserList(restaurantListSortKeys),
   getRestaurantList
 );
 

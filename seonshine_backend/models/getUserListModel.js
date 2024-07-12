@@ -1,10 +1,16 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelizeUserDb } from '../db/dbConfig.js';
-import { sortTypeOption } from '../constants/validation.js';
+import { sortTypeOptions } from '../constants/validation.js';
 
-class GetUserList extends Model {}
+class GetUserListValidationModel extends Model {
+  static sortableFields = [];
 
-GetUserList.init(
+  static setSortableFields(fields) {
+    this.sortableFields = fields;
+  }
+}
+
+GetUserListValidationModel.init(
   {
     page_size: {
       type: DataTypes.INTEGER,
@@ -34,7 +40,7 @@ GetUserList.init(
         },
         min: {
           args: [1],
-          msg: 'Page number must be a greater than 1',
+          msg: 'Page number must be a greater than or equal to 1',
         },
       },
     },
@@ -48,6 +54,15 @@ GetUserList.init(
         notEmpty: {
           msg: 'Sort key cannot be empty',
         },
+        isValidSortKey(value) {
+          if (!GetUserListValidationModel.sortableFields.includes(value)) {
+            throw new Error(
+              `Invalid sort key. Must be one of: ${GetUserListValidationModel.sortableFields.join(
+                ', '
+              )}`
+            );
+          }
+        },
       },
     },
     sort_type: {
@@ -58,7 +73,7 @@ GetUserList.init(
           msg: 'Sort type is required',
         },
         isIn: {
-          args: [sortTypeOption],
+          args: [sortTypeOptions],
           msg: 'Sort type be either asc or desc',
         },
       },
@@ -71,4 +86,4 @@ GetUserList.init(
   }
 );
 
-export default GetUserList;
+export default GetUserListValidationModel;
