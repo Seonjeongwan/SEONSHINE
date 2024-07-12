@@ -12,9 +12,14 @@ import {
 import { authenticateToken } from '../middleware/auth.js';
 import {
   validateChangeStatus,
+  validateGetUserList,
   validateUpdateUser,
 } from '../middleware/validation/userValidate.js';
 import { endpoints } from './endpoints.js';
+import {
+  userListSortKeys,
+  waitingApprovalListSortKeys,
+} from '../constants/validation.js';
 
 const userRouter = express.Router();
 
@@ -22,12 +27,14 @@ const userRouter = express.Router();
 userRouter.get(
   endpoints.users.list,
   authenticateToken({ role: UserRole.admin }),
+  validateGetUserList(userListSortKeys),
   getUserList
 );
 
 userRouter.get(
   endpoints.users.waitingConfirm,
   authenticateToken({ role: UserRole.admin }),
+  validateGetUserList(waitingApprovalListSortKeys),
   getUserWaitingConfirmList
 );
 
