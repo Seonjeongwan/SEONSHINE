@@ -82,24 +82,6 @@ const Table = <T extends object>({
     }
   }, [data, isFetching]);
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (tableContainerRef.current) {
-        const viewportHeight = window.innerHeight;
-        const containerTop = tableContainerRef.current.getBoundingClientRect().top;
-        const maxHeight = viewportHeight - containerTop - 88;
-        tableContainerRef.current.style.maxHeight = `${maxHeight}px`;
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    size === 'normal' && handleResize();
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
   return (
     <Box className="bg-white px-4 pb-4 w-full rounded-md">
       <TableContainer

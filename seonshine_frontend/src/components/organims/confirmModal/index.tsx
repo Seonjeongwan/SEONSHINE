@@ -41,7 +41,7 @@ const ConfirmModal = ({ open, title, description, handleClose, handleConfirm }: 
           <Typography
             id="common-modal-title"
             component="h2"
-            className="font-bold text-2xl md:text-4xl"
+            className="font-bold text-3xl md:text-4xl text-center"
           >
             {title}
           </Typography>

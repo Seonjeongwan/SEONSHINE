@@ -105,6 +105,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
       {
         onSuccess: (res) => {
           queryClient.invalidateQueries({ queryKey: ['getUserDetail'] });
+          user?.role_id === RoleEnum.ADMIN && queryClient.invalidateQueries({ queryKey: ['getCurrentProfile'] });
           toast.success(res.message);
           setIsEditing(false);
         },
@@ -144,6 +145,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
           changeUserAvatar(imagePayload, {
             onSuccess: () => {
               queryClient.invalidateQueries({ queryKey: ['getUserDetail'] });
+              user?.role_id === RoleEnum.ADMIN && queryClient.invalidateQueries({ queryKey: ['getCurrentProfile'] });
               toast.success('Your profile image has been updated.');
             },
             onError: () => setUploadError('Cannot upload image.'),
@@ -162,6 +164,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ userId, isOpen, onC
       onSuccess: (data) => {
         toast.success(data.message);
         queryClient.invalidateQueries({ queryKey: ['getUserDetail'] });
+        user?.role_id === RoleEnum.ADMIN && queryClient.invalidateQueries({ queryKey: ['getCurrentProfile'] });
         const photoInput = document.getElementById('upload-photo') as HTMLInputElement;
         photoInput.value = '';
       },
