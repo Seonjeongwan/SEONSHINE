@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Avatar, Box, Button, FormHelperText, Skeleton, Stack, Typography } from '@mui/material';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, UseQueryResult } from '@tanstack/react-query';
 
 import DatePicker from '@/components/molecules/datePicker';
 import ConfirmModal from '@/components/organims/confirmModal';
@@ -13,6 +13,7 @@ import { userInfoSchema, UserInfoSchemaType } from '@/components/organims/userPr
 import { avatarBaseURL } from '@/constants/image';
 import { useAuth } from '@/hooks/useAuth';
 import {
+  GetUserDetailResponseType,
   labelRoleById,
   labelUserStatus,
   RoleEnum,
@@ -26,7 +27,7 @@ import {
   useChangeStatusApi,
   useChangeUserAvatarApi,
   useGetBranches,
-  useGetUserDetailApi,
+  useGetCurrentProfileApi,
   useUpdateUserApi,
 } from '@/apis/hooks/userApi.hook';
 
@@ -75,7 +76,9 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
   const [isDeleteAvatarModalOpen, setIsDeleteAvatarModalOpen] = useState(false);
   const [isDeactiveModalOpen, setIsDeactivateModalOpen] = useState(false);
 
-  const { data: user, isLoading } = useGetUserDetailApi({ params: { user_id: userId } });
+  const { data: user, isLoading } = useGetCurrentProfileApi({
+    enabled: true,
+  }) as UseQueryResult<GetUserDetailResponseType>;
 
   const { mutate: updateUser, isPending } = useUpdateUserApi({ userId });
   const { mutate: changeUserAvatar } = useChangeUserAvatarApi(userId);
@@ -119,7 +122,7 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
         try {
           changeUserAvatar(imagePayload, {
             onSuccess: () => {
-              queryClient.invalidateQueries({ queryKey: ['getUserDetail'] });
+              queryClient.invalidateQueries({ queryKey: ['getCurrentProfile'] });
               toast.success('Your profile image has been updated.');
             },
             onError: () => setUploadError('Cannot upload image.'),
@@ -137,7 +140,7 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
     changeUserAvatar(emptyFilePayload, {
       onSuccess: (data) => {
         toast.success(data.message);
-        queryClient.invalidateQueries({ queryKey: ['getUserDetail'] });
+        queryClient.invalidateQueries({ queryKey: ['getCurrentProfile'] });
         const photoInput = document.getElementById('upload-photo') as HTMLInputElement;
         photoInput.value = '';
       },
@@ -157,7 +160,7 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
       },
       {
         onSuccess: (res) => {
-          queryClient.invalidateQueries({ queryKey: ['getUserDetail'] });
+          queryClient.invalidateQueries({ queryKey: ['getCurrentProfile'] });
           toast.success(res.message);
           setIsEditing(false);
         },
