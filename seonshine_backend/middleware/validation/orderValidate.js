@@ -46,19 +46,25 @@ export const validateOrderHistory = (req, res, next) => {
       .json({ error: "To Date is required" });
   }
 
-  const isValidFromDate = dayjs(from, "YYYY-MM-DD", true).isValid();
-  const isValidToDate = dayjs(to, "YYYY-MM-DD", true).isValid();
+  const fromDate = dayjs(from, "YYYY-MM-DD", true);
+  const toDate = dayjs(to, "YYYY-MM-DD", true);
 
-  if (!isValidFromDate) {
+  if (!fromDate.isValid()) {
     return res
       .status(httpStatusCodes.badRequest)
       .json({ error: "Invalid From Date" });
   }
 
-  if (!isValidToDate) {
+  if (!toDate.isValid()) {
     return res
       .status(httpStatusCodes.badRequest)
       .json({ error: "Invalid To Date" });
+  }
+
+  if (toDate.isBefore(fromDate)) {
+    return res
+      .status(httpStatusCodes.badRequest)
+      .json({ error: "To Date must be greater than or equal to From Date" });
   }
 
   next();
