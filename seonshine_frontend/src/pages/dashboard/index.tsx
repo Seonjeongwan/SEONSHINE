@@ -160,7 +160,7 @@ const Dashboard = () => {
   const watchedDate = watch('date');
 
   const { data: orderList, isFetching } = useGetOrderListDetailApi({
-    params: { date: watchedDate },
+    params: { date: watchedDate, branch_id: currentUser?.branch_id },
   });
 
   const { data: orderListSummary } = useGetOrderListSummaryApi({

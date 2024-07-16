@@ -10,6 +10,7 @@ import useTable from '@/hooks/useTable';
 import { OrderListType } from '@/types/order';
 
 import { useGetOrderListDetailApi } from '@/apis/hooks/orderListApi.hook';
+import useAuthStore from '@/store/auth.store';
 
 import { OrderListTableHeader } from './OrderListTableHeader';
 import { DateSchema, DateSchemaType } from './schema';
@@ -19,13 +20,15 @@ const ITEMS_PER_PAGE = 20;
 const today = format(new Date(), 'yyyy-MM-dd');
 
 const UserOrderListTab = () => {
+  const { currentUser } = useAuthStore(); // ko dc
+
   const {
     control,
     watch,
     formState: { errors },
   } = useForm<DateSchemaType>({
     resolver: zodResolver(DateSchema),
-    defaultValues: { date: today },
+    defaultValues: { date: today, branch_id: currentUser?.branch_id },
   });
 
   const { currentPage, sortKey, sortType, pageSize, handlePageChange, handleSortingChange } = useTable({
@@ -34,9 +37,10 @@ const UserOrderListTab = () => {
   });
 
   const watchedDate = watch('date');
+  const watchedBranchId = watch('branch_id');
 
   const { data: orderList, isFetching } = useGetOrderListDetailApi({
-    params: { date: watchedDate },
+    params: { date: watchedDate, branch_id: watchedBranchId },
   });
   const columns = OrderListTableHeader;
 
@@ -45,6 +49,7 @@ const UserOrderListTab = () => {
         restaurant_name: order.restaurant_name,
         employee_name: order.username,
         ordered_items: order.item_name,
+        branch_name: order.branch_name,
         date: order.submitted_time,
       }))
     : [];
@@ -61,7 +66,7 @@ const UserOrderListTab = () => {
         <Typography
           component="h4"
           className="text-2xl font-bold"
-        >{`Order for ${watchedDate}`}</Typography>
+        >{`Order for ${watchedDate}(${watchedBranchId})`}</Typography>
         <Typography className="text-lg font-normal">{`Order user: ${orderList?.total}`}</Typography>
       </Stack>
 

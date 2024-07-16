@@ -58,13 +58,13 @@ const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInf
     <Stack
       direction="column"
       alignItems="center"
-      className="w-full px-4 h-screen md:h-full sm:px-8 md:px-12 lg:px-12 bg-white rounded-lg shadow-md max-w-2xl"
+      className="w-full px-4 h-screen md:h-full sm:px-8 md:px-12 lg:px-12 bg-white rounded-lg shadow-md max-w-2xl relative"
     >
       <Link
-        className="cursor-pointer !underline self-start pt-12"
+        className="cursor-pointer !underline self-start absolute top-4 left-4"
         href="/login"
       >
-        Back to Login
+        {'< Back to Login'}
       </Link>
       <Box className="grid w-full h-full grid-cols-1 lg:grid-cols-1">
         <Typography

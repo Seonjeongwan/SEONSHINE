@@ -1,15 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 
 import { Logout, Notifications } from '@mui/icons-material';
 import { Avatar, Badge, Box, IconButton, Stack, Typography } from '@mui/material';
 
 import logo from '@/assets/images/logo.png';
+import { USER_INFO_KEY } from '@/constants/authentications';
 import { avatarBaseURL } from '@/constants/image';
 import { menuItems } from '@/constants/menu';
 import { useAuth } from '@/hooks/useAuth';
 import { paths } from '@/routes/paths';
-import { RoleEnum } from '@/types/user';
+import { CurrentUserType, RoleEnum } from '@/types/user';
+import SessionCache from '@/utils/sessionCache';
 
 import { useGetCurrentProfileApi } from '@/apis/hooks/userApi.hook';
 import useAuthStore from '@/store/auth.store';
@@ -23,7 +25,7 @@ const Sidebar = ({ role }: SidebarPropsType) => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { logout } = useAuth();
+  const { logout, updateUserInfo } = useAuth();
 
   const { currentUser } = useAuthStore();
 
@@ -35,6 +37,12 @@ const Sidebar = ({ role }: SidebarPropsType) => {
 
   const handleOpenModal = () => (role === RoleEnum.ADMIN ? setIsModalOpen(true) : navigate(paths.profile));
   const handleCloseModal = () => setIsModalOpen(false);
+
+  useEffect(() => {
+    if (userDetail) {
+      updateUserInfo(userDetail as CurrentUserType);
+    }
+  }, [userDetail]);
 
   return (
     <Stack
