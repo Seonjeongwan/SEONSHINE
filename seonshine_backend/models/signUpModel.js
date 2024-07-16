@@ -1,5 +1,8 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelizeUserDb } from "../db/dbConfig.js";
+import { UserRole } from "../constants/auth.js";
+
+const signUpAllowedRoles = [UserRole.user, UserRole.restaurant];
 
 class SignUp extends Model {}
 
@@ -13,8 +16,12 @@ SignUp.init(
           msg: "User ID is required",
         },
         len: {
-          args: [8, 255],
-          msg: "User ID must be between 8 and 255 characters long",
+          args: [8, 20],
+          msg: "User ID must be between 8 and 20 characters long",
+        },
+        is: {
+          args: /^[a-zA-Z0-9]+$/,
+          msg: "User ID can only contain numbers and alphabetic characters",
         },
       },
     },
@@ -24,6 +31,10 @@ SignUp.init(
       validate: {
         notNull: {
           msg: "Role ID is required",
+        },
+        isIn: {
+          args: [signUpAllowedRoles],
+          msg: "Only roles user and restaurant are allowed",
         },
       },
     },
@@ -68,8 +79,8 @@ SignUp.init(
           msg: "Password is required",
         },
         len: {
-          args: [6, 255],
-          msg: "Password must be between 6 and 255 characters long",
+          args: [6, 50],
+          msg: "Password must be between 6 and 50 characters long",
         },
       },
     },
@@ -77,8 +88,8 @@ SignUp.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       validate: {
-        isRequiredForRoleId1(value) {
-          if (this.role_id === "1" && !value) {
+        isRequiredBasedRole(value) {
+          if (this.role_id == UserRole.user && !value) {
             throw new Error("Branch is required");
           }
         },
@@ -87,8 +98,8 @@ SignUp.init(
     address: {
       type: DataTypes.STRING,
       validate: {
-        isRequiredForRoleId2(value) {
-          if (this.role_id === "2" && !value) {
+        isRequiredBasedRole(value) {
+          if (this.role_id == UserRole.restaurant && !value) {
             throw new Error("Address is required");
           }
         },
