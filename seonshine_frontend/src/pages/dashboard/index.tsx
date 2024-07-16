@@ -238,7 +238,7 @@ const Dashboard = () => {
         }}
       >
         <Stack className="flex-grow">Today's Restaurant</Stack>
-        <Stack className="font-bold text-2xl">{dashboardSummary?.today_restaurant_name}</Stack>
+        <Stack className="font-bold text-2xl">{dashboardSummary?.today_restaurant_name || 'None'}</Stack>
       </Box>
       <Box
         className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4 cursor-pointer"
@@ -279,7 +279,7 @@ const Dashboard = () => {
         }}
       >
         <Stack className="flex-grow">Today's Restaurant</Stack>
-        <Stack className="font-bold text-2xl">{dashboardSummary?.today_restaurant_name}</Stack>
+        <Stack className="font-bold text-2xl">{dashboardSummary?.today_restaurant_name || 'None'}</Stack>
       </Box>
 
       <Box
