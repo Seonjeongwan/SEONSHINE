@@ -17,4 +17,5 @@ export const tables = {
   orderHistory: "order_history",
   orderItems: "order_items",
   uploads: "uploads",
+  settings: "settings",
 };
