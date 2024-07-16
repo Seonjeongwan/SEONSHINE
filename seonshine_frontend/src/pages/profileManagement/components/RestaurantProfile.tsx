@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Avatar, Box, Button, FormHelperText, Skeleton, Stack, Typography } from '@mui/material';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, UseQueryResult } from '@tanstack/react-query';
 
 import ConfirmModal from '@/components/organims/confirmModal';
 import { restaurantInfoSchema, RestaurantInfoSchemaType } from '@/components/organims/restaurantProfileModal/schema';
@@ -14,6 +14,7 @@ import { useAuth } from '@/hooks/useAuth';
 import {
   dayByWeekday,
   DayEnum,
+  GetRestaurantDetailResponseType,
   labelRoleById,
   labelUserStatus,
   RestaurantDetailType,
@@ -26,6 +27,7 @@ import { isValidImageFile } from '@/utils/file';
 import {
   useChangeStatusApi,
   useChangeUserAvatarApi,
+  useGetCurrentProfileApi,
   useGetRestaurantDetailApi,
   useUpdateRestaurantApi,
 } from '@/apis/hooks/userApi.hook';
@@ -74,7 +76,9 @@ const RestaurantProfile = ({ userId }: RestaurantProfilePropsType) => {
   const [isDeleteAvatarModalOpen, setIsDeleteAvatarModalOpen] = useState(false);
   const [isDeactiveModalOpen, setIsDeactivateModalOpen] = useState(false);
 
-  const { data: restaurant, isLoading } = useGetRestaurantDetailApi({ params: { restaurant_id: userId } });
+  const { data: restaurant, isLoading } = useGetCurrentProfileApi({
+    enabled: true,
+  }) as UseQueryResult<GetRestaurantDetailResponseType>;
 
   const { mutate: updateUser, isPending } = useUpdateRestaurantApi({ userId });
   const { mutate: changeUserAvatar } = useChangeUserAvatarApi(userId);
@@ -115,7 +119,7 @@ const RestaurantProfile = ({ userId }: RestaurantProfilePropsType) => {
         try {
           changeUserAvatar(imagePayload, {
             onSuccess: () => {
-              queryClient.invalidateQueries({ queryKey: ['getRestaurantDetail'] });
+              queryClient.invalidateQueries({ queryKey: ['getCurrentProfile'] });
               toast.success('Your profile image has been updated.');
             },
             onError: () => setUploadError('Cannot upload image.'),
@@ -133,7 +137,7 @@ const RestaurantProfile = ({ userId }: RestaurantProfilePropsType) => {
     changeUserAvatar(emptyFilePayload, {
       onSuccess: (data) => {
         toast.success(data.message);
-        queryClient.invalidateQueries({ queryKey: ['getRestaurantDetail'] });
+        queryClient.invalidateQueries({ queryKey: ['getCurrentProfile'] });
         const photoInput = document.getElementById('upload-photo') as HTMLInputElement;
         photoInput.value = '';
       },
@@ -153,7 +157,7 @@ const RestaurantProfile = ({ userId }: RestaurantProfilePropsType) => {
       },
       {
         onSuccess: (res) => {
-          queryClient.invalidateQueries({ queryKey: ['getRestaurantDetail'] });
+          queryClient.invalidateQueries({ queryKey: ['getCurrentProfile'] });
           toast.success(res.message);
           setIsEditing(false);
         },

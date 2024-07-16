@@ -73,6 +73,13 @@ export const getUserDetail = async ({ user_id }: GetUserDetailApiPropsType): Pro
   return response.data;
 };
 
+export const getCurrentProfile = async (): Promise<GetUserDetailResponseType | GetRestaurantDetailResponseType> => {
+  const response = await axiosInstance.get<GetUserDetailResponseType | GetRestaurantDetailResponseType>(
+    `/common/current-profile`,
+  );
+  return response.data;
+};
+
 export const changeUserAvatar = async (
   payload: UploadImagePayloadType,
   user_id: string,

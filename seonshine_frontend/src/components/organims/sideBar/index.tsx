@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 
 import { Logout, Notifications } from '@mui/icons-material';
 import { Avatar, Badge, Box, IconButton, Stack, Typography } from '@mui/material';
@@ -11,7 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { paths } from '@/routes/paths';
 import { RoleEnum } from '@/types/user';
 
-import { useGetRestaurantDetailApi, useGetUserDetailApi } from '@/apis/hooks/userApi.hook';
+import { useGetCurrentProfileApi } from '@/apis/hooks/userApi.hook';
 import useAuthStore from '@/store/auth.store';
 
 import ConfirmModal from '../confirmModal';
@@ -29,23 +29,7 @@ const Sidebar = ({ role }: SidebarPropsType) => {
 
   const navigate = useNavigate();
 
-  const { data: userDetail } = useGetUserDetailApi({
-    params: { user_id: currentUser?.user_id as string },
-    enabled: currentUser?.role_id !== RoleEnum.RESTAURANT,
-  });
-
-  const { data: resaurantDetail } = useGetRestaurantDetailApi({
-    params: { restaurant_id: currentUser?.user_id as string },
-    enabled: currentUser?.role_id === RoleEnum.RESTAURANT,
-  });
-
-  const avatarUrl = useMemo(
-    () =>
-      currentUser?.role_id === RoleEnum.RESTAURANT
-        ? resaurantDetail?.profile_picture_url
-        : userDetail?.profile_picture_url,
-    [userDetail, resaurantDetail],
-  );
+  const { data: userDetail } = useGetCurrentProfileApi({ enabled: true });
 
   const allowedMenuItems = menuItems.filter((item) => item.permission.includes(role));
 
@@ -93,7 +77,7 @@ const Sidebar = ({ role }: SidebarPropsType) => {
           onClick={handleOpenModal}
         >
           <Avatar
-            src={!avatarUrl ? '' : `${avatarBaseURL}${avatarUrl}`}
+            src={!userDetail?.profile_picture_url ? '' : `${avatarBaseURL}${userDetail?.profile_picture_url}`}
             className="bg-gray-200"
           />
         </IconButton>

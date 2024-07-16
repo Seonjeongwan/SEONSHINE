@@ -47,6 +47,7 @@ import {
   discardOrderMenuItem,
   getAllRestaurants,
   getCurrentOrder,
+  getCurrentProfile,
   getDashboardSummary,
   getMenuList,
   getRestaurantDetail,
@@ -276,6 +277,20 @@ export const useGetDashBoardSummary = ({
     queryKey: ['getDashboardSummary'],
     queryFn: async () => {
       return getDashboardSummary();
+    },
+    enabled,
+  });
+};
+
+export const useGetCurrentProfileApi = ({
+  enabled = true,
+}: {
+  enabled?: boolean;
+}): UseQueryResult<GetUserDetailResponseType | GetRestaurantDetailResponseType> => {
+  return useQuery({
+    queryKey: ['getCurrentProfile'],
+    queryFn: async () => {
+      return getCurrentProfile();
     },
     enabled,
   });

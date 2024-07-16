@@ -1,11 +1,12 @@
 import express from "express";
 import { changePassword, login, resendOtpForgotPassword, resendOtpSignUp, sendOtpForgotPassword, signUp, verifyOtpForgotPassword, verifySignUp } from "../controllers/authController.js";
 import { endpoints } from "./endpoints.js";
+import { validateSignUp } from "../middleware/validation/signUpValidate.js";
 
 const authRouter = express.Router();
 
 //TODO: Using validate user middleware
-authRouter.post(endpoints.auth.signup.index, signUp);
+authRouter.post(endpoints.auth.signup.index, validateSignUp, signUp);
 
 authRouter.post(endpoints.auth.login, login);
 
