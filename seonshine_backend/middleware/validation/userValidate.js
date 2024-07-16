@@ -99,3 +99,32 @@ export const validateGetUserDetail = (req, res, next) => {
   }
   next();
 };
+
+export const validateChangeAvatar = async (req, res, next) => {
+  const allowedFileTypes = ["image/jpeg", "image/jpg", "image/png"];
+  const maxSize = 5 * 1024 * 1024;
+  try {
+    const file = req.file;
+
+    if (file) {
+      if (!allowedFileTypes.includes(file.mimetype)) {
+        return res.status(httpStatusCodes.badRequest).json({
+          message: "Invalid file type. Only JPEG, JPG, and PNG are allowed.",
+        });
+      }
+
+      if (file.size > maxSize) {
+        return res
+          .status(httpStatusCodes.badRequest)
+          .json({ message: "File size exceeds the limit of 5MB." });
+      }
+    }
+
+    next();
+  } catch (error) {
+    console.error("Error in validation middleware:", error);
+    return res
+      .status(httpStatusCodes.internalServerError)
+      .json({ error: "Internal Server Error" });
+  }
+};

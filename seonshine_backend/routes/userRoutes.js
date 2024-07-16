@@ -11,6 +11,7 @@ import {
 } from '../controllers/userController.js';
 import { authenticateToken } from '../middleware/auth.js';
 import {
+  validateChangeAvatar,
   validateChangeStatus,
   validateGetUserDetail,
   validateGetUserList,
@@ -58,6 +59,7 @@ userRouter.post(
   endpoints.users.changeAvatar,
   authenticateToken(),
   upload.single('file'),
+  validateChangeAvatar,
   changeUserAvatar
 );
 
