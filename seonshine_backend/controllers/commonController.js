@@ -84,7 +84,7 @@ const getUserDashboardSummary = async (currentUserId) => {
     raw: true,
   });
 
-  const todayRestaurantId = restaurantAssign.restaurant_id;
+  const todayRestaurantId = restaurantAssign?.restaurant_id;
 
   if (todayRestaurantId) {
     const restaurant = await User.findByPk(todayRestaurantId, {
@@ -170,7 +170,7 @@ const getAdminDashboardSummary = async () => {
     raw: true,
   });
 
-  const todayRestaurantId = restaurantAssign.restaurant_id;
+  const todayRestaurantId = restaurantAssign?.restaurant_id;
 
   if (todayRestaurantId) {
     const restaurant = await User.findByPk(todayRestaurantId, {

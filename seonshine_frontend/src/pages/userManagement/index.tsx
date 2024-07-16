@@ -25,16 +25,19 @@ const UserManagement = () => {
   };
   return (
     <Box className="w-full">
-      <StyledTabs
-        value={value}
-        onChange={handleChange}
-        aria-label="management tabs"
-        TabIndicatorProps={{ style: { display: 'none' } }}
-      >
-        <StyledTab label={isMobile ? 'User' : 'User Management'} />
-        <StyledTab label={isMobile ? 'Restaurant' : 'Restaurant Management'} />
-        <StyledTab label="Approval" />
-      </StyledTabs>
+      <Box className="sticky top-0 z-10 bg-black-100">
+        <StyledTabs
+          value={value}
+          onChange={handleChange}
+          aria-label="management tabs"
+          TabIndicatorProps={{ style: { display: 'none' } }}
+        >
+          <StyledTab label={isMobile ? 'User' : 'User Management'} />
+          <StyledTab label={isMobile ? 'Restaurant' : 'Restaurant Management'} />
+          <StyledTab label="Approval" />
+        </StyledTabs>
+      </Box>
+
       <Box className="px-4 md:px-8 my-4">
         <TabPanel
           value={value}
