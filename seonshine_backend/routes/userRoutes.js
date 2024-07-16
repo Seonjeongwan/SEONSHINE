@@ -1,6 +1,6 @@
-import express from "express";
-import { upload } from "../config/storage.js";
-import { UserRole } from "../constants/auth.js";
+import express from 'express';
+import { upload } from '../config/storage.js';
+import { UserRole } from '../constants/auth.js';
 import {
   changeUserAvatar,
   changeUserStatus,
@@ -8,20 +8,20 @@ import {
   getUserList,
   getUserWaitingConfirmList,
   updateUser,
-} from "../controllers/userController.js";
-import { authenticateToken } from "../middleware/auth.js";
+} from '../controllers/userController.js';
+import { authenticateToken } from '../middleware/auth.js';
 import {
   validateChangeAvatar,
   validateChangeStatus,
   validateGetUserDetail,
   validateGetUserList,
   validateUpdateUser,
-} from "../middleware/validation/userValidate.js";
-import { endpoints } from "./endpoints.js";
+} from '../middleware/validation/userValidate.js';
+import { endpoints } from './endpoints.js';
 import {
   userListSortKeys,
   waitingApprovalListSortKeys,
-} from "../constants/validation.js";
+} from '../constants/validation.js';
 
 const userRouter = express.Router();
 
@@ -50,7 +50,7 @@ userRouter.get(
 
 userRouter.post(
   endpoints.users.changeStatus,
-  authenticateToken(),
+  authenticateToken({ role: UserRole.admin }),
   validateChangeStatus,
   changeUserStatus
 );
@@ -58,7 +58,7 @@ userRouter.post(
 userRouter.post(
   endpoints.users.changeAvatar,
   authenticateToken(),
-  upload.single("file"),
+  upload.single('file'),
   validateChangeAvatar,
   changeUserAvatar
 );
