@@ -1,5 +1,5 @@
 import { ValidationError } from 'sequelize';
-import { UserStatus } from '../../constants/auth.js';
+import { UserRole, UserStatus } from '../../constants/auth.js';
 import { httpStatusCodes } from '../../constants/http.js';
 import User from '../../models/userModel.js';
 import UpdateUser from '../../models/updateUserModel.js';
@@ -105,6 +105,17 @@ export const validateChangeAvatar = async (req, res, next) => {
   const maxSize = 5 * 1024 * 1024;
   try {
     const file = req.file;
+    const userId = req.params.id;
+    const currentUser = req.user;
+
+    if (
+      currentUser.role_id !== UserRole.admin &&
+      currentUser.user_id !== userId
+    ) {
+      return res
+        .status(httpStatusCodes.forbidden)
+        .json({ message: "You do not have permission to change this avatar." });
+    }
 
     if (file) {
       if (!allowedFileTypes.includes(file.mimetype)) {
