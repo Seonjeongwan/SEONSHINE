@@ -5,6 +5,19 @@ class SignUp extends Model {}
 
 SignUp.init(
   {
+    user_id: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: "User ID is required",
+        },
+        len: {
+          args: [8, 255],
+          msg: "User ID must be between 8 and 255 characters long",
+        },
+      },
+    },
     role_id: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -21,9 +34,17 @@ SignUp.init(
         notNull: {
           msg: "Username is required",
         },
-        len: {
-          args: [8, 255],
-          msg: "Username must be between 8 and 255 characters long",
+      },
+    },
+    phone_number: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: "Phone number is required",
+        },
+        isNumeric: {
+          msg: "Phone number must contain only numbers",
         },
       },
     },
@@ -49,22 +70,6 @@ SignUp.init(
         len: {
           args: [6, 255],
           msg: "Password must be between 6 and 255 characters long",
-        },
-      },
-    },
-    phone_number: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notNull: {
-          msg: "Phone number is required",
-        },
-        isNumeric: {
-          msg: "Phone number must contain only numbers",
-        },
-        len: {
-          args: [10, 10],
-          msg: "Phone number must be exactly 10 digits long",
         },
       },
     },
