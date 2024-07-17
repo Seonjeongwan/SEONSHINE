@@ -1,24 +1,49 @@
-import { ValidationError } from 'sequelize';
-import { UserRole, UserStatus } from '../../constants/auth.js';
-import { httpStatusCodes } from '../../constants/http.js';
-import User from '../../models/userModel.js';
-import UpdateUser from '../../models/updateUserModel.js';
-import GetUserListValidationModel from '../../models/getUserListModel.js';
-import { userIdRegex } from '../../constants/regex.js';
+import { ValidationError } from "sequelize";
+import { UserRole, UserStatus } from "../../constants/auth.js";
+import { httpStatusCodes } from "../../constants/http.js";
+import User from "../../models/userModel.js";
+import UpdateUser from "../../models/updateUserModel.js";
+import GetUserListValidationModel from "../../models/getUserListModel.js";
+import { userIdRegex } from "../../constants/regex.js";
 
 export const validateChangeStatus = (req, res, next) => {
-  const { status } = req.body;
+  const { status, user_id } = req.body;
+  const currentUser = req.user;
+  const roleId = Number(currentUser?.role_id);
 
   if (!status) {
     return res
       .status(httpStatusCodes.badRequest)
-      .json({ error: 'Status is required' });
+      .json({ error: "Status is required" });
   }
 
   if (!Object.values(UserStatus).includes(Number(status))) {
     return res
       .status(httpStatusCodes.badRequest)
-      .json({ error: 'Invalid status' });
+      .json({ error: "Invalid status" });
+  }
+
+  if (!user_id) {
+    return res
+      .status(httpStatusCodes.badRequest)
+      .json({ error: "User Id is require" });
+  }
+
+  if (roleId === UserRole.admin) {
+    if (status === UserStatus.inactive) {
+      return res
+        .status(httpStatusCodes.badRequest)
+        .json({ error: "Admin user can't change this status" });
+    }
+  } else {
+    if (user_id !== currentUser.user_id) {
+      return res.status(httpStatusCodes.forbidden).json({
+        error: "You don't have permission to change the status of another user",
+      });
+    }
+    if (status === UserStatus.inactiveByAdmin) {
+      return res.sendStatus(httpStatusCodes.forbidden);
+    }
   }
 
   next();
@@ -83,19 +108,19 @@ export const validateGetUserDetail = (req, res, next) => {
   if (!id) {
     return res
       .status(httpStatusCodes.badRequest)
-      .json({ error: 'User id is required.' });
+      .json({ error: "User id is required." });
   }
 
-  if (id.trim() === '') {
+  if (id.trim() === "") {
     return res
       .status(httpStatusCodes.badRequest)
-      .json({ error: 'User id cannot be empty.' });
+      .json({ error: "User id cannot be empty." });
   }
 
   if (!userIdRegex.test(id)) {
     return res
       .status(httpStatusCodes.badRequest)
-      .json({ error: 'Invalid User id' });
+      .json({ error: "Invalid User id" });
   }
   next();
 };

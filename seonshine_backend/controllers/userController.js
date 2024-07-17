@@ -128,6 +128,13 @@ export const changeUserStatus = async (req, res) => {
         .json({ message: "User not found" });
     }
 
+    if (status === Number(user.user_status)) {
+      return res.status(httpStatusCodes.badRequest).json({
+        error:
+          "User status can only be changed if it is different from the current status",
+      });
+    }
+
     user.user_status = status;
     user.updated_at = Sequelize.literal("CURRENT_TIMESTAMP");
 
