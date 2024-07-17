@@ -37,14 +37,12 @@ export const validateChangeStatus = (req, res, next) => {
     }
   } else {
     if (user_id !== currentUser.user_id) {
-      return res.status(httpStatusCodes.badRequest).json({
-        error: "Restaurant/ normal users can only change their own status",
+      return res.status(httpStatusCodes.forbidden).json({
+        error: "You don't have permission to change the status of another user",
       });
     }
     if (status === UserStatus.inactiveByAdmin) {
-      return res
-        .status(httpStatusCodes.badRequest)
-        .json({ error: "Restaurant/ normal users can't change this status" });
+      return res.sendStatus(httpStatusCodes.forbidden);
     }
   }
 
