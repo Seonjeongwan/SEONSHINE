@@ -9,7 +9,7 @@ import useAuthStore from '@/store/auth.store';
 type UseAuthType = {
   currentUser: CurrentUserType | null;
   logout: () => void;
-  login: (user: CurrentUserType, accessToken: string, rememberMe: boolean) => void;
+  login: (user: CurrentUserType, accessToken: string) => void;
   updateUserInfo: (user: CurrentUserType) => void;
   updateToken: (accessToken: string) => void;
 };
@@ -17,14 +17,10 @@ type UseAuthType = {
 export const useAuth = (): UseAuthType => {
   const { currentUser, setCurrentUser } = useAuthStore();
 
-  const login = (user: CurrentUserType, accessToken: string, rememberMe: boolean) => {
+  const login = (user: CurrentUserType, accessToken: string) => {
     setCurrentUser(user);
     setAccessToken(accessToken);
-    if (rememberMe) {
-      saveUserToCache(user);
-    } else {
-      SessionCache.save(USER_INFO_KEY, JSON.stringify(user));
-    }
+    saveUserToCache(user);
   };
 
   const logout = () => {

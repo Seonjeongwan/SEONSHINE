@@ -183,6 +183,7 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
       },
       {
         onSuccess: () => {
+          setIsDeactivateModalOpen(false);
           toast.success('This account has been deactivated. Please contact admin to reactivate account.', {
             autoClose: 2000,
             onClose: () => {
