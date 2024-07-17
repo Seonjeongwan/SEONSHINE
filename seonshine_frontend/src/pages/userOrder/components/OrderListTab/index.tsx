@@ -60,14 +60,24 @@ const UserOrderListTab = () => {
       className="w-full"
     >
       <Stack
-        className="my-8"
+        className="px-4 md:px-6"
         justifyContent="space-between"
       >
         <Typography
           component="h4"
-          className="text-2xl font-bold"
-        >{`Order for ${watchedDate}(${watchedBranchId})`}</Typography>
+          className="text-xl md:text-2xl font-bold"
+        >{`Order for ${watchedDate}`}</Typography>
+
         <Typography className="text-lg font-normal">{`Order user: ${orderList?.total}`}</Typography>
+      </Stack>
+      <Stack
+        className="mb-2 px-4 md:px-6"
+        justifyContent="space-between"
+      >
+        <Typography
+          component="h4"
+          className="text-xl md:text-2xl font-bold"
+        >{`Branch: ${orderList?.data[0].branch_name}`}</Typography>
       </Stack>
 
       <Table<OrderListType>
