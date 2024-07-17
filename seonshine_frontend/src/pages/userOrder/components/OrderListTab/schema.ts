@@ -17,6 +17,7 @@ export const DateSchema = zod.object({
         message: 'Invalid date format',
       },
     ),
+  branch_id: zod.number(),
 });
 
 export type DateSchemaType = zod.infer<typeof DateSchema>;

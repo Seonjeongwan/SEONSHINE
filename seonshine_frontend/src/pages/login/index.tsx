@@ -66,7 +66,7 @@ const LoginPage = () => {
         }
 
         if (user) {
-          handleLoginSuccess(user, user.token, !!rememberCheckboxRef.current?.checked);
+          handleLoginSuccess(user, user?.token as string, !!rememberCheckboxRef.current?.checked);
           navigate(paths.index);
         }
       },

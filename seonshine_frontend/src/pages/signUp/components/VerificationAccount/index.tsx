@@ -121,10 +121,10 @@ const AccountVerificationPage = ({
         className="w-full h-screen md:pt-12 md:p-24 bg-white rounded-lg shadow-md max-w-screen relative md:h-171 md:w-240 sm:h-131 sm:w-200 flex flex-col justify-center items-center gap-6"
       >
         <Link
-          className="cursor-pointer !underline self-start"
+          className="cursor-pointer !underline self-start absolute top-4 left-4"
           href="/login"
         >
-          Back to Login
+          {'< Back to Login'}
         </Link>
         <Typography
           variant="heading2"
