@@ -148,7 +148,7 @@ const OrderMenuTab = () => {
       >
         {currentOrder && (
           <Box className="px-2 mb-6">
-            <Typography className="font-bold text-2xl mb-4">Ordered Item</Typography>
+            <Typography className="font-bold text-xl md:text-2xl mb-4">Ordered Item</Typography>
             <Grid
               container
               spacing={2}
@@ -182,7 +182,7 @@ const OrderMenuTab = () => {
                 className="flex flex-col justify-between"
               >
                 <Box className="ml-0 md:ml-4 mt-4 md:mt-0">
-                  <Typography className="font-bold text-3xl overflow-hidden whitespace-nowrap overflow-ellipsis">
+                  <Typography className="font-bold text-2xl md:text-3xl overflow-hidden whitespace-nowrap overflow-ellipsis">
                     {currentOrder.item_name}
                   </Typography>
                   <Typography className="text-md text-gray-500">{currentOrder.restaurant_name}</Typography>
@@ -203,7 +203,7 @@ const OrderMenuTab = () => {
           </Box>
         )}
         <Box className="px-2">
-          <Typography className="font-bold text-2xl">
+          <Typography className="font-bold text-xl md:text-2xl">
             Menu list of {todayMenuList?.current_day.replace(/-/g, '.')} - {todayMenuList?.restaurant_name}
             <LocationOnIcon
               className="ml-2 cursor-pointer text-[28px]"
