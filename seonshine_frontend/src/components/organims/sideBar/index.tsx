@@ -5,13 +5,11 @@ import { Logout, Notifications } from '@mui/icons-material';
 import { Avatar, Badge, Box, IconButton, Stack, Typography } from '@mui/material';
 
 import logo from '@/assets/images/logo.png';
-import { USER_INFO_KEY } from '@/constants/authentications';
 import { avatarBaseURL } from '@/constants/image';
 import { menuItems } from '@/constants/menu';
 import { useAuth } from '@/hooks/useAuth';
 import { paths } from '@/routes/paths';
 import { CurrentUserType, RoleEnum } from '@/types/user';
-import SessionCache from '@/utils/sessionCache';
 
 import { useGetCurrentProfileApi } from '@/apis/hooks/userApi.hook';
 import useAuthStore from '@/store/auth.store';
