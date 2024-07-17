@@ -1,23 +1,27 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { Box, Button, Checkbox, FormControlLabel, IconButton, Link, Stack, Typography } from '@mui/material';
+import { Box, Button, IconButton, Link, Stack, Typography } from '@mui/material';
 
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
+import AccountVerificationLayout from '@/components/organims/accountVerification/accountVerificationLayout';
+import ConfirmModal from '@/components/organims/confirmModal';
 
 import loginBanner from '@/assets/images/login-banner.png';
 import logo from '@/assets/images/logo.png';
 import { useAuth } from '@/hooks/useAuth';
 import { paths } from '@/routes/paths';
 import { IErrorResponse } from '@/types/common';
-import { UserStatusEnum } from '@/types/user';
+import { CurrentUserType, UserStatusEnum } from '@/types/user';
+import { clearAccessToken, setAccessToken } from '@/utils/persistCache/token';
 
 import { useLoginApi } from '@/apis/hooks/authApi.hook';
+import { useChangeStatusApi } from '@/apis/hooks/userApi.hook';
 import { useLoadingStore } from '@/store/loading.store';
 
 import PendingApprovalPage from '../signUp/components/PendingApproval';
@@ -36,16 +40,20 @@ const LoginPage = () => {
     },
   });
   const [isWaiting, setIsWaiting] = useState<boolean>(false);
+  const [isClose, setIsClose] = useState<boolean>(false);
+  const [userLogin, setUserLogin] = useState<CurrentUserType | undefined>(undefined);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
+
   const navigate = useNavigate();
 
   const { mutate: exeLogin, isPending } = useLoginApi();
   const { login: handleLoginSuccess } = useAuth();
 
+  const { mutate: changeStatus } = useChangeStatusApi();
+
   const setLoading = useLoadingStore((state) => state.setLoading);
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
-
-  const rememberCheckboxRef = useRef<HTMLInputElement>(null);
 
   const handleTogglePassword = () => setShowPassword((prev) => !prev);
 
@@ -61,12 +69,18 @@ const LoginPage = () => {
           setIsWaiting(true);
         }
 
-        if (Number(user_status) === UserStatusEnum.DEACTIVATED || Number(user_status) === UserStatusEnum.CLOSE) {
+        if (Number(user_status) === UserStatusEnum.CLOSE) {
+          setIsClose(true);
+          setUserLogin(user);
+          return;
+        }
+
+        if (Number(user_status) === UserStatusEnum.DEACTIVATED) {
           toast.warning(message);
         }
 
         if (user) {
-          handleLoginSuccess(user, user?.token as string, !!rememberCheckboxRef.current?.checked);
+          handleLoginSuccess(user, user?.token as string);
           navigate(paths.index);
         }
       },
@@ -78,6 +92,27 @@ const LoginPage = () => {
 
   const submitForm = (data: LoginSchemaType) => {
     handleLogin(data);
+  };
+
+  const handleActivate = () => {
+    setAccessToken(userLogin?.token as string);
+    changeStatus(
+      {
+        user_id: userLogin?.user_id as string,
+        status: UserStatusEnum.ACTIVE,
+      },
+      {
+        onSuccess: () => {
+          toast.success('The account has been successfully activated.');
+          handleLoginSuccess(userLogin!, userLogin?.token as string);
+          navigate(paths.index);
+        },
+        onError: () => {
+          toast.error('Activate failed');
+          clearAccessToken();
+        },
+      },
+    );
   };
 
   useEffect(() => {
@@ -95,6 +130,54 @@ const LoginPage = () => {
           className="items-center"
           handleGotoLogin={() => setIsWaiting(false)}
         />
+      ) : isClose ? (
+        <Stack
+          alignItems="center"
+          justifyContent="center"
+          className="h-full w-full"
+        >
+          <ConfirmModal
+            open={isConfirmModalOpen}
+            title="Active Confirmation"
+            description="Are you sure you want to activate this account?"
+            handleClose={() => setIsConfirmModalOpen(false)}
+            handleConfirm={handleActivate}
+          />
+          <Stack
+            direction="column"
+            justifyContent="center"
+            gap={8}
+            alignItems="center"
+            className="w-full md:w-max h-full md:h-fit bg-white p-20 pt-32 rounded-md"
+          >
+            <Typography
+              component="h2"
+              className="text-center uppercase text-4xl font-extrabold"
+            >
+              You have deactivated your account
+            </Typography>
+            <Typography className="text-center text-xl font-medium">
+              Please Activate your account to use the service.
+            </Typography>
+            <Button
+              variant="contained"
+              onClick={() => setIsConfirmModalOpen(true)}
+              sx={{
+                fontSize: '14px',
+                fontWeight: 400,
+                marginTop: '56px',
+                paddingInline: '32px',
+                paddingBlock: '6px',
+                minWidth: 'min-content',
+                maxWidth: 'max-content',
+                borderRadius: '32px',
+                boxShadow: 'none',
+              }}
+            >
+              Activate
+            </Button>
+          </Stack>
+        </Stack>
       ) : (
         <Stack className="w-full h-full bg-white shadow-md md:rounded-2xl shadow-black-100 md:w-280 md:h-176">
           <Box className="grid w-full h-full grid-cols-1 md:grid-cols-2">
@@ -202,23 +285,9 @@ const LoginPage = () => {
                   </Box>
                   <Stack
                     marginTop={2}
-                    justifyContent="space-between"
+                    justifyContent="flex-end"
                     alignItems="center"
                   >
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          size="small"
-                          inputRef={rememberCheckboxRef}
-                        />
-                      }
-                      label="Remember me"
-                      sx={{
-                        '.MuiFormControlLabel-label': {
-                          fontSize: '13px',
-                        },
-                      }}
-                    />
                     <Link
                       href={paths.forgotPassword}
                       className="text-sm"

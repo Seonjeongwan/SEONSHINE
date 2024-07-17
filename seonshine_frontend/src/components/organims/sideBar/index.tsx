@@ -12,7 +12,6 @@ import { paths } from '@/routes/paths';
 import { CurrentUserType, RoleEnum } from '@/types/user';
 
 import { useGetCurrentProfileApi } from '@/apis/hooks/userApi.hook';
-import useAuthStore from '@/store/auth.store';
 
 import ConfirmModal from '../confirmModal';
 import UserProfileModal from '../userProfileModal';
@@ -24,8 +23,6 @@ const Sidebar = ({ role }: SidebarPropsType) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { logout, updateUserInfo } = useAuth();
-
-  const { currentUser } = useAuthStore();
 
   const navigate = useNavigate();
 
@@ -89,7 +86,7 @@ const Sidebar = ({ role }: SidebarPropsType) => {
         </IconButton>
         {isModalOpen && (
           <UserProfileModal
-            userId={currentUser?.user_id as string}
+            userId={userDetail?.user_id as string}
             isOpen={isModalOpen}
             onClose={handleCloseModal}
           />

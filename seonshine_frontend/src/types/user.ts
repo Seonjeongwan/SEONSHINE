@@ -44,6 +44,7 @@ export type CurrentUserType = {
   created_at?: string;
   updated_at?: string;
   token?: string;
+  user_status?: string;
 };
 
 export type GetUserListApiPropsType = {
