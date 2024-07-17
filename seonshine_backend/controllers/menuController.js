@@ -6,6 +6,7 @@ import Upload from "../models/uploadModel.js";
 import User from "../models/userModel.js";
 import UserProfile from "../models/userProfileModel.js";
 import { requestUploadFile } from "../utils/file.js";
+import { UserRole } from "../constants/auth.js";
 
 export const getMenuList = async (req, res) => {
   try {
@@ -88,6 +89,19 @@ export const deleteMenuItem = async (req, res) => {
       });
     }
 
+    const restaurantId = menuItem.restaurant_id;
+    const currentUser = req.user;
+
+    if (
+      currentUser.role_id == UserRole.user ||
+      (currentUser.role_id == UserRole.restaurant &&
+        currentUser.user_id != restaurantId)
+    ) {
+      return res.status(httpStatusCodes.forbidden).json({
+        message: "You do not have permission to delete menu item.",
+      });
+    }
+
     await menuItem.destroy();
 
     return res.status(httpStatusCodes.success).json({
@@ -112,6 +126,18 @@ export const updateMenuItem = async (req, res) => {
     if (!menuItem) {
       return res.status(httpStatusCodes.notFound).json({
         message: "Menu item not found",
+      });
+    }
+    const restaurantId = menuItem.restaurant_id;
+    const currentUser = req.user;
+
+    if (
+      currentUser.role_id == UserRole.user ||
+      (currentUser.role_id == UserRole.restaurant &&
+        currentUser.user_id != restaurantId)
+    ) {
+      return res.status(httpStatusCodes.forbidden).json({
+        message: "You do not have permission to update menu item.",
       });
     }
 
@@ -202,7 +228,7 @@ export const getMenuListByCurrentDay = async (req, res) => {
 
     response.menu_list = menuItems || [];
     response.restaurant_name = restaurant?.username || "";
-    response.restaurant_address = restaurantProfile?.address || ""
+    response.restaurant_address = restaurantProfile?.address || "";
 
     return res.status(httpStatusCodes.success).json(response);
   } catch (error) {

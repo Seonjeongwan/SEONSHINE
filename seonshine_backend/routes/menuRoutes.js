@@ -9,6 +9,7 @@ import {
 } from "../controllers/menuController.js";
 import { authenticateToken } from "../middleware/auth.js";
 import { endpoints } from "./endpoints.js";
+import { validateCreateMenuItem, validateUpdateMenuItem } from "../middleware/validation/menuValidate.js";
 
 const menuRoutes = express.Router();
 
@@ -18,6 +19,7 @@ menuRoutes.post(
   endpoints.menu.createItem,
   authenticateToken(),
   upload.single("file"),
+  validateCreateMenuItem,
   createMenuItem
 );
 
@@ -25,6 +27,7 @@ menuRoutes.put(
   endpoints.menu.edit,
   authenticateToken(),
   upload.single("file"),
+  validateUpdateMenuItem,
   updateMenuItem
 );
 
