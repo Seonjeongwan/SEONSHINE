@@ -148,7 +148,10 @@ export const login = async (req, res) => {
         const response = {};
         response.message = statusWithMessageLogin[userStatus];
         response.user_status = userStatus;
-        if (String(userStatus) === String(UserStatus.active)) {
+        if (
+          String(userStatus) === String(UserStatus.active) ||
+          String(userStatus) === String(UserStatus.inactive)
+        ) {
           const token = generateToken(user);
           response.user = { ...user, token };
         }

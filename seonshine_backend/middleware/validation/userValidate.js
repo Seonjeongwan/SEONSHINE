@@ -10,7 +10,6 @@ export const validateChangeStatus = (req, res, next) => {
   const { status, user_id } = req.body;
   const currentUser = req.user;
   const roleId = Number(currentUser?.role_id);
-  const userStatus = Number(currentUser?.user_status);
 
   if (!status) {
     return res
@@ -46,14 +45,6 @@ export const validateChangeStatus = (req, res, next) => {
       return res
         .status(httpStatusCodes.badRequest)
         .json({ error: "Restaurant/ normal users can't change this status" });
-    }
-    if (status === UserStatus.active) {
-      if (userStatus !== UserStatus.inactive) {
-        return res.status(httpStatusCodes.badRequest).json({
-          error:
-            "Only restaurant/ normal users can active if their account status is inactive",
-        });
-      }
     }
   }
 
