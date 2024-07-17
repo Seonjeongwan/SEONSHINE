@@ -34,23 +34,24 @@ export const validateChangeStatus = (req, res, next) => {
     if (status === UserStatus.inactive) {
       return res
         .status(httpStatusCodes.badRequest)
-        .json({ error: "Admin can't change this status" });
+        .json({ error: "Admin user can't change this status" });
     }
   } else {
     if (user_id !== currentUser.user_id) {
-      return res
-        .status(httpStatusCodes.badRequest)
-        .json({ error: "Users can only change their own status" });
+      return res.status(httpStatusCodes.badRequest).json({
+        error: "Restaurant/ normal users can only change their own status",
+      });
     }
     if (status === UserStatus.inactiveByAdmin) {
       return res
         .status(httpStatusCodes.badRequest)
-        .json({ error: "Users can't change this status" });
+        .json({ error: "Restaurant/ normal users can't change this status" });
     }
     if (status === UserStatus.active) {
       if (userStatus !== UserStatus.inactive) {
         return res.status(httpStatusCodes.badRequest).json({
-          error: "Users can become active if their account status is inactive",
+          error:
+            "Only restaurant/ normal users can active if their account status is inactive",
         });
       }
     }
