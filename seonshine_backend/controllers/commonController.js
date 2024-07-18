@@ -10,6 +10,9 @@ import RestaurantAssigned from "../models/restaurantAssignedModel.js";
 import User from "../models/userModel.js";
 import { getResponseErrors } from "../utils/responseParser.js";
 import UserProfile from "../models/userProfileModel.js";
+import Settings from "../models/settingModel.js";
+import { settingCategories } from "../constants/setting.js";
+import { sequelizeCommonDb } from "../db/dbConfig.js";
 
 export const getAllBranch = async (req, res) => {
   const branches = await Branch.findAll({
@@ -299,5 +302,59 @@ export const getCurrentProfile = async (req, res) => {
     res
       .status(httpStatusCodes.internalServerError)
       .json({ error: httpStatusErrors.internalServerError });
+  }
+};
+
+export const saveOrderPeriod = async (req, res) => {
+  const transactionCommonDb = await sequelizeCommonDb.transaction();
+
+  try {
+    const { start, end } = req.body;
+    const [startHour, startMinute] = start.split(":");
+    const [endHour, endMinute] = end.split(":");
+
+    const data = {
+      start_hour: Number(startHour),
+      start_minute: Number(startMinute),
+      end_hour: Number(endHour),
+      end_minute: Number(endMinute),
+    };
+
+    const currentOrderPeriod = await Settings.findOne({
+      where: {
+        category: settingCategories.orderPeriod,
+      },
+    });
+
+    if (currentOrderPeriod) {
+      await currentOrderPeriod.update(
+        {
+          data: JSON.stringify(data),
+        },
+        {
+          transaction: transactionCommonDb,
+        }
+      );
+    } else {
+      await Settings.create(
+        {
+          category: settingCategories.orderPeriod,
+          data: JSON.stringify(data),
+        },
+        {
+          transaction: transactionCommonDb,
+        }
+      );
+    }
+
+    await transactionCommonDb.commit();
+    res
+      .status(httpStatusCodes.success)
+      .json({ message: "Save order period successfully." });
+  } catch (error) {
+    await transactionCommonDb.rollback();
+    res
+      .status(httpStatusCodes.internalServerError)
+      .send(httpStatusErrors.internalServerError);
   }
 };
