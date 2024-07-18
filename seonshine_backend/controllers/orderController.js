@@ -8,6 +8,8 @@ import { sequelizeOrderDb } from "../db/dbConfig.js";
 import { OrderHistory, OrderItem, User } from "../models/index.js";
 import MenuItem from "../models/menuItemModel.js";
 import RestaurantAssigned from "../models/restaurantAssignedModel.js";
+import Settings from "../models/settingModel.js";
+import { settingCategories } from "../constants/setting.js";
 
 export const orderItemCurrentDay = async (req, res) => {
   const transactionOrderDb = await sequelizeOrderDb.transaction();
@@ -450,14 +452,25 @@ export const getCurrentOrder = async (req, res) => {
 };
 
 export const getOrderPeriod = async (req, res) => {
-  const startTime = process.env.ORDER_START_HOUR_MINUTE;
-  const endTime = process.env.ORDER_END_HOUR_MINUTE;
-  const [startHour, startMinute] = startTime.split(":");
-  const [endHour, endMinute] = endTime.split(":");
-  res.status(httpStatusCodes.success).json({
-    startHour: Number(startHour),
-    startMinute: Number(startMinute),
-    endHour: Number(endHour),
-    endMinute: Number(endMinute),
-  });
+  try {
+    const orderPeriod = await Settings.findOne({
+      attributes: ["category", "data"],
+      where: {
+        category: settingCategories.orderPeriod,
+      },
+      raw: true,
+    });
+
+    const response = {};
+
+    if (orderPeriod) {
+      response.data = JSON.parse(orderPeriod.data);
+    }
+
+    res.status(httpStatusCodes.success).send(response);
+  } catch (error) {
+    res
+      .status(httpStatusCodes.internalServerError)
+      .send(httpStatusErrors.internalServerError);
+  }
 };
