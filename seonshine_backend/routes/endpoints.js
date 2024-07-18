@@ -55,5 +55,5 @@ export const endpoints = {
   },
   dashboard: "/dashboard/summary",
   currentProfile: "/current-profile",
-  saveOrderPeriod: "/save-period",
+  saveOrderPeriod: "/order-period-setting",
 };

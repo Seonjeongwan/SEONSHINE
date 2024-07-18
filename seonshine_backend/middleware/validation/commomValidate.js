@@ -1,4 +1,3 @@
-import dayjs from "dayjs";
 import { httpStatusCodes } from "../../constants/http.js";
 import { validTimeFormatRegex } from "../../constants/regex.js";
 
@@ -23,10 +22,7 @@ export const validateSaveOrderPeriod = (req, res, next) => {
       .json({ error: 'Invalid time format. Expected "hh:mm".' });
   }
 
-  const startTime = dayjs(`1970-01-01T${start}:00`);
-  const endTime = dayjs(`1970-01-01T${end}:00`);
-
-  if (startTime.isAfter(endTime) || startTime.isSame(endTime)) {
+  if (start >= end) {
     return res
       .status(400)
       .json({ error: "Start time must be before end time." });
