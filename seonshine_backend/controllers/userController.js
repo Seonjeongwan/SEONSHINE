@@ -224,7 +224,20 @@ export const changeUserAvatar = async (req, res) => {
 
     // Delete avatar
     if (!file) {
-      if (profile) {
+      if (profile && profile.profile_picture_url) {
+        const oldFileName = profile.profile_picture_url.split("/").pop();
+        console.log(`Deleting old file: ${oldFileName}`);
+
+        try {
+          await httpUpload.delete(`/delete/${oldFileName}`);
+          console.log("delete api");
+        } catch (deleteError) {
+          console.error(
+            `Failed to delete old file: ${oldFileName}`,
+            deleteError
+          );
+        }
+
         profile.profile_picture_url = null;
         profile.updated_at = Sequelize.literal("CURRENT_TIMESTAMP");
         await profile.save();
@@ -266,6 +279,21 @@ export const changeUserAvatar = async (req, res) => {
       await Upload.create(upload);
 
       if (profile) {
+        // Delete old image from file server
+        if (profile.profile_picture_url) {
+          const oldFileName = profile.profile_picture_url.split("/").pop();
+          console.log(`Deleting old file: ${oldFileName}`);
+
+          try {
+            await httpUpload.delete(`/delete/${oldFileName}`);
+          } catch (deleteError) {
+            console.error(
+              `Failed to delete old file: ${oldFileName}`,
+              deleteError
+            );
+          }
+        }
+
         profile.profile_picture_url = path;
         profile.updated_at = Sequelize.literal("CURRENT_TIMESTAMP");
         await profile.save();
