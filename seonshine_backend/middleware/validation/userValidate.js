@@ -134,8 +134,8 @@ export const validateChangeAvatar = async (req, res, next) => {
     const currentUser = req.user;
 
     if (
-      currentUser.role_id !== UserRole.admin &&
-      currentUser.user_id !== userId
+      currentUser.role_id != UserRole.admin &&
+      currentUser.user_id != userId
     ) {
       return res
         .status(httpStatusCodes.forbidden)

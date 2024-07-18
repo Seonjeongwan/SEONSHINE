@@ -45,6 +45,25 @@ app.get("/download/:path", (req, res) => {
   });
 });
 
+// Route to handle file deletion
+app.delete("/delete/:path", (req, res) => {
+  const filePath = `uploads/${req.params.path}`;
+  const absolutePath = path.resolve(__dirname, filePath);
+
+  fs.access(absolutePath, fs.constants.F_OK, (err) => {
+    if (err) {
+      return res.status(404).send({ error: "File not found" });
+    }
+
+    fs.unlink(absolutePath, (err) => {
+      if (err) {
+        return res.status(500).send({ error: "Error deleting file" });
+      }
+      res.send({ message: "File deleted successfully" });
+    });
+  });
+});
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`File server is running on port ${PORT}`);
