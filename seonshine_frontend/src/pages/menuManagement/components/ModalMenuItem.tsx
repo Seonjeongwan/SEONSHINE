@@ -59,7 +59,6 @@ const ModalMenuItem = ({ selectedItem, onClose, item_id = 0, restaurant_id = '' 
   const handleSave = (data: MenuListInfoSchemaType) => {
     updateMenuItem(data, {
       onSuccess: (res) => {
-        console.log({ res });
         queryClient.invalidateQueries({ queryKey: ['getMenuList'] });
         toast.success(res.message);
         setIsEditing(false);

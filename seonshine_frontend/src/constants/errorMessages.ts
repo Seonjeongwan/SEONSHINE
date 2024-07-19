@@ -1,10 +1,15 @@
 export const errorMessages = {
   require: 'This field is required',
-  employeeIdInvalid: 'Invalid employee id',
+  passwordMinLength: `Password must be at least 8 characters long`,
+  passwordLowerCase: 'Password must include at least one lowercase letter',
+  passwordUpperCase: 'Password must include at least one uppercase letter',
+  passwordDigit: 'Password must include at least one digit',
+  passwordSpecialChar: 'Password must include at least one special character',
+  employeeIdInvalid: 'Employee Number must be at least 4  characters long',
   passwordInvalid: 'Invalid password',
   passwordNotMatch: "Passwords don't match",
   otpInvalid: 'OTP must have 6 digits',
   emailInvalid: 'Invalid email',
   phoneNumberInvalid: 'Invalid phone number',
-  idInvalid: 'Invalid ID'
+  idInvalid: 'ID must be at least 4 characters long',
 };

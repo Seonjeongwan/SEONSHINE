@@ -1,8 +1,16 @@
 import * as zod from 'zod';
 
 import { errorMessages } from '@/constants/errorMessages';
-import { employeeIdRegex, otpRegex, passwordRegex, phoneNumberRegex } from '@/constants/regex';
+import { employeeIdRegex, otpRegex, phoneNumberRegex } from '@/constants/regex';
 import { RoleEnum } from '@/types/user';
+
+const passwordMinLength = 8;
+const passwordCriteria = [
+  { regex: /[a-z]/, message: errorMessages.passwordLowerCase },
+  { regex: /[A-Z]/, message: errorMessages.passwordUpperCase },
+  { regex: /\d/, message: errorMessages.passwordDigit },
+  { regex: /[@$!%*?&]/, message: errorMessages.passwordSpecialChar },
+];
 
 export const SignUpSchema = zod
   .object({
@@ -11,12 +19,20 @@ export const SignUpSchema = zod
     password: zod
       .string()
       .min(1, { message: errorMessages.require })
-      .refine((value) => passwordRegex.test(value), {
-        message: errorMessages.passwordInvalid,
+      .min(passwordMinLength, { message: errorMessages.passwordMinLength })
+      .superRefine((value, ctx) => {
+        passwordCriteria.forEach(({ regex, message }) => {
+          if (!regex.test(value)) {
+            ctx.addIssue({
+              code: zod.ZodIssueCode.custom,
+              message,
+            });
+          }
+        });
       }),
-    confirmPassword: zod.string(),
+    confirmPassword: zod.string().min(1, { message: errorMessages.require }),
     fullName: zod.string().min(1, { message: errorMessages.require }),
-    email: zod.string(),
+    email: zod.string().min(1, { message: errorMessages.require }),
     phoneNumber: zod
       .string()
       .min(1, { message: errorMessages.require })

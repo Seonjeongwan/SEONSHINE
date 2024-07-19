@@ -375,7 +375,7 @@ const Dashboard = () => {
               {menuList?.map((dish, index) => (
                 <Box
                   key={index}
-                  className="p-2 md:p-4 outline-none"
+                  className="p-2 pt-4 md:p-4 outline-none"
                 >
                   {dish.image_url ? (
                     <img
@@ -384,7 +384,7 @@ const Dashboard = () => {
                       className="w-full h-32 md:h-40 object-cover rounded-md"
                     />
                   ) : (
-                    <Stack className="w-full h-32 md:h-40 items-center bg-gray-200">
+                    <Stack className="w-full h-32 md:h-40 items-center bg-gray-200 rounded-md">
                       <RestaurantRounded
                         className="w-full h-1/2 opacity-30"
                         fontSize="large"
@@ -392,7 +392,7 @@ const Dashboard = () => {
                     </Stack>
                   )}
 
-                  <h3 className="text-left mt-2">{dish.name}</h3>
+                  <h3 className="text-left mt-2 font-bold">{dish.name}</h3>
                 </Box>
               ))}
             </Slider>

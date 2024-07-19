@@ -8,6 +8,7 @@ import { Box, Button, FormControl, IconButton, Link, MenuItem, Select, Stack, Ty
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
 
+import { useDeviceType } from '@/hooks/useDeviceType';
 import { labelIDByRole, RoleEnum } from '@/types/user';
 
 import { useGetBranches } from '@/apis/hooks/userApi.hook';
@@ -16,6 +17,7 @@ import { EnterUserInformationPropsType } from '../../types';
 import { SignUpSchema, SignUpSchemaType } from './schema';
 
 const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInformationPropsType) => {
+  const { isMobile } = useDeviceType();
   const {
     handleSubmit,
     register,
@@ -67,18 +69,19 @@ const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInf
         {'< Back to Login'}
       </Link>
       <Box className="grid w-full h-full grid-cols-1 lg:grid-cols-1">
-        <Typography
-          variant="heading2"
-          component="h2"
-          className="text-center pt-8 pb-4"
-        >
-          Sign Up
-        </Typography>
         <Stack
           justifyContent="center"
           alignItems="center"
           className="h-full px-2"
+          direction={'column'}
         >
+          <Typography
+            variant="heading2"
+            component="h2"
+            className="text-center pt-8 pb-4"
+          >
+            Sign Up
+          </Typography>
           <form
             onSubmit={handleSubmit(submitForm)}
             className="w-full"
@@ -88,7 +91,7 @@ const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInf
               flexDirection="column"
               className="h-full"
             >
-              <Box className="grid gap-8 mt-4">
+              <Box className="grid gap-4 mt-4">
                 <Stack direction="column">
                   <FormLabel
                     title={
@@ -149,13 +152,13 @@ const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInf
                 </Stack>
                 <Stack direction="column">
                   <FormLabel
-                    title="Full name"
+                    title="Full Name"
                     required
                   />
                   <FormInput
                     name="fullName"
                     register={register}
-                    placeholder="Full name"
+                    placeholder="Full Name"
                     error={errors.fullName}
                   />
                 </Stack>
@@ -180,10 +183,10 @@ const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInf
                     </Stack>
                   </Stack>
                 ) : (
-                  <Stack direction={'row'}>
+                  <Stack direction={!isMobile ? 'row' : 'column'}>
                     <Stack
                       direction="column"
-                      className={'mr-2 w-1/2'}
+                      className={!isMobile ? 'mr-2 w-1/2' : 'mr-2 w-full mb-4'}
                     >
                       <FormLabel
                         title="Email"
@@ -199,10 +202,10 @@ const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInf
                     </Stack>
                     <Stack
                       direction="column"
-                      className={'w-1/2'}
+                      className={!isMobile ? 'mr-2 w-1/2' : 'mr-2 w-full'}
                     >
                       <FormLabel
-                        title="Phone number"
+                        title="Phone Number"
                         required
                       />
                       <FormInput
@@ -225,7 +228,7 @@ const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInf
                       className={'mr-2 w-1/2'}
                     >
                       <FormLabel
-                        title="Phone number"
+                        title="Phone Number"
                         required
                       />
                       <FormInput
@@ -251,7 +254,7 @@ const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInf
                         }}
                       >
                         <FormLabel
-                          title="Branch name"
+                          title="Branch Name"
                           required
                         />
                         <FormControl>
@@ -260,7 +263,7 @@ const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInf
                             displayEmpty
                             inputProps={{ 'aria-label': 'Without label' }}
                             labelId="branch-select-label"
-                            value={selectedBranch}
+                            value={selectedBranch || 'Select Branch'}
                             onChange={(e) => {
                               setSelectedBranch(e.target.value);
                               setValue('branch_id', e.target.value);
