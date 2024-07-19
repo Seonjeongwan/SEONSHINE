@@ -464,7 +464,8 @@ export const getOrderPeriod = async (req, res) => {
     const response = {};
 
     if (orderPeriod) {
-      response.data = JSON.parse(orderPeriod.data);
+      const data = JSON.parse(orderPeriod.data);
+      response.data = typeof data === "object" ? data : JSON.parse(data);
     }
 
     res.status(httpStatusCodes.success).send(response);
