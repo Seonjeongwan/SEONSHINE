@@ -7,6 +7,7 @@ import User from "../models/userModel.js";
 import UserProfile from "../models/userProfileModel.js";
 import { requestUploadFile } from "../utils/file.js";
 import { UserRole } from "../constants/auth.js";
+import httpUpload from "../config/axiosUpload.js";
 
 export const getMenuList = async (req, res) => {
   try {
@@ -102,6 +103,17 @@ export const deleteMenuItem = async (req, res) => {
       });
     }
 
+    // Delete associated image if it exists
+    if (menuItem.image_url) {
+      const oldFileName = menuItem.image_url.split("/").pop();
+      try {
+        await httpUpload.delete(`/delete/${oldFileName}`);
+        console.log(`Deleted old file: ${oldFileName}`);
+      } catch (deleteError) {
+        console.error(`Failed to delete old file: ${oldFileName}`, deleteError);
+      }
+    }
+
     await menuItem.destroy();
 
     return res.status(httpStatusCodes.success).json({
@@ -128,6 +140,7 @@ export const updateMenuItem = async (req, res) => {
         message: "Menu item not found",
       });
     }
+
     const restaurantId = menuItem.restaurant_id;
     const currentUser = req.user;
 
@@ -159,6 +172,26 @@ export const updateMenuItem = async (req, res) => {
         await Upload.create(upload);
 
         itemImagePath = path;
+
+        // Delete old image if it exists
+        if (menuItem.image_url) {
+          const oldFileName = menuItem.image_url.split("/").pop();
+          try {
+            await httpUpload.delete(`/delete/${oldFileName}`);
+            console.log(`Deleted old file: ${oldFileName}`);
+          } catch (deleteError) {
+            console.error(`Failed to delete old file: ${oldFileName}`, deleteError);
+          }
+        }
+      }
+    } else if (menuItem.image_url) {
+      // Handle delete when no new file is provided
+      const oldFileName = menuItem.image_url.split("/").pop();
+      try {
+        await httpUpload.delete(`/delete/${oldFileName}`);
+        console.log(`Deleted old file: ${oldFileName}`);
+      } catch (deleteError) {
+        console.error(`Failed to delete old file: ${oldFileName}`, deleteError);
       }
     }
 
@@ -166,7 +199,7 @@ export const updateMenuItem = async (req, res) => {
       name,
     };
 
-    if (itemImagePath) {
+    if (itemImagePath || file === null) {
       menuUpdated.image_url = itemImagePath;
     }
 
