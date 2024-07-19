@@ -15,12 +15,12 @@ export const AssignTableHeader = ({
   isSelectDisabled,
 }: AssignTableHeaderPropsType): CustomColumnDef<AssignTableType>[] => [
   {
-    accessorKey: 'assignedDate',
+    accessorKey: 'assigned_date',
     header: 'Assigned Date',
     cell: (info) => (
       <Box className="flex items-center justify-end bg-gradient-to-r from-gray-200 to-gray-500 h-full min-w-40 w-3/4 my-1">
         <Typography className="font-extrabold italic text-3xl text-black-100">
-          {dayByWeekday[info.row.original.assignedDate as DayEnum]}
+          {dayByWeekday[info.row.original.assigned_date as DayEnum]}
         </Typography>
       </Box>
     ),
@@ -38,7 +38,7 @@ export const AssignTableHeader = ({
           displayEmpty
           inputProps={{ 'aria-label': 'Without label' }}
           value={info.row.original.selectedRestaurantId || ''}
-          onChange={(e: SelectChangeEvent) => handleSelectChange(info.row.original.assignedDate, e.target.value)}
+          onChange={(e: SelectChangeEvent) => handleSelectChange(info.row.original.assigned_date, e.target.value)}
           size="small"
           className="bg-white font-bold min-w-52 rounded-xl h-10"
           sx={{
@@ -47,7 +47,7 @@ export const AssignTableHeader = ({
               paddingBottom: '14px',
             },
           }}
-          disabled={isSelectDisabled(info.row.original.assignedDate)}
+          disabled={isSelectDisabled(info.row.original.assigned_date)}
         >
           <MenuItem value="">None</MenuItem>
           {info.row.original.restaurants.map((option) => (

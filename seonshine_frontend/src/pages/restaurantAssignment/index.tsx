@@ -15,7 +15,6 @@ import { useGetOrderPeriodApi, useSetOrderPeriodApi } from '@/apis/hooks/orderLi
 import { useGetRestaurantAssignListApi, useRestaurantAssignApi } from '@/apis/hooks/restaurantAssignApi.hook';
 import { useGetAllRestaurantsApi } from '@/apis/hooks/userApi.hook';
 
-import AssignCard from './components/AssignCard';
 import { AssignTableHeader } from './components/AssignTableHeader';
 import { orderPeriodSchema, OrderPeriodSchemaType } from './schema';
 import { AssignTableType, SelectionsType } from './types';
@@ -58,7 +57,7 @@ const RestaurantAssignment = () => {
   const getDataAssignTable: AssignTableType[] = useMemo(
     () =>
       Array.from({ length: 5 }).map((_, index) => ({
-        assignedDate: index + 1,
+        assigned_date: index + 1,
         restaurants: allRestaurants || [],
         address: selections[index + 1]?.address || '',
         selectedRestaurantId: selections[index + 1]?.userId,
@@ -136,33 +135,17 @@ const RestaurantAssignment = () => {
 
   return (
     <Box className="px-4 md:px-8 my-4 w-full lg:w-280">
-      {isMobile ? (
-        <Stack
-          direction="column"
-          gap={4}
-        >
-          {getDataAssignTable.map((item) => (
-            <AssignCard
-              key={item.assignedDate}
-              assignedData={item}
-              handleSelectChange={handleSelectChange}
-              isSelectDisabled={isSelectDisabled}
-            />
-          ))}
-        </Stack>
-      ) : (
-        <Table<AssignTableType>
-          data={!assignedRestaurantList ? [] : getDataAssignTable}
-          columns={columns}
-          isFetching={isAllRestaurantsFetching || isAssignedListFetching}
-          currentPage={0}
-          onPageChange={() => {}}
-        />
-      )}
+      <Table<AssignTableType>
+        data={!assignedRestaurantList ? [] : getDataAssignTable}
+        columns={columns}
+        isFetching={isAllRestaurantsFetching || isAssignedListFetching}
+        currentPage={0}
+        onPageChange={() => {}}
+      />
       <Stack
         direction="column"
         gap={2}
-        className={isMobile ? 'mt-4' : 'mt-8'}
+        className="mt-8"
       >
         <Typography
           fontSize={20}
@@ -172,7 +155,7 @@ const RestaurantAssignment = () => {
         </Typography>
         <form onSubmit={handleSubmit(onSubmitForm)}>
           <Stack
-            className="bg-white p-8 rounded-md shadow-sm"
+            className="bg-white p-8 rounded-md"
             alignItems={isMobile ? 'flex-start' : 'center'}
             direction={isMobile ? 'column' : 'row'}
             gap={isMobile ? 6 : 8}

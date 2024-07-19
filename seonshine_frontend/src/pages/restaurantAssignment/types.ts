@@ -1,7 +1,7 @@
 import { AllRestaurantType } from '@/types/user';
 
 export type AssignTableType = {
-  assignedDate: number;
+  assigned_date: number;
   restaurants: AllRestaurantType[];
   address: string;
   selectedRestaurantId?: string;
