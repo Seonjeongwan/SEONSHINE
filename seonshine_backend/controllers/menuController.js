@@ -145,9 +145,9 @@ export const updateMenuItem = async (req, res) => {
     const currentUser = req.user;
 
     if (
-      currentUser.role_id == UserRole.user ||
-      (currentUser.role_id == UserRole.restaurant &&
-        currentUser.user_id != restaurantId)
+      currentUser.role_id === UserRole.user ||
+      (currentUser.role_id === UserRole.restaurant &&
+        currentUser.user_id !== restaurantId)
     ) {
       return res.status(httpStatusCodes.forbidden).json({
         message: "You do not have permission to update menu item.",
