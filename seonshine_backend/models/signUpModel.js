@@ -86,7 +86,6 @@ SignUp.init(
     },
     branch_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       validate: {
         isRequiredBasedRole(value) {
           if (this.role_id == UserRole.user && !value) {
