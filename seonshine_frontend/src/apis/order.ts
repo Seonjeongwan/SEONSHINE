@@ -9,6 +9,8 @@ import {
   GetOrderListSummaryApiPropsType,
   GetOrderListSummaryResponseType,
   GetOrderPeriodResponseType,
+  SettingOrderPeriodApiPayloadType,
+  SettingOrderPeriodApiResponeType,
 } from '@/types/order';
 
 export const getOrderList = async (params: GetOrderListApiPropsType): Promise<GetOrderListResponseType> => {
@@ -47,5 +49,12 @@ export const getOrderListDetail = async (
   const response = await axiosInstance.get<GetOrderListDetailResponseType>('/order/list/detail', {
     params: params,
   });
+  return response.data;
+};
+
+export const setOrderPeriod = async (
+  payload: SettingOrderPeriodApiPayloadType,
+): Promise<SettingOrderPeriodApiResponeType> => {
+  const response = await axiosInstance.post<SettingOrderPeriodApiResponeType>('/common/order-period-setting', payload);
   return response.data;
 };

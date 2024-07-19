@@ -1,4 +1,4 @@
-import { useQuery, UseQueryResult } from '@tanstack/react-query';
+import { useMutation, UseMutationResult, useQuery, UseQueryResult } from '@tanstack/react-query';
 
 import {
   GetOrderListApiPropsType,
@@ -10,9 +10,18 @@ import {
   GetOrderListSummaryApiPropsType,
   GetOrderListSummaryResponseType,
   GetOrderPeriodResponseType,
+  SettingOrderPeriodApiPayloadType,
+  SettingOrderPeriodApiResponeType,
 } from '@/types/order';
 
-import { getOrderList, getOrderListDetail, getOrderListHistory, getOrderListSummary, getOrderPeriod } from '../order';
+import {
+  getOrderList,
+  getOrderListDetail,
+  getOrderListHistory,
+  getOrderListSummary,
+  getOrderPeriod,
+  setOrderPeriod,
+} from '../order';
 
 export const useGetOrderListApi = (params: GetOrderListApiPropsType): UseQueryResult<GetOrderListResponseType> => {
   return useQuery({
@@ -25,7 +34,7 @@ export const useGetOrderListApi = (params: GetOrderListApiPropsType): UseQueryRe
 
 export const useGetOrderPeriodApi = (): UseQueryResult<GetOrderPeriodResponseType> => {
   return useQuery({
-    queryKey: ['getOrderList'],
+    queryKey: ['getOrderPeriod'],
     queryFn: async () => {
       return getOrderPeriod();
     },
@@ -71,5 +80,17 @@ export const useGetOrderListDetailApi = ({
       return getOrderListDetail(params);
     },
     enabled,
+  });
+};
+
+export const useSetOrderPeriodApi = (): UseMutationResult<
+  SettingOrderPeriodApiResponeType,
+  unknown,
+  SettingOrderPeriodApiPayloadType
+> => {
+  return useMutation({
+    mutationFn: async (payload) => {
+      return setOrderPeriod(payload);
+    },
   });
 };

@@ -15,10 +15,12 @@ export type GetOrderListResponseType = {
 };
 
 export type GetOrderPeriodResponseType = {
-  startHour: number;
-  startMinute: number;
-  endHour: number;
-  endMinute: number;
+  data: {
+    start_hour: number;
+    start_minute: number;
+    end_hour: number;
+    end_minute: number;
+  };
 };
 
 export type GetOrderListSummaryApiPropsType = {
@@ -77,6 +79,15 @@ export type OrderListDetailItemType = {
   restaurant_name: string;
   submitted_time: string;
   branch_name: string;
+};
+
+export type SettingOrderPeriodApiPayloadType = {
+  start?: string;
+  end?: string;
+};
+
+export type SettingOrderPeriodApiResponeType = {
+  message: string;
 };
 
 export type ViewModeType = 'summary' | 'detail';
