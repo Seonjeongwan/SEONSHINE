@@ -98,6 +98,7 @@ const ForgotPasswordPage = () => {
           handleSubmitOtp={handleSubmitOtp}
           secondsCountdown={timeCountdown}
           handleResendOtp={handleResendOtp}
+          useBackToLogin
           className="relative"
         />
       )}

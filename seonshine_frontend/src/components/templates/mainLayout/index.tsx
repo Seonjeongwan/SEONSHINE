@@ -97,7 +97,7 @@ const MainLayout = ({ children, role }: MainLayoutPropsType) => {
   }, [location]);
 
   return (
-    <Stack className="h-screen bg-black-100 overflow-hidden">
+    <Stack className="h-screen max-h-dvh bg-black-100 overflow-hidden">
       <Drawer
         variant="temporary"
         open={sidebarOpen}
