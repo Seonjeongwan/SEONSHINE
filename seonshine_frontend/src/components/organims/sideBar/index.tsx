@@ -65,6 +65,7 @@ const Sidebar = ({ role }: SidebarPropsType) => {
         <Typography
           variant="heading3"
           component="h4"
+          className="mr-3"
         >
           SeonShine
         </Typography>
