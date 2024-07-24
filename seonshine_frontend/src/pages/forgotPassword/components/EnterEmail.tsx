@@ -40,16 +40,20 @@ const EnterEmail = ({ handleSubmitEmail }: EnterEmailPropsType) => {
       <form
         onSubmit={handleSubmit(onSubmit)}
         noValidate
+        className="w-full flex items-center justify-center"
       >
         <Stack
           direction="column"
           gap={6}
-          sx={{
+          sx={(theme) => ({
+            [theme.breakpoints.down(400)]: {
+              width: '100%',
+            },
             width: {
-              xs: '320px',
+              xs: '360px',
               sm: '475px',
             },
-          }}
+          })}
           className="p-0 pt-6"
         >
           <FormInput

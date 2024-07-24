@@ -21,14 +21,14 @@ const AccountVerificationLayout = ({
     <Stack
       alignItems="center"
       justifyContent="center"
-      className={`min-h-screen relative ${className}`}
+      className={`h-screen max-h-dvh relative ${className}`}
     >
       <Stack
         direction="column"
         justifyContent="center"
         gap={6}
         alignItems="center"
-        className={`w-full h-screen p-24 bg-white rounded-lg shadow-md max-w-screen relative ${
+        className={`w-full h-screen p-8 md:p-24 bg-white rounded-lg shadow-md max-w-screen relative ${
           size === 'normal' ? 'md:h-171 md:w-240' : 'md:h-131 md:w-194'
         }`}
       >
@@ -41,7 +41,7 @@ const AccountVerificationLayout = ({
         </Typography>
         <Typography
           variant="bodyS"
-          className="text-center min-w-max"
+          className="text-center"
           dangerouslySetInnerHTML={{ __html: description }}
         />
         {children}

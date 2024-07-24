@@ -281,7 +281,6 @@ const OrderListTab = ({ orderDate, branchId, branchList }: OrderListTabPropsType
             <Typography className="text-lg">{`Branch: ${
               branchList.find((branch) => branch.branch_id === watchedBranchId)?.branch_name || 'All'
             }`}</Typography>
-            <Typography className="text-lg">{`Order Amount: ${orderListSummary?.total || 0}`}</Typography>
           </Stack>
         )}
       </Stack>

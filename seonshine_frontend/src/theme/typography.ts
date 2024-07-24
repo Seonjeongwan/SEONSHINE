@@ -31,8 +31,7 @@ export const customTypographyVariants: TypographyVariantsOptions = {
   heading1: {
     fontSize: '64px',
     fontWeight: fontWeightValue.ExtraBold,
-    lineHeight: '26px',
-    textShadow: '0 4px 4px rgba(0, 0, 0, 0.5)',
+    lineHeight: '64px',
     textTransform: 'uppercase',
   },
   heading2: {

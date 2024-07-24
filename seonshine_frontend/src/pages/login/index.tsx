@@ -123,7 +123,7 @@ const LoginPage = () => {
     <Stack
       justifyContent="center"
       alignItems="center"
-      className="w-full h-screen"
+      className="w-full h-screen max-h-dvh"
     >
       {isWaiting ? (
         <PendingApprovalPage
@@ -148,15 +148,15 @@ const LoginPage = () => {
             justifyContent="center"
             gap={8}
             alignItems="center"
-            className="w-full md:w-max h-full md:h-fit bg-white p-20 pt-32 rounded-md"
+            className="w-full md:w-max h-full md:h-fit bg-white p-4 sm:p-20 rounded-md"
           >
             <Typography
               component="h2"
-              className="text-center uppercase text-4xl font-extrabold"
+              className="text-center uppercase text-2xl sm:text-4xl font-extrabold"
             >
-              You have deactivated your account
+              You've deactivated your account
             </Typography>
-            <Typography className="text-center text-xl font-medium">
+            <Typography className="text-center text-lg sm:text-xl">
               Please Activate your account to use the service.
             </Typography>
             <Button
@@ -208,7 +208,7 @@ const LoginPage = () => {
                     className="mb-16"
                   >
                     <Box
-                      className="hidden xs:block md:hidden"
+                      className="flex md:hidden"
                       sx={{
                         width: {
                           xs: '80px',
@@ -229,13 +229,16 @@ const LoginPage = () => {
                     <Typography
                       variant="heading1"
                       component="h1"
-                      className="text-center tracking-wider"
-                      sx={{
+                      className="text-center tracking-wider mr-4 md:m-auto"
+                      sx={(theme) => ({
+                        [theme.breakpoints.down(400)]: {
+                          fontSize: '40px',
+                        },
                         fontSize: {
                           xs: '48px',
                           md: '64px',
                         },
-                      }}
+                      })}
                     >
                       Seonshine
                     </Typography>
@@ -284,7 +287,7 @@ const LoginPage = () => {
                     </Stack>
                   </Box>
                   <Stack
-                    marginTop={2}
+                    marginTop={4}
                     justifyContent="flex-end"
                     alignItems="center"
                   >
