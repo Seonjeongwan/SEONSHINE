@@ -92,7 +92,7 @@ export const SignUpSchema = zod
       }
     },
     {
-      message: errorMessages.emailInvalid,
+      message: errorMessages.emailShinhanInvalid,
       path: ['email'],
     },
   );

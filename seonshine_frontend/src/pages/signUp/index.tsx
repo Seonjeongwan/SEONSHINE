@@ -148,7 +148,7 @@ const SignUpPage = () => {
         <Stack
           alignItems="center"
           justifyContent="center"
-          className="md:pt-12"
+          className="pt-4 md:pt-8"
         >
           <ChooseUserType handleSubmitUserType={handleSubmitUserType} />
         </Stack>
@@ -157,7 +157,7 @@ const SignUpPage = () => {
         <Stack
           alignItems="center"
           justifyContent="center"
-          className="md:pt-8 md:pb-16"
+          className="pt-4 md:pt-8 md:pb-16"
         >
           <ProfileRegistration
             handleSubmitInformation={handleSubmitInformation}
@@ -169,12 +169,12 @@ const SignUpPage = () => {
         <Stack
           alignItems="center"
           justifyContent="center"
-          className="md:pt-8 md:pb-16"
+          className="pt-4 md:pt-8 md:pb-16"
         >
           <AccountVerificationPage
             title="Account Verification"
             description="An OTP has been sent to your email. 
-          Please enter the OTP to verify you account"
+          Please enter the OTP to verify your account"
             handleResendOtp={handleResendOtp}
             handleSubmitOtp={handleSubmitOtp}
             secondsCountdown={secondsCountdown}
@@ -186,7 +186,7 @@ const SignUpPage = () => {
         <Stack
           alignItems="center"
           justifyContent="center"
-          className="md:pt-8 md:pb-16"
+          className="pt-4 md:pt-8 md:pb-16"
         >
           <PendingApprovalPage />
         </Stack>

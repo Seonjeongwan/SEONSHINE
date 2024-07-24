@@ -16,6 +16,7 @@ export const OrderListHeader: CustomColumnDef<OrderListType>[] = [
     cell: (order) => {
       return order.row.original.restaurant_name || '...';
     },
+    enableSorting: false,
   },
   {
     accessorKey: 'employee_name',
@@ -23,6 +24,7 @@ export const OrderListHeader: CustomColumnDef<OrderListType>[] = [
     cell: (order) => {
       return order.row.original.employee_name || '...';
     },
+    enableSorting: false,
   },
   {
     accessorKey: 'ordered_items',
@@ -30,6 +32,7 @@ export const OrderListHeader: CustomColumnDef<OrderListType>[] = [
     cell: (order) => {
       return order.row.original.ordered_items || '...';
     },
+    enableSorting: false,
   },
   {
     accessorKey: 'branch_name',
@@ -37,6 +40,7 @@ export const OrderListHeader: CustomColumnDef<OrderListType>[] = [
     cell: (order) => {
       return order.row.original.branch_name || '...';
     },
+    enableSorting: false,
   },
   {
     accessorKey: 'date',
@@ -44,5 +48,6 @@ export const OrderListHeader: CustomColumnDef<OrderListType>[] = [
     cell: (order) => {
       return order.row.original.date || '...';
     },
+    enableSorting: false,
   },
 ];

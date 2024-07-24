@@ -60,7 +60,7 @@ const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInf
     <Stack
       direction="column"
       alignItems="center"
-      className="w-full px-4 h-screen md:h-full sm:px-8 md:px-12 lg:px-12 bg-white rounded-lg shadow-md max-w-2xl relative"
+      className="w-full px-4 h-screen sm:h-full sm:px-8 md:px-12 lg:px-12 bg-white rounded-lg shadow-md max-w-2xl relative sm:md-4"
     >
       <Link
         className="cursor-pointer !underline self-start absolute top-4 left-4"

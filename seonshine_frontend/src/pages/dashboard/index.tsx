@@ -120,7 +120,7 @@ const Dashboard = () => {
     swipeToSlide: true,
     scrollToSlide: true,
     autoplay: true,
-    speed: 1500,
+    speed: 500,
     autoplaySpeed: 5000,
     pauseOnHover: true,
     afterChange: function (index: number) {},
