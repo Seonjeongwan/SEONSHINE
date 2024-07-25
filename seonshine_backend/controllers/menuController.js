@@ -103,18 +103,17 @@ export const deleteMenuItem = async (req, res) => {
       });
     }
 
+    await menuItem.destroy();
+
     // Delete associated image if it exists
     if (menuItem.image_url) {
       const oldFileName = menuItem.image_url.split("/").pop();
       try {
         await httpUpload.delete(`/delete/${oldFileName}`);
-        console.log(`Deleted old file: ${oldFileName}`);
       } catch (deleteError) {
         console.error(`Failed to delete old file: ${oldFileName}`, deleteError);
       }
     }
-
-    await menuItem.destroy();
 
     return res.status(httpStatusCodes.success).json({
       message: "Delete successfully",
@@ -178,20 +177,13 @@ export const updateMenuItem = async (req, res) => {
           const oldFileName = menuItem.image_url.split("/").pop();
           try {
             await httpUpload.delete(`/delete/${oldFileName}`);
-            console.log(`Deleted old file: ${oldFileName}`);
           } catch (deleteError) {
-            console.error(`Failed to delete old file: ${oldFileName}`, deleteError);
+            console.error(
+              `Failed to delete old file: ${oldFileName}`,
+              deleteError
+            );
           }
         }
-      }
-    } else if (menuItem.image_url) {
-      // Handle delete when no new file is provided
-      const oldFileName = menuItem.image_url.split("/").pop();
-      try {
-        await httpUpload.delete(`/delete/${oldFileName}`);
-        console.log(`Deleted old file: ${oldFileName}`);
-      } catch (deleteError) {
-        console.error(`Failed to delete old file: ${oldFileName}`, deleteError);
       }
     }
 
@@ -228,10 +220,12 @@ export const getMenuListByCurrentDay = async (req, res) => {
       raw: true,
     });
 
+    const clientTimezone = req.headers["timezone"] || "UTC";
+
     const response = {
       restaurant_name: "",
       restaurant_address: "",
-      current_day: dayjs().format("YYYY-MM-DD"),
+      current_day: dayjs().tz(clientTimezone).format("YYYY-MM-DD"),
       menu_list: [],
     };
 

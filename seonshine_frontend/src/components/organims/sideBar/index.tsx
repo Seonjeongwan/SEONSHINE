@@ -93,7 +93,7 @@ const Sidebar = ({ role }: SidebarPropsType) => {
           />
         )}
 
-        <IconButton
+        {/* <IconButton
           aria-label="notifications"
           className="w-12 h-12"
         >
@@ -110,7 +110,7 @@ const Sidebar = ({ role }: SidebarPropsType) => {
               sx={{ fontSize: 24 }}
             />
           </Badge>
-        </IconButton>
+        </IconButton> */}
       </Stack>
 
       <Stack

@@ -250,14 +250,14 @@ const LoginPage = () => {
                       className="gap-2"
                     >
                       <FormLabel
-                        title="Employee ID"
+                        title="User ID"
                         required
                       />
                       <FormInput
                         name="employeeId"
                         autoFocus
                         register={register}
-                        placeholder="Employee ID"
+                        placeholder="User ID"
                         error={errors.employeeId}
                       />
                     </Stack>
