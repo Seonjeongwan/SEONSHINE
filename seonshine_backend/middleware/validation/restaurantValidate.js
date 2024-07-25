@@ -1,7 +1,7 @@
-import { ValidationError } from 'sequelize';
-import { weekdays } from '../../constants/common.js';
-import { httpStatusCodes } from '../../constants/http.js';
-import UpdateRestaurant from '../../models/updateRestaurantModel.js';
+import { ValidationError } from "sequelize";
+import { weekdays } from "../../constants/common.js";
+import { httpStatusCodes } from "../../constants/http.js";
+import UpdateRestaurant from "../../models/updateRestaurantModel.js";
 
 export const validateAssignRestaurantDate = (req, res, next) => {
   const { weekday } = req.body;
@@ -9,7 +9,7 @@ export const validateAssignRestaurantDate = (req, res, next) => {
   if (weekday !== 0 && !weekday) {
     return res
       .status(httpStatusCodes.badRequest)
-      .json({ error: 'Weekday is required' });
+      .json({ error: "Weekday is required" });
   }
 
   const isValidWeekday = weekday in weekdays;
@@ -17,7 +17,15 @@ export const validateAssignRestaurantDate = (req, res, next) => {
   if (!isValidWeekday) {
     return res
       .status(httpStatusCodes.badRequest)
-      .json({ error: 'Invalid Weekday' });
+      .json({ error: "Invalid Weekday" });
+  }
+
+  const currentDay = new Date().getDay();
+
+  if (currentDay === weekday) {
+    return res
+      .status(httpStatusCodes.badRequest)
+      .json({ error: "Can't assign restaurant for today" });
   }
 
   next();

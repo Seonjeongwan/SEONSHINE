@@ -6,7 +6,7 @@ export const errorMessages = {
   passwordDigit: 'Password must include at least one digit',
   passwordSpecialChar: 'Password must include at least one special character',
   employeeIdInvalid: 'ID must be 4-20 characters, letters and numbers only',
-  passwordInvalid: 'Password: 8-50 chars, letters, numbers, special chars only',
+  passwordInvalid: 'Invalid password',
   passwordNotMatch: "Passwords don't match",
   otpInvalid: 'OTP must have 6 digits',
   emailInvalid: 'Invalid email',

@@ -87,7 +87,8 @@ export const RestaurantTableHeader = (
               user.row.original.user_status == UserStatusEnum.ACTIVE ? palette.red[200] : palette.blue[400],
             fontSize: '14px',
             fontWeight: 400,
-            padding: '6px',
+            paddingBlock: '6px',
+            paddingInline: '16px',
             width: {
               xs: '80%',
               md: '50%',

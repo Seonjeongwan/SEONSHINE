@@ -85,18 +85,8 @@ const RestaurantAssignment = () => {
   };
 
   const isSelectDisabled = (id: number) => {
-    if (!orderPeriod) return false;
     const currentDayIndex = new Date().getDay();
-    if (id !== currentDayIndex) return false;
-    const { start_hour, start_minute, end_hour, end_minute } = orderPeriod.data;
-
-    const now = new Date();
-    const currentHour = now.getHours();
-    const currentMinute = now.getMinutes();
-    return (
-      (currentHour > start_hour || (currentHour === start_hour && currentMinute >= start_minute)) &&
-      (currentHour < end_hour || (currentHour === end_hour && currentMinute <= end_minute))
-    );
+    return id === currentDayIndex;
   };
 
   const columns = AssignTableHeader({ handleSelectChange, isSelectDisabled });

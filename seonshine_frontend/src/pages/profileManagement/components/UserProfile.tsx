@@ -405,7 +405,7 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
           className="bg-white w-full py-6 rounded-md"
           direction="column"
           alignItems="center"
-          gap={4}
+          gap={6}
         >
           <Typography
             variant="heading4"
@@ -414,7 +414,7 @@ const UserProfile = ({ userId }: UserProfilePropsType) => {
             Deactivate your account?
           </Typography>
           <Button
-            className="bg-red-300 hover:bg-red-500 rounded-full"
+            className="bg-red-200 hover:bg-red-400 rounded-full"
             onClick={onClickDeactivateButton}
           >
             Deactivate

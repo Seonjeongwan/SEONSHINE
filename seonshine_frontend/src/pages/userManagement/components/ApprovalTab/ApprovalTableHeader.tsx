@@ -66,7 +66,7 @@ export const ApprovalTableHeader = (handleAction: (userId: string) => void): Cus
             fontSize: '14px',
             fontWeight: 400,
             paddingBlock: '6px',
-            paddingInline: '12px',
+            paddingInline: '16px',
             width: {
               xs: '80%',
               md: '50%',
