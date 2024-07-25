@@ -17,11 +17,11 @@ module.exports = {
       [
         {
           branch_id: 1,
-          branch_name: "shinhan VN",
+          branch_name: "Shinhan VN",
         },
         {
           branch_id: 2,
-          branch_name: "shinhan KR",
+          branch_name: "Shinhan KR",
         },
       ],
       {

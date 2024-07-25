@@ -1,16 +1,8 @@
 import * as zod from 'zod';
 
 import { errorMessages } from '@/constants/errorMessages';
-import { employeeIdRegex, otpRegex, phoneNumberRegex } from '@/constants/regex';
+import { employeeIdRegex, otpRegex, passwordCriteria, passwordMinLength, phoneNumberRegex } from '@/constants/regex';
 import { RoleEnum } from '@/types/user';
-
-const passwordMinLength = 8;
-const passwordCriteria = [
-  { regex: /[a-z]/, message: errorMessages.passwordLowerCase },
-  { regex: /[A-Z]/, message: errorMessages.passwordUpperCase },
-  { regex: /\d/, message: errorMessages.passwordDigit },
-  { regex: /[@$!%*?&]/, message: errorMessages.passwordSpecialChar },
-];
 
 export const SignUpSchema = zod
   .object({

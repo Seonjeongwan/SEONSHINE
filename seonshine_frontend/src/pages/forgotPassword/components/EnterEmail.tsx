@@ -33,7 +33,7 @@ const EnterEmail = ({ handleSubmitEmail }: EnterEmailPropsType) => {
     >
       <Link
         to={paths.login}
-        className="text-blue-400 !underline absolute top-2 left-3 font-medium"
+        className="text-blue-400 !underline absolute top-4 left-4 font-medium"
       >
         {'< Back to Login'}
       </Link>

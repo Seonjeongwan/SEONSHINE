@@ -1,7 +1,7 @@
 import * as zod from 'zod';
 
 import { errorMessages } from '@/constants/errorMessages';
-import { passwordRegex } from '@/constants/regex';
+import { passwordCriteria, passwordMinLength, passwordRegex } from '@/constants/regex';
 
 export const EmailSchema = zod.object({
   email: zod.string().email(),
@@ -14,8 +14,16 @@ export const PasswordSchema = zod
     password: zod
       .string()
       .min(1, { message: errorMessages.require })
-      .refine((value) => passwordRegex.test(value), {
-        message: errorMessages.passwordInvalid,
+      .min(passwordMinLength, { message: errorMessages.passwordMinLength })
+      .superRefine((value, ctx) => {
+        passwordCriteria.forEach(({ regex, message }) => {
+          if (!regex.test(value)) {
+            ctx.addIssue({
+              code: zod.ZodIssueCode.custom,
+              message,
+            });
+          }
+        });
       }),
     confirmPassword: zod.string().min(1, { message: errorMessages.require }),
   })

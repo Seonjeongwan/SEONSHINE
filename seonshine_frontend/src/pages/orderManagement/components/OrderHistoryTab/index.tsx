@@ -114,7 +114,7 @@ const OrderHistoryTab = ({ handleViewDetail }: OrderHistoryTabPropsStyle) => {
         gap={4}
       >
         {OrderHistoryList &&
-          OrderHistoryList.data.map((item) => (
+          [...OrderHistoryList.data].reverse().map((item) => (
             <OrderHistoryItem
               key={item.order_id}
               item={item}

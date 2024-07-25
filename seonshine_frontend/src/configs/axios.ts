@@ -28,23 +28,41 @@ axiosInstance.interceptors.request.use(
   },
 );
 
+let isToastShown = false;
+
 axiosInstance.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
     if (error.response && (error.response.status === UNAUTHORIZED || error.response.status === FORBIDDEN)) {
-      clearUserFromCache();
-      clearAccessToken();
-      SessionCache.remove(USER_INFO_KEY);
-      toast.warning('You are logged out. Please login again.', {
-        autoClose: 2000,
-        onClose: () => {
-          window.location.href = paths.login;
-        },
-      });
+      if (!isToastShown) {
+        isToastShown = true;
+        clearUserFromCache();
+        clearAccessToken();
+        SessionCache.remove(USER_INFO_KEY);
+        toast.warning('You are logged out. Please login again.', {
+          autoClose: 2000,
+          onClose: () => {
+            isToastShown = false;
+            window.location.href = paths.login;
+          },
+        });
+      }
     }
     return Promise.reject(error);
   },
 );
+
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    config.headers['Timezone'] = timezone;
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
 export default axiosInstance;

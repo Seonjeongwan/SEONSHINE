@@ -102,6 +102,7 @@ export const orderItemCurrentDay = async (req, res) => {
         quantity: 1,
         price: 0,
         order_date: currentDate,
+        cancel_yn: "1",
       };
       await OrderItem.create(orderItem, {
         transaction: transactionOrderDb,
@@ -255,14 +256,19 @@ export const getOrderListSummary = async (req, res) => {
         },
         raw: true,
       });
-      if (restaurantAssign) {
-        const restaurant = await User.findByPk(restaurantAssign.restaurant_id, {
-          attributes: ["username"],
-          raw: true,
-        });
-        restaurantId = restaurantAssign?.restaurant_id || "";
-        restaurantName = restaurant?.username || "";
-      }
+
+      const restaurant_id =
+        !restaurantAssign || currentUser.role_id === String(UserRole.restaurant)
+          ? currentUser.user_id
+          : restaurantAssign?.restaurant_id;
+
+      const restaurant = await User.findByPk(restaurant_id, {
+        attributes: ["username"],
+        raw: true,
+      });
+
+      restaurantId = restaurant?.user_id || "";
+      restaurantName = restaurant?.username || "";
     }
 
     res.status(httpStatusCodes.success).send({
@@ -283,6 +289,8 @@ export const getOrderListSummary = async (req, res) => {
 //TODO: Check current user cannot get other branch and all, just admin can get all
 export const getOrderListDetail = async (req, res) => {
   const { date = "", branch_id } = req.query;
+
+  const clientTimezone = req.headers["timezone"] || "UTC";
 
   const select = `SELECT o.user_id, o.restaurant_id, o.item_id, o.item_name, u.username, u2.username as restaurant_name, o.updated_at as submitted_time, b.branch_name 
     FROM order_db.order_items o 
@@ -308,7 +316,9 @@ export const getOrderListDetail = async (req, res) => {
     const rowsConvertedDate = (rows || []).map((row) => {
       return {
         ...row,
-        submitted_time: dayjs(row.submitted_time).format(dateTimeFormat.full),
+        submitted_time: dayjs(row.submitted_time)
+          .tz(clientTimezone)
+          .format(dateTimeFormat.full),
       };
     });
 
@@ -358,6 +368,7 @@ export const getOrderListDetail = async (req, res) => {
 export const getOrderHistory = async (req, res) => {
   try {
     const { from, to } = req.query;
+
     const currentUser = req.user;
     const { user_id, role_id } = currentUser;
     const select = `SELECT o.order_id, o.branch_id, o.restaurant_id, o.order_date, o.total_amount, u.username as restaurant_name, p.address as restaurant_address, p.profile_picture_url as restaurant_image_url, b.branch_name 
@@ -393,6 +404,8 @@ export const getCurrentOrder = async (req, res) => {
   try {
     const currentDate = dayjs().format(dateTimeFormat.short);
 
+    const clientTimezone = req.headers["timezone"] || "UTC";
+
     const currentUser = req.user;
 
     const currentOrderItem = await OrderItem.findOne({
@@ -425,9 +438,9 @@ export const getCurrentOrder = async (req, res) => {
     });
 
     if (currentOrderItem) {
-      currentOrderItem.submitted_time = dayjs(
-        currentOrderItem.submitted_time
-      ).format(dateTimeFormat.full);
+      currentOrderItem.submitted_time = dayjs(currentOrderItem.submitted_time)
+        .tz(clientTimezone)
+        .format(dateTimeFormat.full);
 
       const restaurantId = currentOrderItem.restaurant_id;
       const restaurant = await User.findByPk(restaurantId, {
