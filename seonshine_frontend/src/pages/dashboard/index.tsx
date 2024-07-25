@@ -322,7 +322,7 @@ const Dashboard = () => {
       <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
         <Stack className="flex-grow">Assigned Date</Stack>
         <Stack className="font-bold text-2xl">
-          {dashboardSummary?.assigned_weekdays?.map((day) => dayMapper(day)).join(', ')}
+          {dashboardSummary?.assigned_weekdays?.map((day) => dayMapper(day)).join(', ') || 'None'}
         </Stack>
       </Box>
       {restaurantIsAssigned() && (
@@ -363,40 +363,51 @@ const Dashboard = () => {
               View more
             </Link>
           </Stack>
-          <Box
-            className="flex flex-col bg-white rounded-md mt-2"
-            sx={{
-              '.slick-prev:before, .slick-next:before': {
-                color: 'transparent',
-              },
-            }}
-          >
-            <Slider {...settings}>
-              {menuList?.map((dish, index) => (
-                <Box
-                  key={index}
-                  className="p-2 pt-4 md:p-4 outline-none"
-                >
-                  {dish.image_url ? (
-                    <img
-                      src={`${avatarBaseURL}${dish.image_url}`}
-                      alt={dish.name}
-                      className="w-full h-32 md:h-40 object-cover rounded-md"
-                    />
-                  ) : (
-                    <Stack className="w-full h-32 md:h-40 items-center bg-gray-200 rounded-md">
-                      <RestaurantRounded
-                        className="w-full h-1/2 opacity-30"
-                        fontSize="large"
+          {menuList?.length ? (
+            <Box
+              className="flex flex-col bg-white rounded-md mt-2"
+              sx={{
+                '.slick-prev:before, .slick-next:before': {
+                  color: 'transparent',
+                },
+              }}
+            >
+              <Slider {...settings}>
+                {menuList?.map((dish, index) => (
+                  <Box
+                    key={index}
+                    className="p-2 pt-4 md:p-4 outline-none"
+                  >
+                    {dish.image_url ? (
+                      <img
+                        src={`${avatarBaseURL}${dish.image_url}`}
+                        alt={dish.name}
+                        className="w-full h-32 md:h-40 object-cover rounded-md"
                       />
-                    </Stack>
-                  )}
+                    ) : (
+                      <Stack className="w-full h-32 md:h-40 items-center bg-gray-200 rounded-md">
+                        <RestaurantRounded
+                          className="w-full h-1/2 opacity-30"
+                          fontSize="large"
+                        />
+                      </Stack>
+                    )}
 
-                  <h3 className="text-left mt-2 font-bold">{dish.name}</h3>
-                </Box>
-              ))}
-            </Slider>
-          </Box>
+                    <h3 className="text-left mt-2 font-bold">{dish.name}</h3>
+                  </Box>
+                ))}
+              </Slider>
+            </Box>
+          ) : (
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              className="w-full h-52 bg-white object-cover rounded-md mt-2"
+            >
+              No Menu Item is found
+            </Box>
+          )}
         </Box>
       </Stack>
       <Stack className="flex-1 mt-6 min-h-fit">
