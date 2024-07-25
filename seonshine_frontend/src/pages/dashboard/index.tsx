@@ -6,6 +6,7 @@ import Slider from 'react-slick';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { RestaurantRounded } from '@mui/icons-material';
 import { Box, Stack } from '@mui/material';
+import { alignProperty } from '@mui/material/styles/cssUtils';
 import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { before } from 'node:test';
@@ -31,6 +32,7 @@ import useAuthStore from '@/store/auth.store';
 import { DateSchema, DateSchemaType } from '../orderManagement/components/OrderListTab/schema';
 import { OrderListHeader } from './OrderListHeader';
 import { OrderListRestaurantTableHeader } from './OrderListRestaurantTableHeader';
+import './styles.css';
 
 const Dashboard = () => {
   const { isMobile } = useDeviceType();
@@ -112,37 +114,6 @@ const Dashboard = () => {
       </div>
     );
   }
-  const settings = {
-    className: 'center',
-    infinite: true,
-    centerPadding: '60px',
-    slidesToShow: 5,
-    swipeToSlide: true,
-    scrollToSlide: true,
-    autoplay: true,
-    speed: 500,
-    autoplaySpeed: 5000,
-    pauseOnHover: true,
-    afterChange: function (index: number) {},
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 3,
-          centerPadding: '40px',
-        },
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 2,
-          centerPadding: '20px',
-        },
-      },
-    ],
-    nextArrow: <SampleNextArrow />,
-    prevArrow: <SamplePrevArrow />,
-  };
 
   const todayIndex = new Date().getDay();
   const ITEMS_PER_PAGE = 10;
@@ -232,6 +203,40 @@ const Dashboard = () => {
   };
 
   const menuList = currentUser?.role_id === RoleEnum.RESTAURANT ? restaurantSelfMenuList : todayMenuList?.menu_list;
+
+  const itemCounts = menuList?.length as number;
+  const settings = {
+    infinite: itemCounts >= 5,
+    centerPadding: '60px',
+    slidesToShow: 5,
+    swipeToSlide: true,
+    scrollToSlide: true,
+    autoplay: true,
+    speed: 500,
+    autoplaySpeed: 5000,
+    pauseOnHover: true,
+    afterChange: function (index: number) {},
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 3,
+          infinite: itemCounts >= 3,
+          centerPadding: '40px',
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 2,
+          infinite: itemCounts >= 2,
+          centerPadding: '20px',
+        },
+      },
+    ],
+    nextArrow: <SampleNextArrow />,
+    prevArrow: <SamplePrevArrow />,
+  };
   const renderAdminBoxes = () => (
     <>
       <Box
@@ -372,38 +377,66 @@ const Dashboard = () => {
                 },
               }}
             >
-              <Slider {...settings}>
-                {menuList?.map((dish, index) => (
-                  <Box
-                    key={index}
-                    className="p-2 pt-4 md:p-4 outline-none"
-                  >
-                    {dish.image_url ? (
-                      <img
-                        src={`${avatarBaseURL}${dish.image_url}`}
-                        alt={dish.name}
-                        className="w-full h-32 md:h-40 object-cover rounded-md"
-                      />
-                    ) : (
-                      <Stack className="w-full h-32 md:h-40 items-center bg-gray-200 rounded-md">
-                        <RestaurantRounded
-                          className="w-full h-1/2 opacity-30"
-                          fontSize="large"
+              {(itemCounts <= 2 && isMobile) || (!isMobile && itemCounts < 5) ? (
+                <Box className="flex flex-row">
+                  {menuList?.map((dish, index) => (
+                    <Box
+                      key={index}
+                      className="w-1/2 md:w-1/4 p-2 pt-4 md:p-4 outline-none"
+                    >
+                      {dish.image_url ? (
+                        <img
+                          src={`${avatarBaseURL}${dish.image_url}`}
+                          alt={dish.name}
+                          className="w-full h-32 md:h-40 object-cover rounded-md"
                         />
-                      </Stack>
-                    )}
+                      ) : (
+                        <Stack className="w-full h-32 md:h-40 items-center bg-gray-200 rounded-md">
+                          <RestaurantRounded
+                            className="w-full h-1/2 opacity-30"
+                            fontSize="large"
+                          />
+                        </Stack>
+                      )}
 
-                    <h3 className="text-left mt-2 font-bold">{dish.name}</h3>
-                  </Box>
-                ))}
-              </Slider>
+                      <h3 className="text-left mt-2 font-bold">{dish.name}</h3>
+                    </Box>
+                  ))}
+                </Box>
+              ) : (
+                <Slider {...settings}>
+                  {menuList?.map((dish, index) => (
+                    <Box
+                      key={index}
+                      className="p-2 pt-4 md:p-4 outline-none"
+                    >
+                      {dish.image_url ? (
+                        <img
+                          src={`${avatarBaseURL}${dish.image_url}`}
+                          alt={dish.name}
+                          className="w-full h-32 md:h-40 object-cover rounded-md"
+                        />
+                      ) : (
+                        <Stack className="w-full h-32 md:h-40 items-center bg-gray-200 rounded-md">
+                          <RestaurantRounded
+                            className="w-full h-1/2 opacity-30"
+                            fontSize="large"
+                          />
+                        </Stack>
+                      )}
+
+                      <h3 className="text-left mt-2 font-bold">{dish.name}</h3>
+                    </Box>
+                  ))}
+                </Slider>
+              )}
             </Box>
           ) : (
             <Box
               display="flex"
               alignItems="center"
               justifyContent="center"
-              className="w-full h-52 bg-white object-cover rounded-md mt-2"
+              className="w-full h-56 bg-white object-cover rounded-md mt-2"
             >
               No Menu Item is found
             </Box>

@@ -158,11 +158,11 @@ const RestaurantAssignment = () => {
         <form onSubmit={handleSubmit(onSubmitForm)}>
           <Stack
             className="bg-white p-8 rounded-md shadow-sm"
-            alignItems={isMobile ? 'flex-start' : 'center'}
+            alignItems={'center'}
             direction={isMobile ? 'column' : 'row'}
             gap={isMobile ? 6 : 8}
           >
-            <Typography className="text-lg font-normal">Order starts every day from</Typography>
+            <Typography className="text-lg font-normal self-start">Order starts every day from</Typography>
             <Stack
               alignItems="center"
               gap={4}
@@ -183,7 +183,7 @@ const RestaurantAssignment = () => {
               color="primary"
               type="submit"
               disabled={!isDirty || isPending}
-              className="font-bold text-black-500 rounded-full bg-black-200 hover:bg-black-300 hover:text-white border-none hover:border-none h-auto py-2 px-10"
+              className="font-bold text-black-500 rounded-full bg-black-200 hover:bg-black-300 hover:text-white border-none hover:border-none h-auto py-2 px-10 self-end"
             >
               Save
             </Button>
