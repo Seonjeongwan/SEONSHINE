@@ -23,6 +23,7 @@ import ConfirmModal from '@/components/organims/confirmModal';
 
 import { avatarBaseURL } from '@/constants/image';
 import { GetMenuListApiPropsType, GetMenuListResponseType, GetTodayMenuListResponseType } from '@/types/user';
+import { convertToTimeString } from '@/utils/datetime';
 
 import { useGetOrderPeriodApi } from '@/apis/hooks/orderListApi.hook';
 import {
@@ -127,8 +128,8 @@ const OrderMenuTab = () => {
 
     const year = dateObj.getFullYear();
     const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-    const day = dateObj.getDate().toString().padStart( 2, '0');
-    const hours = (dateObj.getHours()).toString().padStart(2, '0');
+    const day = dateObj.getDate().toString().padStart(2, '0');
+    const hours = dateObj.getHours().toString().padStart(2, '0');
     const minutes = dateObj.getMinutes().toString().padStart(2, '0');
 
     return `${year}.${month}.${day} - ${hours}:${minutes}`;
@@ -140,6 +141,8 @@ const OrderMenuTab = () => {
     window.open(url);
   };
 
+  const startTime = convertToTimeString(Number(orderPeriod?.data.start_hour), Number(orderPeriod?.data.start_minute));
+  const endTime = convertToTimeString(Number(orderPeriod?.data.end_hour), Number(orderPeriod?.data.end_minute));
   return (
     <Box className="px-2 md:px-4">
       <Stack
@@ -201,7 +204,7 @@ const OrderMenuTab = () => {
             </Grid>
           </Box>
         )}
-        <Box className="px-2 flex flex-col md:flex-row justify-between">
+        <Box className="px-2 flex flex-col lg:flex-row justify-between">
           <Typography className="font-bold text-xl md:text-2xl">
             Menu list of {todayMenuList?.current_day.replace(/-/g, '.')} - {todayMenuList?.restaurant_name}
             <LocationOnIcon
@@ -214,8 +217,7 @@ const OrderMenuTab = () => {
           <Box className="flex flex-row ">
             <Typography className="font-bold text-md md:text-xl mr-1">Available ordering time:</Typography>
             <Typography className="text-md md:text-xl">
-              {orderPeriod?.data.start_hour}:{orderPeriod?.data.start_minute} ~ {orderPeriod?.data.end_hour}:
-              {orderPeriod?.data.end_minute}
+              {startTime} ~ {endTime}
             </Typography>
           </Box>
         </Box>

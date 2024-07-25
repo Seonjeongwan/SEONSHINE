@@ -19,12 +19,7 @@ import AssignCard from './components/AssignCard';
 import { AssignTableHeader } from './components/AssignTableHeader';
 import { orderPeriodSchema, OrderPeriodSchemaType } from './schema';
 import { AssignTableType, SelectionsType } from './types';
-
-const convertToTimeString = (hour: number, minute: number): string => {
-  const formattedHour = hour.toString().padStart(2, '0');
-  const formattedMinute = minute.toString().padStart(2, '0');
-  return `${formattedHour}:${formattedMinute}`;
-};
+import { convertToTimeString } from '@/utils/datetime';
 
 const RestaurantAssignment = () => {
   const [selections, setSelections] = useState<SelectionsType>({});
