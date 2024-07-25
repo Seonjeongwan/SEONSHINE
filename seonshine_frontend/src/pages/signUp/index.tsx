@@ -148,7 +148,7 @@ const SignUpPage = () => {
         <Stack
           alignItems="center"
           justifyContent="center"
-          className="pt-4 md:pt-8"
+          className="sm:pt-4 md:pt-8"
         >
           <ChooseUserType handleSubmitUserType={handleSubmitUserType} />
         </Stack>
@@ -157,7 +157,7 @@ const SignUpPage = () => {
         <Stack
           alignItems="center"
           justifyContent="center"
-          className="pt-4 md:pt-8 md:pb-16"
+          className="sm:pt-4 md:pt-8 md:pb-16"
         >
           <ProfileRegistration
             handleSubmitInformation={handleSubmitInformation}
@@ -169,7 +169,7 @@ const SignUpPage = () => {
         <Stack
           alignItems="center"
           justifyContent="center"
-          className="pt-4 md:pt-8 md:pb-16"
+          className="sm:pt-4 md:pt-8 md:pb-16"
         >
           <AccountVerificationPage
             title="Account Verification"
@@ -186,7 +186,7 @@ const SignUpPage = () => {
         <Stack
           alignItems="center"
           justifyContent="center"
-          className="pt-4 md:pt-8 md:pb-16"
+          className="sm:pt-4 md:pt-8 md:pb-16"
         >
           <PendingApprovalPage />
         </Stack>
