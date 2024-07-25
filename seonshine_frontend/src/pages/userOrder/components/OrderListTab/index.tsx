@@ -73,7 +73,7 @@ const UserOrderListTab = () => {
       >
         <Typography
           component="h4"
-          className="text-xl md:text-2xl font-bold"
+          className="text-md md:text-xl font-bold"
         >{`Branch: ${currentUser?.branch_name}`}</Typography>
       </Stack>
 

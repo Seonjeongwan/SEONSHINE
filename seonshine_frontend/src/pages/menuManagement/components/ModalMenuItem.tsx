@@ -59,7 +59,6 @@ const ModalMenuItem = ({ selectedItem, onClose, item_id = 0, restaurant_id = '' 
   const handleSave = (data: MenuListInfoSchemaType) => {
     updateMenuItem(data, {
       onSuccess: (res) => {
-        console.log({ res });
         queryClient.invalidateQueries({ queryKey: ['getMenuList'] });
         toast.success(res.message);
         setIsEditing(false);
@@ -272,16 +271,15 @@ const ModalMenuItem = ({ selectedItem, onClose, item_id = 0, restaurant_id = '' 
                     <>
                       <Button
                         onClick={onClose}
-                        className="font-bold"
+                        className="font-bold bg-blue-400 hover:bg-blue-500"
                       >
                         OK
                       </Button>
                       <Button
-                        variant="contained"
                         color="error"
                         onClick={handleClickAction}
-                        className="ml-2"
                         disabled={isLoadingDelete}
+                        className="ml-2 bg-red-200 hover:bg-red-3000"
                       >
                         Delete
                       </Button>

@@ -113,78 +113,83 @@ const MenuManagement = () => {
 
   return (
     <Box className="px-4 md:px-8">
-      <Stack direction="column">
-        <Box className="sticky top-0 z-10 h-full w-full bg-black-100">
-          <Stack className="h-full flex-col md:flex-row">
-            {currentUser?.role_id == RoleEnum.ADMIN && (
-              <FormControl
-                variant="outlined"
-                className="w-full md:w-1/4 rounded-xl mb-4 md:mr-4 md:mb-0"
-              >
-                <Select
-                  displayEmpty
-                  inputProps={{ 'aria-label': 'Without label' }}
-                  value={restaurantQuery}
-                  onChange={(e) => setRestaurantQuery(e.target.value)}
-                  size="small"
-                  className="rounded-xl bg-white font-bold h-full md:max-w-full"
-                  sx={{
-                    '& .MuiSelect-select': {
-                      display: 'flex',
-                      alignItems: 'center',
-                    },
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      border: 'none',
-                    },
-                  }}
-                >
-                  <MenuItem
-                    value=""
-                    disabled
-                  >
-                    Select Restaurant
-                  </MenuItem>
-                  {allRestaurants.map((restaurant) => (
-                    <MenuItem
-                      key={restaurant.user_id}
-                      value={restaurant.user_id}
-                    >
-                      {restaurant.username}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
-            {restaurantQuery && (
-              <TextField
-                value={query}
-                placeholder="Search for menu item"
-                onChange={(e) => setQuery(e.target.value)}
-                variant="outlined"
-                className="bg-white rounded-xl h-full w-full md:w-1/2"
+      <Box className="sticky top-0 z-10 h-full w-full bg-black-100">
+        <Stack className="h-full flex-col md:flex-row">
+          {currentUser?.role_id == RoleEnum.ADMIN && (
+            <FormControl
+              variant="outlined"
+              className="w-full md:w-1/4 rounded-xl mb-4 md:mr-4 md:mb-0"
+            >
+              <Select
+                displayEmpty
+                inputProps={{ 'aria-label': 'Without label' }}
+                value={restaurantQuery}
+                onChange={(e) => setRestaurantQuery(e.target.value)}
+                size="small"
+                className="rounded-xl bg-white font-bold h-full md:w-full"
                 sx={{
-                  '& .MuiOutlinedInput-root': {
-                    height: '100%',
+                  '& .MuiSelect-select': {
                     display: 'flex',
                     alignItems: 'center',
-                    '& fieldset': {
-                      border: 'none',
-                    },
-                    paddingY: '12,5',
+                    paddingBottom: '15px',
+                    paddingTop: '15.5px',
+                  },
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
                   },
                 }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            )}
-          </Stack>
-          {restaurantQuery && <h2 className="text-2xl font-bold">Menu List</h2>}
-        </Box>
+              >
+                <MenuItem
+                  value=""
+                  disabled
+                >
+                  Select Restaurant
+                </MenuItem>
+                {allRestaurants.map((restaurant) => (
+                  <MenuItem
+                    key={restaurant.user_id}
+                    value={restaurant.user_id}
+                  >
+                    {restaurant.username}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+          {restaurantQuery && (
+            <TextField
+              value={query}
+              placeholder="Search for menu item"
+              onChange={(e) => setQuery(e.target.value)}
+              variant="outlined"
+              className="bg-white rounded-xl h-full w-full md:w-1/2"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  '& fieldset': {
+                    border: 'none',
+                  },
+                  paddingY: '12,5',
+                },
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ fontSize: 28 }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          )}
+        </Stack>
+        {restaurantQuery && <h2 className="text-2xl font-bold mt-4 mb-3">Menu List</h2>}
+      </Box>
+      <Stack
+        direction="column"
+        className="pb-4"
+      >
         <Stack className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 md:gap-4">
           {filteredDishes?.map((dish, index) => (
             <Stack
