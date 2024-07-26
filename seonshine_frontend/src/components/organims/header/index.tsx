@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { NavigateNext } from '@mui/icons-material';
 import { Breadcrumbs, Stack, Typography } from '@mui/material';
 
+import { paths as path } from '@/routes/paths';
 import { buildFullPath, getNameByPath, getTitleByPath } from '@/utils/menu';
 
 const Header = () => {
@@ -26,7 +27,7 @@ const Header = () => {
         separator={<NavigateNext fontSize="small" />}
         className="font-normal text-base text-black-500"
       >
-        <Link to="/">Home</Link>
+        <Link to={path.dashboard}>Home</Link>
         {paths.map((path, index) => {
           const fullPath = buildFullPath(paths, index);
           const name = getNameByPath(fullPath);
