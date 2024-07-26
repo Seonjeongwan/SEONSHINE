@@ -9,7 +9,6 @@ export const validTimeFormatRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
 export const passwordMinLength = 8;
 export const passwordCriteria = [
   { regex: /[a-z]/, message: errorMessages.passwordLowerCase },
-  { regex: /[A-Z]/, message: errorMessages.passwordUpperCase },
   { regex: /\d/, message: errorMessages.passwordDigit },
   { regex: /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~\\]/, message: errorMessages.passwordSpecialChar },
 ];
