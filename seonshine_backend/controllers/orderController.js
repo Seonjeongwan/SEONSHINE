@@ -479,6 +479,13 @@ export const getOrderPeriod = async (req, res) => {
     if (orderPeriod) {
       const data = JSON.parse(orderPeriod.data);
       response.data = typeof data === "object" ? data : JSON.parse(data);
+    } else {
+      response.data = JSON.stringify({
+        start_hour: 7,
+        start_minute: 0,
+        end_hour: 11,
+        end_minute: 0,
+      });
     }
 
     res.status(httpStatusCodes.success).send(response);
