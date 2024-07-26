@@ -20,13 +20,13 @@ export const validateAssignRestaurantDate = (req, res, next) => {
       .json({ error: "Invalid Weekday" });
   }
 
-  // const currentDay = new Date().getDay();
+  const currentDay = new Date().getDay();
 
-  // if (currentDay === weekday) {
-  //   return res
-  //     .status(httpStatusCodes.badRequest)
-  //     .json({ error: "Can't assign restaurant for today" });
-  // }
+  if (currentDay === weekday) {
+    return res
+      .status(httpStatusCodes.badRequest)
+      .json({ error: "Can't assign restaurant for today" });
+  }
 
   next();
 };

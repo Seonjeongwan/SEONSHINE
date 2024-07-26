@@ -16,6 +16,7 @@ export const OrderListRestaurantTableHeader: CustomColumnDef<OrderListType>[] = 
     cell: (order) => {
       return order.row.original.ordered_items || '...';
     },
+    enableSorting: false,
   },
   {
     accessorKey: 'amount',
@@ -24,5 +25,6 @@ export const OrderListRestaurantTableHeader: CustomColumnDef<OrderListType>[] = 
       return order.row.original.amount || '...';
     },
     align: 'center',
+    enableSorting: false,
   },
 ];
