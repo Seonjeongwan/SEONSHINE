@@ -35,7 +35,7 @@ const OrderHistoryItem = ({ item, handleViewDetail }: OrderHistoryItemPropsType)
       <Typography className="text-2xl font-bold">{order_date}</Typography>
       <Stack
         direction={isMobile ? 'column' : 'row'}
-        className="bg-white min-h-max min-w-max rounded-xl sm:rounded-s-full p-4 sm:pr-6"
+        className="bg-white min-h-max md:min-w-max rounded-xl sm:rounded-s-full p-4 sm:pr-6"
         alignItems="center"
         gap={2}
       >
