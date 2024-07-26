@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -44,15 +45,37 @@ const UserOrderListTab = () => {
   });
   const columns = OrderListTableHeader;
 
-  const data: OrderListType[] = orderList
-    ? orderList.data.map((order) => ({
-        restaurant_name: order.restaurant_name,
-        employee_name: order.username,
-        ordered_items: order.item_name,
-        branch_name: order.branch_name,
-        date: order.submitted_time,
-      }))
-    : [];
+  const sortData = (data: OrderListType[]) => {
+    return data.sort((a, b) => {
+      const aValue = a[sortKey as keyof OrderListType];
+      const bValue = b[sortKey as keyof OrderListType];
+
+      if (aValue === undefined || bValue === undefined) {
+        return 0;
+      }
+
+      if (aValue < bValue) {
+        return sortType === 'asc' ? -1 : 1;
+      } else if (aValue > bValue) {
+        return sortType === 'asc' ? 1 : -1;
+      } else {
+        return 0;
+      }
+    });
+  };
+
+  const data: OrderListType[] = useMemo(() => {
+    const data = orderList
+      ? orderList.data.map((order) => ({
+          restaurant_name: order.restaurant_name,
+          employee_name: order.username,
+          ordered_items: order.item_name,
+          branch_name: order.branch_name,
+          date: order.submitted_time,
+        }))
+      : [];
+    return sortData(data);
+  }, [orderList, sortKey, sortType]);
 
   return (
     <Stack
