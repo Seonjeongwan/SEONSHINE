@@ -10,6 +10,7 @@ import TimePicker from '@/components/molecules/timePicker';
 import Table from '@/components/organims/table';
 
 import { useDeviceType } from '@/hooks/useDeviceType';
+import { convertToTimeString } from '@/utils/datetime';
 
 import { useGetOrderPeriodApi, useSetOrderPeriodApi } from '@/apis/hooks/orderListApi.hook';
 import { useGetRestaurantAssignListApi, useRestaurantAssignApi } from '@/apis/hooks/restaurantAssignApi.hook';
@@ -19,7 +20,6 @@ import AssignCard from './components/AssignCard';
 import { AssignTableHeader } from './components/AssignTableHeader';
 import { orderPeriodSchema, OrderPeriodSchemaType } from './schema';
 import { AssignTableType, SelectionsType } from './types';
-import { convertToTimeString } from '@/utils/datetime';
 
 const RestaurantAssignment = () => {
   const [selections, setSelections] = useState<SelectionsType>({});
@@ -33,8 +33,8 @@ const RestaurantAssignment = () => {
 
   const queryClient = useQueryClient();
 
-  const startTime = convertToTimeString(Number(orderPeriod?.data.start_hour), Number(orderPeriod?.data.start_minute));
-  const endTime = convertToTimeString(Number(orderPeriod?.data.end_hour), Number(orderPeriod?.data.end_minute));
+  const startTime = convertToTimeString(Number(orderPeriod?.data?.start_hour), Number(orderPeriod?.data?.start_minute));
+  const endTime = convertToTimeString(Number(orderPeriod?.data?.end_hour), Number(orderPeriod?.data?.end_minute));
 
   const {
     control,
