@@ -259,13 +259,17 @@ export const getOrderListSummary = async (req, res) => {
 
       const restaurant_id =
         !restaurantAssign || currentUser.role_id === String(UserRole.restaurant)
-          ? currentUser.user_id
+          ? currentUser.role_id === String(UserRole.admin)
+            ? undefined
+            : currentUser.user_id
           : restaurantAssign?.restaurant_id;
 
-      const restaurant = await User.findByPk(restaurant_id, {
-        attributes: ["username"],
-        raw: true,
-      });
+      const restaurant =
+        restaurant_id &&
+        (await User.findByPk(restaurant_id, {
+          attributes: ["username"],
+          raw: true,
+        }));
 
       restaurantId = restaurant?.user_id || "";
       restaurantName = restaurant?.username || "";
