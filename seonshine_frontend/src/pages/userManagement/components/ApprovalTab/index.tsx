@@ -71,7 +71,7 @@ const ApprovalTab = () => {
     });
   };
 
-  const columns = ApprovalTableHeader(handleClickAction);
+  const columns = ApprovalTableHeader(handleClickAction, (currentPage - 1) * pageSize);
 
   return (
     <Stack direction="column">

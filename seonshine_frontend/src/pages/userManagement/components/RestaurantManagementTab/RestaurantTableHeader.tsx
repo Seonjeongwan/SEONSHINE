@@ -6,12 +6,13 @@ import { dayByWeekday, DayEnum, labelUserStatus, RestaurantType, UserStatusEnum 
 export const RestaurantTableHeader = (
   handleView: (userId: string) => void,
   handleAction: (userId: string, userStatus: UserStatusEnum) => void,
+  pageCount: number,
 ): CustomColumnDef<RestaurantType>[] => [
   {
     accessorKey: 'no',
     header: 'No',
     cell: (user) => {
-      return user.row.index + 1;
+      return pageCount + user.row.index + 1;
     },
     enableSorting: false,
   },

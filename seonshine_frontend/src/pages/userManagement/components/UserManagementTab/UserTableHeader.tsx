@@ -6,12 +6,13 @@ import { labelUserStatus, UserStatusEnum, UserType } from '@/types/user';
 export const UserTableHeader = (
   handleView: (userId: string) => void,
   handleAction: (userId: string, userStatus: UserStatusEnum) => void,
+  pageCount: number,
 ): CustomColumnDef<UserType>[] => [
   {
     accessorKey: 'no',
     header: 'No',
     cell: (user) => {
-      return user.row.index + 1;
+      return pageCount + user.row.index + 1;
     },
     enableSorting: false,
   },

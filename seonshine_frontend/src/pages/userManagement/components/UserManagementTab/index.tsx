@@ -83,7 +83,7 @@ const UserManagementTab = () => {
 
   const defaultOption = searchUserOptions[0].value;
 
-  const columns = UserTableHeader(handleOpenModal, handleClickAction);
+  const columns = UserTableHeader(handleOpenModal, handleClickAction, (currentPage - 1) * pageSize);
 
   return (
     <Stack direction="column">
