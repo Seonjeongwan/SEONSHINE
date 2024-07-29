@@ -73,7 +73,7 @@ export const SignUpSchema = zod
   .refine(
     (data) => {
       if (data.userType === RoleEnum.USER) {
-        if (typeof data.email === 'string' && data.email.includes('@gmail.com')) {
+        if (typeof data.email === 'string' && data.email.includes('@')) {
           return false;
         }
         return typeof data.email === 'string';

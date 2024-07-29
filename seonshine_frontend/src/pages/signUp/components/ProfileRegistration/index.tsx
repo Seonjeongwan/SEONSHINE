@@ -43,7 +43,7 @@ const ProfileRegistration = ({ handleSubmitInformation, userType }: EnterUserInf
   const submitForm = (data: SignUpSchemaType) => {
     let modifiedData = { ...data };
 
-    if (userType === RoleEnum.USER && !data.email.includes('@shinhan.com')) {
+    if (userType === RoleEnum.USER) {
       modifiedData.email = data.email + '@shinhan.com';
     }
 

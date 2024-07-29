@@ -5,12 +5,15 @@ import { Button, Typography } from '@mui/material';
 import { CustomColumnDef } from '@/types/table';
 import { labelRoleById, WaitingUserType } from '@/types/user';
 
-export const ApprovalTableHeader = (handleAction: (userId: string) => void): CustomColumnDef<WaitingUserType>[] => [
+export const ApprovalTableHeader = (
+  handleAction: (userId: string) => void,
+  pageCount: number,
+): CustomColumnDef<WaitingUserType>[] => [
   {
     accessorKey: 'no',
     header: 'No',
     cell: (user) => {
-      return user.row.index + 1;
+      return pageCount + user.row.index + 1;
     },
     enableSorting: false,
   },

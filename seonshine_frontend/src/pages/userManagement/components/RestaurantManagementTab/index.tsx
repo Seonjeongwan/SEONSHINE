@@ -83,7 +83,7 @@ const RestaurantManagementTab = () => {
 
   const handleCloseModal = () => setIsModalOpen(false);
 
-  const columns = RestaurantTableHeader(handleOpenModal, handleClickAction);
+  const columns = RestaurantTableHeader(handleOpenModal, handleClickAction, (currentPage - 1) * pageSize);
 
   return (
     <Stack direction="column">

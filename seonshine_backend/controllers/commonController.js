@@ -190,7 +190,7 @@ const getAdminDashboardSummary = async () => {
     ],
     where: {
       role_id: {
-        [Op.not]: UserRole.admin,
+        [Op.not]: [UserRole.admin, UserRole.restaurant],
       },
       user_status: {
         [Op.in]: [UserStatus.active, UserStatus.waitingConfirm],
