@@ -4,6 +4,7 @@ export type LoginResponseType = {
   message: string;
   user?: CurrentUserType;
   user_status: string;
+  user_id: string;
 };
 
 export type SendOTPPayloadType = {

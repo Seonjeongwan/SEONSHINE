@@ -2,6 +2,9 @@
 seonshine_mgr / seonshine@2
 root / admin -> setting needed 
 
+db 접속 (ip:port)
+54.254.0.100:3360
+
 -github root user
 sunnythek@naver.com
 

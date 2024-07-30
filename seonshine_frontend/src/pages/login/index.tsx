@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { Box, Button, IconButton, Link, Stack, Typography } from '@mui/material';
+import { Box, Button, Checkbox, FormControlLabel, IconButton, Link, Stack, Typography } from '@mui/material';
 
 import FormInput from '@/components/molecules/formEntity/input';
 import { FormLabel } from '@/components/molecules/formEntity/label';
@@ -31,6 +31,7 @@ const LoginPage = () => {
   const {
     handleSubmit,
     register,
+    setValue,
     formState: { errors },
   } = useForm<LoginSchemaType>({
     resolver: zodResolver(LoginSchema),
@@ -43,6 +44,7 @@ const LoginPage = () => {
   const [isClose, setIsClose] = useState<boolean>(false);
   const [userLogin, setUserLogin] = useState<CurrentUserType | undefined>(undefined);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -52,6 +54,14 @@ const LoginPage = () => {
   const { mutate: changeStatus } = useChangeStatusApi();
 
   const setLoading = useLoadingStore((state) => state.setLoading);
+
+  useEffect(() => {
+    const rememberedUserId = localStorage.getItem('rememberedUserId');
+    if (rememberedUserId) {
+      setValue('employeeId', rememberedUserId);
+      setRememberMe(true);
+    }
+  }, [setValue]);
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
@@ -81,6 +91,11 @@ const LoginPage = () => {
 
         if (user) {
           handleLoginSuccess(user, user?.token as string);
+          if (rememberMe) {
+            localStorage.setItem('rememberedUserId', user?.user_id); // 로그인 ID 저장
+          } else {
+            localStorage.removeItem('rememberedUserId');
+          }
           navigate(paths.index);
         }
       },
@@ -285,6 +300,17 @@ const LoginPage = () => {
                         }
                       />
                     </Stack>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={rememberMe}
+                          onChange={(e) => setRememberMe(e.target.checked)}
+                          name="rememberMe"
+                          color="primary"
+                        />
+                      }
+                      label="Remember me"
+                    />
                   </Box>
                   <Stack
                     marginTop={4}
