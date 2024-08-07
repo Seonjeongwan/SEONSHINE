@@ -20,6 +20,7 @@ import { avatarBaseURL } from '@/constants/image';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { OrderListType, UserOrderTabEnum } from '@/types/order';
 import { RoleEnum, UserManagementTabEnum } from '@/types/user';
+import { convertToTimeString } from '@/utils/datetime';
 
 import {
   useGetOrderListDetailApi,
@@ -170,6 +171,8 @@ const Dashboard = () => {
   const { data: dashboardSummary } = useGetDashBoardSummary({ enabled: true });
   const { data: orderPeriod } = useGetOrderPeriodApi();
 
+  const startTime = convertToTimeString(Number(orderPeriod?.data.start_hour), Number(orderPeriod?.data.start_minute));
+  const endTime = convertToTimeString(Number(orderPeriod?.data.end_hour), Number(orderPeriod?.data.end_minute));
   const navigate = useNavigate();
   const handleClickViewMore = () => {
     {
@@ -333,7 +336,15 @@ const Dashboard = () => {
       {restaurantIsAssigned() && (
         <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
           <Stack className="flex-grow">Order Status</Stack>
-          <Stack className="self-end font-bold text-2xl">{isOrderEnabled() ? 'Waiting' : 'Ordered'}</Stack>
+          <Stack className="self-end font-bold text-2xl">{isOrderEnabled() ? 'Waiting' : 'Order Done'}</Stack>
+        </Box>
+      )}
+      {restaurantIsAssigned() && (
+        <Box className="w-full md:w-1/4 flex flex-col bg-white rounded-md p-4">
+          <Stack className="flex-grow">Order Time</Stack>
+          <Stack className="self-end font-bold text-2xl">
+            {startTime} ~ {endTime}
+          </Stack>
         </Box>
       )}
     </>
