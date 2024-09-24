@@ -56,5 +56,13 @@ ssl 초기 발급을 위해서 명령어 실행 필요 (맨초기만)
 docker-compose -f docker-compose.prod.yml up -d frontend
 docker-compose -f docker-compose.prod.yml run -d certbot certonly --webroot -w /var/www/certbot --seonshine.vn@gmail.com -d seonshine.net -d www.seonshine.net --agree-tos --no-eff-email
 
+docker-compose -f docker-compose.prod.yml run certbot certonly --force-renewal --webroot -w /var/www/certbot --email seonshine.vn@gmail.com -d seonshine.net -d www.seonshine.net --agree-tos --no-eff-email
+
+기존 컨테이너 ssl 갱신
+docker exec -it <certbot 컨테이너 이름 또는 ID> certbot renew --webroot -w /var/www/certbot --quiet --force-renewal
+
+도메인 구매 위치
+aw Route 53 / id sunnythek@gmail.com
+
 권한 이슈 존재
 chmod +x ./seonshine_frontend/renewal-hooks/deploy/reload-nginx.sh
