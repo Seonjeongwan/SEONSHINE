@@ -238,6 +238,7 @@ export const getOrderListSummary = async (req, res) => {
       ],
       where: condition,
       group: ["item_name", "item_id", "restaurant_id"],
+      order: [["item_name", "ASC"]], // item_name으로 오름차순 정렬
     });
 
     let restaurantId = null;
@@ -249,7 +250,7 @@ export const getOrderListSummary = async (req, res) => {
     } else {
       //TODO: After restaurant assign history done, please use history table. And remove restaurant id with normal user call
       const weekday = dayjs(date).day();
-      const restaurantAssign = await RestaurantAssigned.findOne({
+      const restaurantAssign = await RestaurantAs signed.findOne({
         attributes: ["restaurant_id"],
         where: {
           weekday: weekday,
@@ -306,7 +307,9 @@ export const getOrderListDetail = async (req, res) => {
     branch_id ? "AND (o.branch_id = :branch_id)" : ""
   }  `;
 
-  const query = `${select} ${where}`;
+  const orderBy = `ORDER BY u.username ASC`;
+
+  const query = `${select} ${where} ${orderBy}`;
 
   try {
     const rows = await sequelizeOrderDb.query(query, {
