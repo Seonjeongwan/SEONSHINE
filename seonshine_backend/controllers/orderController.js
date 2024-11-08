@@ -250,7 +250,7 @@ export const getOrderListSummary = async (req, res) => {
     } else {
       //TODO: After restaurant assign history done, please use history table. And remove restaurant id with normal user call
       const weekday = dayjs(date).day();
-      const restaurantAssign = await RestaurantAs signed.findOne({
+      const restaurantAssign = await RestaurantAssigned.findOne({
         attributes: ["restaurant_id"],
         where: {
           weekday: weekday,
