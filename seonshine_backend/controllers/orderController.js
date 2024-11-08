@@ -238,7 +238,7 @@ export const getOrderListSummary = async (req, res) => {
       ],
       where: condition,
       group: ["item_name", "item_id", "restaurant_id"],
-      order: [["item_name", "ASC"]], // item_name으로 오름차순 정렬
+      //order: [["item_name", "ASC"]], // item_name으로 오름차순 정렬
     });
 
     let restaurantId = null;
