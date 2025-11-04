@@ -109,8 +109,8 @@ services:
       fi;
       trap exit TERM;
       while :; do
-        certbot renew --webroot -w /var/www/certbot --quiet --force-renewal && sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
-        sleep 86400;  # 86400 = 1 day 604800 seconds = 1 week
+        certbot renew --webroot -w /var/www/certbot --quiet && sh /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh;
+        sleep 43200;  # 43200초 = 12시간마다 체크 (인증서 만료 30일 전에만 실제 갱신)
       done
       '
     depends_on:
