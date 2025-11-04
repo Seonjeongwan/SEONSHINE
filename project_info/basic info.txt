@@ -1,3 +1,12 @@
+- terminal 에서 서버 접속하기
+ssh -i ss_cloud_main.pem ubuntu@54.254.0.100
+
+aws 서버 접속
+ssh -i ~/.ssh/id_rsa ubuntu@54.254.0.100
+
+aws server ip
+54.254.0.100
+
 -DB User setting
 seonshine_mgr / seonshine@2
 root / admin -> setting needed 
@@ -33,9 +42,6 @@ backup codes for gmail
 1303 9961
 5021 0901
 
-aws server ip
-54.254.0.100
-
 명령어
 docker build -f Dockerfile.prod -t seonshinevn/seonshine_frontend:prod .
 docker push seonshinevn/seonshine_frontend:prod
@@ -55,6 +61,8 @@ seonshine_fileserver
 seonshine_backend
 
 
+
+
 ssl 초기 발급을 위해서 명령어 실행 필요 (맨초기만)
 docker-compose -f docker-compose.prod.yml up -d frontend
 docker-compose -f docker-compose.prod.yml run -d certbot certonly --webroot -w /var/www/certbot --seonshine.vn@gmail.com -d seonshine.net -d www.seonshine.net --agree-tos --no-eff-email
@@ -70,17 +78,14 @@ aws Route 53 / id sunnythek@gmail.com
 권한 이슈 존재
 chmod +x ./seonshine_frontend/renewal-hooks/deploy/reload-nginx.sh
 
-aws 서버 접속
-ssh -i ~/.ssh/id_rsa ubuntu@54.254.0.100
-
 https cert 갱신방법
 docker exec -it seonshine-certbot-1 certbot certificates
 docker-compose -f docker-compose.prod.yml restart certbot
-docker exec -it 5802b50c08ae certbot certonly --manual --preferred-challenges dns --email seonshine.vn@gmail.com -d seonshine.net -d www.seonshine.net --agree-tos --no-eff-email
-docker exec -it seonshine-certbot certbot renew --webroot -w /var/www/certbot --quiet --force-renewal
+docker exec -it seonshine-certbot-1 certbot certonly --manual --preferred-challenges dns --email seonshine.vn@gmail.com -d seonshine.net -d www.seonshine.net --agree-tos --no-eff-email
+docker exec -it seonshine-certbot-1 certbot renew --webroot -w /var/www/certbot --quiet --force-renewal
 
 certbot재시작
 docker-compose -f docker-compose.prod.yml restart certbot
 
 https cert 확인방법
-docker exec -it 7f8a9b8c26cc certbot certificates
+docker exec -it seonshine-certbot-1 certbot certifiGates
