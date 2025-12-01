@@ -15,10 +15,20 @@ export const orderItemCurrentDay = async (req, res) => {
   const transactionOrderDb = await sequelizeOrderDb.transaction();
   try {
     const { item_id } = req.body;
-    const menuItem = await MenuItem.findByPk(item_id, { raw: true });
+    // 삭제된 메뉴(is_deleted = true)는 주문할 수 없도록 체크
+    const menuItem = await MenuItem.findOne({
+      where: {
+        item_id,
+        is_deleted: false, // 삭제되지 않은 메뉴만 주문 가능
+      },
+      raw: true,
+    });
 
     if (!menuItem) {
-      res.status(httpStatusCodes.badRequest).send("Menu item not found");
+      await transactionOrderDb.rollback();
+      return res.status(httpStatusCodes.badRequest).json({
+        message: "Menu item not found or not available",
+      });
     }
 
     const currentDate = dayjs().format("YYYY-MM-DD");

@@ -16,6 +16,7 @@ export const getMenuList = async (req, res) => {
       attributes: ["item_id", "name", "description", "price", "image_url"],
       where: {
         restaurant_id,
+        is_deleted: false, // 삭제되지 않은 메뉴만 조회 (관리자 화면에서도 삭제된 메뉴는 보이지 않음)
       },
     });
     res.status(httpStatusCodes.success).send(menuItems);
@@ -103,17 +104,21 @@ export const deleteMenuItem = async (req, res) => {
       });
     }
 
-    await menuItem.destroy();
+    // Soft delete: 실제 삭제 대신 is_deleted를 true로 설정
+    // 주문 이력과의 외래키 제약조건 때문에 한번이라도 주문된 메뉴는 실제 삭제가 불가능
+    // is_deleted = true로 설정하면 조회 시 필터링되어 보이지 않음
+    await menuItem.update({ is_deleted: true });
 
-    // Delete associated image if it exists
-    if (menuItem.image_url) {
-      const oldFileName = menuItem.image_url.split("/").pop();
-      try {
-        await httpUpload.delete(`/delete/${oldFileName}`);
-      } catch (deleteError) {
-        console.error(`Failed to delete old file: ${oldFileName}`, deleteError);
-      }
-    }
+    // 이미지는 유지 (주문 이력에서 참조할 수 있도록)
+    // 필요시 이미지도 삭제하려면 아래 주석을 해제하세요
+    // if (menuItem.image_url) {
+    //   const oldFileName = menuItem.image_url.split("/").pop();
+    //   try {
+    //     await httpUpload.delete(`/delete/${oldFileName}`);
+    //   } catch (deleteError) {
+    //     console.error(`Failed to delete old file: ${oldFileName}`, deleteError);
+    //   }
+    // }
 
     return res.status(httpStatusCodes.success).json({
       message: "Delete successfully",
@@ -236,6 +241,7 @@ export const getMenuListByCurrentDay = async (req, res) => {
     const menuItems = await MenuItem.findAll({
       where: {
         restaurant_id: restaurantAssign.restaurant_id,
+        is_deleted: false, // 삭제되지 않은 메뉴만 조회 (사용자 주문 화면에서도 삭제된 메뉴는 보이지 않음)
       },
       raw: true,
     });

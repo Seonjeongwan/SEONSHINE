@@ -32,6 +32,12 @@ MenuItem.init(
     price: {
       type: DataTypes.INTEGER,
     },
+    is_deleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+      comment: "메뉴 삭제 여부 0:정상 1:삭제됨",
+    },
     image_url: {
       type: DataTypes.STRING,
     },

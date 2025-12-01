@@ -222,6 +222,7 @@ export type GetMenuListResponseType = {
   description: string | null;
   price: string | null;
   image_url: string | null;
+  is_deleted?: number; // 메뉴 삭제 여부 0:정상 1:삭제됨 (선택사항, 관리자 화면에서 사용 가능)
 };
 
 export type UpdateMenuItemPayloadType = {

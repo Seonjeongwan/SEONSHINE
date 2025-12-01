@@ -88,4 +88,4 @@ certbot재시작
 docker-compose -f docker-compose.prod.yml restart certbot
 
 https cert 확인방법
-docker exec -it seonshine-certbot certbot certificates
+docker exec -it seonshine-certbot-1 certbot certificates
