@@ -60,8 +60,10 @@ seonshine_frontend
 seonshine_fileserver
 seonshine_backend
 
-
-
+로그확인방법
+docker-compose -f docker-compose.prod.yml logs -f backend
+docker-compose -f docker-compose.prod.yml logs -f frontend
+docker-compose -f docker-compose.prod.yml ps && docker-compose -f docker-compose.prod.yml logs --tail=20
 
 ssl 초기 발급을 위해서 명령어 실행 필요 (맨초기만)
 docker-compose -f docker-compose.prod.yml up -d frontend

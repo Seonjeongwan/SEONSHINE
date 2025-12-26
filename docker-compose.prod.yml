@@ -36,6 +36,8 @@ services:
     ports:
       - "5050:5050"
     # command: sh -c "npm run migrate:all && npm run seed:all && npm run start"
+    volumes:
+      - ./seonshine_backend/logs:/app/logs # 로그 저장 (선택사항)
     depends_on:
       redis:
         condition: service_started
@@ -83,10 +85,13 @@ services:
       - "9000:9000"
     restart: always
 
-  redis:
-    image: redis:6.2
-    ports:
-      - "6379:6379"
+redis:
+  image: redis:6.2
+  ports:
+    - "6379:6379"
+  volumes:
+    - redis-data:/data # 추가 권장
+  restart: always
 
   certbot:
     build:
@@ -122,3 +127,4 @@ volumes:
   portainer_data:
   certbot-etc:
   certbot-www:
+  redis-data:
