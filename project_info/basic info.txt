@@ -81,7 +81,7 @@ aws Route 53 / id sunnythek@gmail.com
 chmod +x ./seonshine_frontend/renewal-hooks/deploy/reload-nginx.sh
 
 https cert 갱신방법
-docker exec -it seonshine-certbot-1 certbot certificates
+docker-compose -f docker-compose.prod.yml restart certbotdocker-compose -f docker-compose.prod.yml restart certbot
 docker-compose -f docker-compose.prod.yml restart certbot
 docker exec -it seonshine-certbot-1 certbot certonly --manual --preferred-challenges dns --email seonshine.vn@gmail.com -d seonshine.net -d www.seonshine.net --agree-tos --no-eff-email
 docker exec -it seonshine-certbot-1 certbot renew --webroot -w /var/www/certbot --quiet --force-renewal
@@ -96,3 +96,20 @@ frontend에서 포트가 사용중인경우 - nginx 종료후 재실행
 sudo systemctl stop nginx
 docker-compose -f docker-compose.prod.yml up -d
 docker-compose -f docker-compose.prod.yml up -d frontend
+
+cloudwatch 사용법
+# 서비스 시작 (sudo 필수)
+sudo systemctl start amazon-cloudwatch-agent
+# 서비스 활성화 (부팅 시 자동 시작)
+sudo systemctl enable amazon-cloudwatch-agent
+# 상태 확인
+sudo systemctl status amazon-cloudwatch-agent
+# 로그 확인
+sudo journalctl -u amazon-cloudwatch-agent -n 50
+# 로그 확인
+sudo tail -30 /opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log
+# 최근 에러 로그 확인
+sudo tail -50 /opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log | grep -i error
+# CloudWatch 전송 관련 로그 확인
+sudo tail -50 /opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log | grep -i cloudwatch
+
