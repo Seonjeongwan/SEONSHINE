@@ -14,10 +14,31 @@ services:
       - certbot-etc:/etc/letsencrypt
       - certbot-www:/var/www/certbot
     depends_on:
-      - backend
-      - fileserver
+      backend:
+        condition: service_healthy
+      fileserver:
+        condition: service_started
     environment:
       - NODE_ENV=production
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:80/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: always
 
   backend:
@@ -26,8 +47,8 @@ services:
     environment:
       - NODE_ENV=production
       - DB_HOST=db
-      - DB_USER=seonshine_mgr
-      - DB_PASSWORD=seonshine@2
+      - DB_USER=${DB_USER:-seonshine_mgr}
+      - DB_PASSWORD=${DB_PASSWORD:-seonshine@2}
       - USER_DB_NAME=user_db
       - COMMON_DB_NAME=common_db
       - RESTAURANT_DB_NAME=restaurant_db
@@ -37,22 +58,42 @@ services:
       - "5050:5050"
     # command: sh -c "npm run migrate:all && npm run seed:all && npm run start"
     volumes:
-      - ./seonshine_backend/logs:/app/logs # 로그 저장 (선택사항)
+      - ./seonshine_backend/logs:/app/logs
     depends_on:
       redis:
         condition: service_started
       db:
         condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:5050/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: always
 
   db:
     image: mysql:8.0.36
-    ports:
-      - "3306:3306"
+    # 포트 외부 노출 제거 (보안 강화)
+    # Backend는 Docker 네트워크로 접근 (DB_HOST=db)
+    ports: []
     environment:
-      - MYSQL_USER=seonshine_mgr
-      - MYSQL_PASSWORD=seonshine@2
-      - MYSQL_ROOT_PASSWORD=seonshine@2
+      - MYSQL_USER=${DB_USER:-seonshine_mgr}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-seonshine@2}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-seonshine@2}
     volumes:
       - mysql-data:/var/lib/mysql
       - ./seonshine_db/schema:/docker-entrypoint-initdb.d
@@ -62,6 +103,11 @@ services:
       timeout: 10s
       retries: 5
       start_period: 5s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: always
 
   fileserver:
@@ -73,6 +119,25 @@ services:
     restart: always
     environment:
       - NODE_ENV=production
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:4000/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   portainer:
     image: portainer/portainer-ce:latest
@@ -87,10 +152,23 @@ services:
 
   redis:
     image: redis:6.2
-    ports:
-      - "6379:6379"
+    # 포트 외부 노출 제거 (보안 강화)
+    # Backend는 Docker 네트워크로 접근
+    ports: []
+    command: redis-server --appendonly yes
     volumes:
-      - redis-data:/data # 추가 권장
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: always
 
   certbot:

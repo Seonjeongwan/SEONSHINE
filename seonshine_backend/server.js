@@ -30,6 +30,11 @@ app.use(cors());
 // Use bodyParser middleware for JSON
 app.use(bodyParser.json());
 
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 // Define route handlers
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRouter);

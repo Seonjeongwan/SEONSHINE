@@ -224,3 +224,6 @@ docker inspect seonshine-db-1 | grep IPAddress
 ```
 
 
+
+
+

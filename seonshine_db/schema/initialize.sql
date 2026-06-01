@@ -87,6 +87,7 @@ CREATE TABLE menu_items (
   name VARCHAR(100) NOT NULL COMMENT '메뉴명',
   description TEXT COMMENT '메뉴 설명',
   price INT COMMENT '가격',
+  is_deleted BOOLEAN NOT NULL DEFAULT false COMMENT '삭제 여부(소프트 삭제) 0:정상 1:삭제됨',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE (restaurant_id, item_id),

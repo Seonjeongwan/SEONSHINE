@@ -91,3 +91,8 @@ docker-compose -f docker-compose.prod.yml restart certbot
 
 https cert 확인방법
 docker exec -it seonshine-certbot-1 certbot certificates
+
+frontend에서 포트가 사용중인경우 - nginx 종료후 재실행
+sudo systemctl stop nginx
+docker-compose -f docker-compose.prod.yml up -d
+docker-compose -f docker-compose.prod.yml up -d frontend

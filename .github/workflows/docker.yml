@@ -10,6 +10,8 @@ on:
       - "seonshine_backend/**"
       - "seonshine_db/**"
       - "seonshine_fileserver/**"
+      - "docker-compose.prod.yml"
+      - "docker-compose.dev.yml"
   workflow_dispatch:
 
 jobs:
@@ -19,6 +21,7 @@ jobs:
       frontend: ${{ steps.check.outputs.frontend }}
       backend: ${{ steps.check.outputs.backend }}
       fileserver: ${{ steps.check.outputs.fileserver }}
+      compose_changed: ${{ steps.check.outputs.compose_changed }}
       any_changes: ${{ steps.check.outputs.any_changes }}
     steps:
       - name: Checkout repository
@@ -70,7 +73,16 @@ jobs:
               echo "fileserver=false" >> $GITHUB_OUTPUT
             fi
 
-            if [ "$FRONTEND_CHANGED" != '' ] || [ "$BACKEND_CHANGED" != '' ] || [ "$FILESERVER_CHANGED" != '' ]; then
+            COMPOSE_CHANGED=$(git diff --name-only HEAD~1 HEAD | grep 'docker-compose.prod.yml\|docker-compose.dev.yml' || echo '')
+            if [ "$COMPOSE_CHANGED" != '' ]; then
+              echo "compose_changed=true" >> $GITHUB_ENV
+              echo "compose_changed=true" >> $GITHUB_OUTPUT
+            else
+              echo "compose_changed=false" >> $GITHUB_ENV
+              echo "compose_changed=false" >> $GITHUB_OUTPUT
+            fi
+
+            if [ "$FRONTEND_CHANGED" != '' ] || [ "$BACKEND_CHANGED" != '' ] || [ "$FILESERVER_CHANGED" != '' ] || [ "$COMPOSE_CHANGED" != '' ]; then
               echo "any_changes=true" >> $GITHUB_ENV
               echo "any_changes=true" >> $GITHUB_OUTPUT
             else
@@ -82,6 +94,7 @@ jobs:
             echo "Frontend: $FRONTEND_CHANGED"
             echo "Backend: $BACKEND_CHANGED"
             echo "Fileserver: $FILESERVER_CHANGED"
+            echo "Compose: $COMPOSE_CHANGED"
             echo "any_changes: $any_changes"
           fi
 
@@ -332,26 +345,92 @@ jobs:
             git reset --hard HEAD
             git pull origin main
             export COMPOSE_HTTP_TIMEOUT=600
-            docker-compose -f docker-compose.prod.yml down
-            docker-compose -f docker-compose.prod.yml pull
 
-            services_to_restart=()
-            if [ "${{ needs.check-changed-files.outputs.frontend }}" == 'true' ]; then
-              services_to_restart+=('frontend')
-            fi
-            if [ "${{ needs.check-changed-files.outputs.backend }}" == 'true' ]; then
-              services_to_restart+=('backend')
-            fi
-            if [ "${{ needs.check-changed-files.outputs.fileserver }}" == 'true' ]; then
-              services_to_restart+=('fileserver')
+            # docker-compose.yml 파일만 변경된 경우
+            if [ "${{ needs.check-changed-files.outputs.compose_changed }}" == 'true' ] && \
+               [ "${{ needs.check-changed-files.outputs.frontend }}" != 'true' ] && \
+               [ "${{ needs.check-changed-files.outputs.backend }}" != 'true' ] && \
+               [ "${{ needs.check-changed-files.outputs.fileserver }}" != 'true' ]; then
+              echo "Only docker-compose.yml changed - applying configuration"
+              docker-compose -f docker-compose.prod.yml up -d
+            else
+              # 코드 변경이 있는 경우: 운영 환경은 신중한 배포 (엄격한 의존성 순서)
+              echo "Code changes detected - PROD environment: careful deployment with dependency order"
+              
+              # 운영 환경: 안정성을 위한 엄격한 순서
+              # 1단계: 인프라 서비스 (항상 실행되어야 함)
+              echo "Step 1: Starting infrastructure services (db, redis)..."
+              docker-compose -f docker-compose.prod.yml up -d db redis
+              
+              # DB가 healthy 상태가 될 때까지 대기 (운영 환경: 엄격한 대기)
+              echo "Waiting for DB to be healthy (prod: strict check)..."
+              timeout=90
+              while [ $timeout -gt 0 ]; do
+                if docker-compose -f docker-compose.prod.yml ps db | grep -q "healthy"; then
+                  echo "DB is healthy"
+                  break
+                fi
+                sleep 2
+                timeout=$((timeout - 2))
+              done
+              
+              if [ $timeout -le 0 ]; then
+                echo "WARNING: DB did not become healthy within timeout"
               fi
-              services_to_restart+=('portainer')
-              services_to_restart+=('certbot')
-              services_to_restart+=('redis')
-            docker-compose -f docker-compose.prod.yml up -d "${services_to_restart[@]}"
+              
+              # 2단계: Fileserver (Frontend가 의존)
+              if [ "${{ needs.check-changed-files.outputs.fileserver }}" == 'true' ]; then
+                echo "Step 2: Pulling and restarting fileserver..."
+                docker-compose -f docker-compose.prod.yml pull fileserver
+                docker-compose -f docker-compose.prod.yml up -d fileserver
+                sleep 5
+              fi
+              
+              # 3단계: Backend (DB, Redis 의존)
+              if [ "${{ needs.check-changed-files.outputs.backend }}" == 'true' ]; then
+                echo "Step 3: Pulling and restarting backend..."
+                docker-compose -f docker-compose.prod.yml pull backend
+                docker-compose -f docker-compose.prod.yml up -d backend
+                
+                # Backend가 healthy 상태가 될 때까지 대기 (운영 환경: 엄격한 대기)
+                echo "Waiting for Backend to be healthy (prod: strict check)..."
+                timeout=180
+                while [ $timeout -gt 0 ]; do
+                  if docker-compose -f docker-compose.prod.yml ps backend | grep -q "healthy"; then
+                    echo "Backend is healthy"
+                    break
+                  fi
+                  sleep 2
+                  timeout=$((timeout - 2))
+                done
+                
+                if [ $timeout -le 0 ]; then
+                  echo "WARNING: Backend did not become healthy within timeout"
+                fi
+              fi
+              
+              # 4단계: Frontend (Backend, Fileserver 의존)
+              if [ "${{ needs.check-changed-files.outputs.frontend }}" == 'true' ]; then
+                echo "Step 4: Pulling and restarting frontend..."
+                docker-compose -f docker-compose.prod.yml pull frontend
+                docker-compose -f docker-compose.prod.yml up -d frontend
+              fi
+              
+              # 5단계: 기타 서비스 (독립적)
+              echo "Step 5: Ensuring other services are running..."
+              docker-compose -f docker-compose.prod.yml up -d certbot portainer
+              
+              # 변경되지 않은 서비스도 최신 이미지로 업데이트
+              docker-compose -f docker-compose.prod.yml pull
+              docker-compose -f docker-compose.prod.yml up -d
+            fi
 
             # Remove unused images
             docker image prune -f
+
+            # 최종 상태 확인
+            echo "Final service status:"
+            docker-compose -f docker-compose.prod.yml ps
 
       - name: SSH into server for develop
         if: github.ref == 'refs/heads/develop'
@@ -361,7 +440,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            echo "SSH connection successful"
+            echo "SSH connection successful - DEVELOP branch deployment"
             if [ ! -d /home/ubuntu/SEONSHINE ]; then
               mkdir -p /home/ubuntu/SEONSHINE
               git clone https://github.com/Seonjeongwan/SEONSHINE.git /home/ubuntu/SEONSHINE
@@ -370,23 +449,74 @@ jobs:
             git reset --hard HEAD
             git pull origin develop
             export COMPOSE_HTTP_TIMEOUT=240
-            docker-compose -f docker-compose.dev.yml down
-            docker-compose -f docker-compose.dev.yml pull
 
-            services_to_restart=()
-            if [ "${{ needs.check-changed-files.outputs.frontend }}" == 'true' ]; then
-              services_to_restart+=('frontend')
-            fi
-            if [ "${{ needs.check-changed-files.outputs.backend }}" == 'true' ]; then
-              services_to_restart+=('backend')
-            fi
-            if [ "${{ needs.check-changed-files.outputs.fileserver }}" == 'true' ]; then
-              services_to_restart+=('fileserver')
+            # docker-compose.yml 파일만 변경된 경우
+            if [ "${{ needs.check-changed-files.outputs.compose_changed }}" == 'true' ] && \
+               [ "${{ needs.check-changed-files.outputs.frontend }}" != 'true' ] && \
+               [ "${{ needs.check-changed-files.outputs.backend }}" != 'true' ] && \
+               [ "${{ needs.check-changed-files.outputs.fileserver }}" != 'true' ]; then
+              echo "Only docker-compose.yml changed - applying configuration"
+              docker-compose -f docker-compose.dev.yml up -d
+            else
+              # 코드 변경이 있는 경우: 개발 서버는 빠른 배포 (의존성 순서 간소화)
+              echo "Code changes detected - DEV server: fast deployment"
+              
+              # 개발 서버: 빠른 배포를 위해 단계 단순화
+              # 1단계: 인프라 서비스 시작
+              echo "Step 1: Starting infrastructure services (db, redis)..."
+              docker-compose -f docker-compose.dev.yml up -d db redis
+              
+              # DB가 healthy 상태가 될 때까지 대기 (개발 서버: 짧은 대기)
+              echo "Waiting for DB to be healthy (dev server: shorter timeout)..."
+              timeout=30
+              while [ $timeout -gt 0 ]; do
+                if docker-compose -f docker-compose.dev.yml ps db | grep -q "healthy"; then
+                  echo "DB is healthy"
+                  break
+                fi
+                sleep 1
+                timeout=$((timeout - 1))
+              done
+              
+              # 개발 서버: 이미지 pull 후 재시작
+              # 2단계: Fileserver
+              if [ "${{ needs.check-changed-files.outputs.fileserver }}" == 'true' ]; then
+                echo "Step 2: Pulling and restarting fileserver..."
+                docker-compose -f docker-compose.dev.yml pull fileserver
+                docker-compose -f docker-compose.dev.yml up -d fileserver
+                sleep 3
               fi
-              services_to_restart+=('portainer')
-              services_to_restart+=('certbot')
-              services_to_restart+=('redis')
-            docker-compose -f docker-compose.dev.yml up -d "${services_to_restart[@]}"
+              
+              # 3단계: Backend
+              if [ "${{ needs.check-changed-files.outputs.backend }}" == 'true' ]; then
+                echo "Step 3: Pulling and restarting backend..."
+                docker-compose -f docker-compose.dev.yml pull backend
+                docker-compose -f docker-compose.dev.yml up -d backend
+                
+                # 개발 서버: 짧은 대기 (healthcheck 없을 수 있음)
+                echo "Waiting for Backend to start (dev server: shorter wait)..."
+                sleep 10
+              fi
+              
+              # 4단계: Frontend
+              if [ "${{ needs.check-changed-files.outputs.frontend }}" == 'true' ]; then
+                echo "Step 4: Pulling and restarting frontend..."
+                docker-compose -f docker-compose.dev.yml pull frontend
+                docker-compose -f docker-compose.dev.yml up -d frontend
+              fi
+              
+              # 5단계: 기타 서비스
+              echo "Step 5: Ensuring other services are running..."
+              docker-compose -f docker-compose.dev.yml up -d redis
+              
+              # 변경되지 않은 서비스도 최신 이미지로 업데이트
+              docker-compose -f docker-compose.dev.yml pull
+              docker-compose -f docker-compose.dev.yml up -d
+            fi
 
             # Remove unused images
             docker image prune -f
+
+            # 최종 상태 확인
+            echo "Final service status:"
+            docker-compose -f docker-compose.dev.yml ps
