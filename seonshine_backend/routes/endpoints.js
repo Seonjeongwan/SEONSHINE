@@ -43,6 +43,8 @@ export const endpoints = {
     edit: "/item/:id",
     delete: "/item/:id",
     currentDayList: "/current-day-list",
+    deletedList: "/deleted-list",
+    restore: "/item/:id/restore",
   },
   order: {
     orderItemCurrentDay: "/order-menu-item",

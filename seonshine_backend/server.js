@@ -16,6 +16,10 @@ import menuRoutes from "./routes/menuRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import restaurantRouter from "./routes/restaurantRoutes.js";
 import userRouter from "./routes/userRoutes.js";
+import {
+  backfillHistoryFromOrderHistory,
+  startRestaurantAssignmentHistoryScheduler,
+} from "./utils/restaurantAssignHistory.js";
 
 // Import database initialization function
 // const initializeDb = require("./db/initialize");
@@ -48,6 +52,13 @@ async function startServer() {
   try {
     // Initialize the database connections
     // await initializeDb();
+
+    try {
+      await backfillHistoryFromOrderHistory();
+    } catch (error) {
+      console.error("restaurant assignment history backfill failed:", error);
+    }
+    startRestaurantAssignmentHistoryScheduler();
 
     // Start the server on the specified port
     app.listen(PORT, () => {

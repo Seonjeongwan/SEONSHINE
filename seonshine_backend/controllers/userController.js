@@ -116,7 +116,9 @@ export const getUserWaitingConfirmList = async (req, res) => {
   }
 };
 
-//TODO: User just change status with 2, admin can change status 2 and 9
+// 권한 검증은 validateChangeStatus 미들웨어에서 처리:
+// - 관리자: inactive(2, 본인 탈퇴 상태)로는 변경 불가
+// - 비관리자: 본인 계정만, inactiveByAdmin(9)로는 변경 불가
 export const changeUserStatus = async (req, res) => {
   try {
     const { user_id, status } = req.body;

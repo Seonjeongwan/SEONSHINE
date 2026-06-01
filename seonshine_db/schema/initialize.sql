@@ -79,6 +79,18 @@ CREATE TABLE restaurant_assigned (
   FOREIGN KEY (restaurant_id) REFERENCES user_db.users(user_id) ON DELETE NO ACTION
 ) COMMENT '요일별 식당정보 테이블';
 
+-- 날짜별 식당 배정 이력 (과거 주문 조회 시 당일 배정 식당 표시)
+CREATE TABLE restaurant_assigned_history (
+  id INT AUTO_INCREMENT PRIMARY KEY COMMENT '이력 ID',
+  date DATE NOT NULL COMMENT '배정 날짜',
+  restaurant_id VARCHAR(20) NOT NULL COMMENT '식당 ID',
+  restaurant_name VARCHAR(100) COMMENT '식당명',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '생성일자',
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '변경일자',
+  UNIQUE KEY uk_restaurant_assigned_history_date (date),
+  FOREIGN KEY (restaurant_id) REFERENCES user_db.users(user_id) ON DELETE NO ACTION
+) COMMENT '날짜별 식당 배정 이력 테이블';
+
 -- 음식 메뉴 항목 테이블
 CREATE TABLE menu_items (
   item_id INT AUTO_INCREMENT PRIMARY KEY COMMENT '식당 메뉴 번호',

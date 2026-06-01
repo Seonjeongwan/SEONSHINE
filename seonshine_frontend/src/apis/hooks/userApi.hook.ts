@@ -49,7 +49,9 @@ import {
   getCurrentOrder,
   getCurrentProfile,
   getDashboardSummary,
+  getDeletedMenuList,
   getMenuList,
+  restoreMenuItem,
   getRestaurantDetail,
   getRestaurantList,
   getTodayMenuList,
@@ -218,6 +220,27 @@ export const useDeleteMenuItemApi = (item_id: number): UseMutationResult<{ messa
   return useMutation({
     mutationFn: async () => {
       return deleteMenuItem(item_id);
+    },
+  });
+};
+
+export const useGetDeletedMenuListApi = (
+  params: GetMenuListApiPropsType,
+  options?: { enabled?: boolean },
+): UseQueryResult<GetMenuListResponseType[]> => {
+  return useQuery({
+    queryKey: ['getDeletedMenuList', params],
+    queryFn: async () => {
+      return getDeletedMenuList(params);
+    },
+    enabled: options?.enabled ?? true,
+  });
+};
+
+export const useRestoreMenuItemApi = (item_id: number): UseMutationResult<{ message: string }, unknown, void> => {
+  return useMutation({
+    mutationFn: async () => {
+      return restoreMenuItem(item_id);
     },
   });
 };

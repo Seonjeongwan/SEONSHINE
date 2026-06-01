@@ -15,6 +15,14 @@ import {
   getFromTemporaryDb,
   saveToTemporaryDb,
 } from "../utils/storage.js";
+import {
+  OTP_MAX_ATTEMPTS,
+  getOtpAttempts,
+  getResendCooldownRemaining,
+  incrementOtpAttempts,
+  resetOtpAttempts,
+  startResendCooldown,
+} from "../utils/otpSecurity.js";
 import { generateToken } from "../utils/token.js";
 
 export const signUp = async (req, res) => {
@@ -29,6 +37,19 @@ export const signUp = async (req, res) => {
       });
     }
 
+    // 발송 남용 방지: 쿨다운 중이면 거부
+    const cooldown = await getResendCooldownRemaining(
+      verificationTypes.signUp,
+      email
+    );
+    if (cooldown > 0) {
+      return res.status(httpStatusCodes.tooManyRequests).send({
+        message: messageErrors.resendCooldown,
+        error: messageErrors.resendCooldown,
+        retryAfter: cooldown,
+      });
+    }
+
     const isSuccessSendingEmailCode = await sendAndSaveEmailVerificationCode(
       email,
       verificationTypes.signUp
@@ -36,6 +57,8 @@ export const signUp = async (req, res) => {
 
     if (isSuccessSendingEmailCode) {
       await saveToTemporaryDb(`signup-user-${email}`, user, 86400);
+      await startResendCooldown(verificationTypes.signUp, email);
+      await resetOtpAttempts(verificationTypes.signUp, email);
       return res
         .status(200)
         .send({ message: "Sending email verification successful" });
@@ -53,6 +76,15 @@ export const signUp = async (req, res) => {
 export const verifySignUp = async (req, res) => {
   try {
     const { code, email } = req.body;
+
+    // 무차별 대입 방지: 실패 시도 누적이 한도를 넘으면 새 코드 발급 전까지 차단
+    const attempts = await getOtpAttempts(verificationTypes.signUp, email);
+    if (attempts >= OTP_MAX_ATTEMPTS) {
+      return res
+        .status(httpStatusCodes.tooManyRequests)
+        .json({ message: messageErrors.verifyCodeTooManyAttempts });
+    }
+
     const verifyInfo = await Verification.findOne({
       where: {
         email: email.trim(),
@@ -69,32 +101,43 @@ export const verifySignUp = async (req, res) => {
           .json({ message: messageErrors.verifyCodeExpires });
       }
       const userInfo = await getFromTemporaryDb(`signup-user-${email}`);
-      if (userInfo) {
-        const hashedPassword = await bcrypt.hash(userInfo.password, 10);
-        const user = {
-          ...userInfo,
-          password: hashedPassword,
-          user_status: UserStatus.waitingConfirm,
-        };
-        const userResponse = await User.create(user);
-        await UserProfile.create({
-          user_id: userResponse.user_id,
-          address: userInfo.address || "",
-        });
-        await deleteFromTemporaryDb(`signup-user-${email}`);
-        //Delete all verification code sign up by email
-        await Verification.destroy({
-          where: {
-            email: email,
-            type: verificationTypes.signUp,
-          },
-        });
-        res.status(httpStatusCodes.created).json(userResponse);
+      if (!userInfo) {
+        // 임시 저장된 가입 정보가 만료/소실된 경우 (응답 누락으로 인한 요청 hang 방지)
+        return res
+          .status(httpStatusCodes.badRequest)
+          .json({ message: messageErrors.signupSessionExpired });
       }
+      const hashedPassword = await bcrypt.hash(userInfo.password, 10);
+      const user = {
+        ...userInfo,
+        password: hashedPassword,
+        user_status: UserStatus.waitingConfirm,
+      };
+      const userResponse = await User.create(user);
+      await UserProfile.create({
+        user_id: userResponse.user_id,
+        address: userInfo.address || "",
+      });
+      await deleteFromTemporaryDb(`signup-user-${email}`);
+      //Delete all verification code sign up by email
+      await Verification.destroy({
+        where: {
+          email: email,
+          type: verificationTypes.signUp,
+        },
+      });
+      await resetOtpAttempts(verificationTypes.signUp, email);
+      return res.status(httpStatusCodes.created).json(userResponse);
     } else {
-      res
-        .status(httpStatusCodes.badRequest)
-        .json({ message: messageErrors.verifyCodeIncorrect });
+      const currentAttempts = await incrementOtpAttempts(
+        verificationTypes.signUp,
+        email
+      );
+      const attemptsRemaining = Math.max(OTP_MAX_ATTEMPTS - currentAttempts, 0);
+      return res.status(httpStatusCodes.badRequest).json({
+        message: messageErrors.verifyCodeIncorrect,
+        attemptsRemaining,
+      });
     }
   } catch (error) {
     console.log("error :>> ", error);
@@ -179,12 +222,27 @@ export const resendOtpSignUp = async (req, res) => {
       });
     }
 
+    // 발송 남용 방지: 쿨다운 중이면 거부
+    const cooldown = await getResendCooldownRemaining(
+      verificationTypes.signUp,
+      email
+    );
+    if (cooldown > 0) {
+      return res.status(httpStatusCodes.tooManyRequests).send({
+        message: messageErrors.resendCooldown,
+        error: messageErrors.resendCooldown,
+        retryAfter: cooldown,
+      });
+    }
+
     const isSuccessSendingEmailCode = await sendAndSaveEmailVerificationCode(
       email,
       verificationTypes.signUp
     );
 
     if (isSuccessSendingEmailCode) {
+      await startResendCooldown(verificationTypes.signUp, email);
+      await resetOtpAttempts(verificationTypes.signUp, email);
       return res
         .status(200)
         .send({ message: "Resend email verification successful" });
@@ -207,8 +265,24 @@ export const sendOtpForgotPassword = async (req, res) => {
 
     const isExist = !!user;
 
+    // 존재하지 않는 이메일이면 여기서 종료 (return 누락으로 인한 이중 응답 버그 수정)
     if (!isExist) {
-      res.status(httpStatusCodes.notFound).json({ error: "Email not found" });
+      return res
+        .status(httpStatusCodes.notFound)
+        .json({ error: "Email not found" });
+    }
+
+    // 발송 남용 방지: 쿨다운 중이면 거부
+    const cooldown = await getResendCooldownRemaining(
+      verificationTypes.forgotPassword,
+      email
+    );
+    if (cooldown > 0) {
+      return res.status(httpStatusCodes.tooManyRequests).send({
+        message: messageErrors.resendCooldown,
+        error: messageErrors.resendCooldown,
+        retryAfter: cooldown,
+      });
     }
 
     const isSuccessSendingEmailCode = await sendAndSaveEmailVerificationCode(
@@ -217,6 +291,8 @@ export const sendOtpForgotPassword = async (req, res) => {
     );
 
     if (isSuccessSendingEmailCode) {
+      await startResendCooldown(verificationTypes.forgotPassword, email);
+      await resetOtpAttempts(verificationTypes.forgotPassword, email);
       return res
         .status(200)
         .send({ message: "Sending email verification successful" });
@@ -235,12 +311,35 @@ export const resendOtpForgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
+    // 등록되지 않은 이메일로의 코드 발송(이메일 스팸) 방지
+    const user = await User.findOne({ where: { email: email.trim() } });
+    if (!user) {
+      return res
+        .status(httpStatusCodes.notFound)
+        .json({ error: "Email not found" });
+    }
+
+    // 발송 남용 방지: 쿨다운 중이면 거부
+    const cooldown = await getResendCooldownRemaining(
+      verificationTypes.forgotPassword,
+      email
+    );
+    if (cooldown > 0) {
+      return res.status(httpStatusCodes.tooManyRequests).send({
+        message: messageErrors.resendCooldown,
+        error: messageErrors.resendCooldown,
+        retryAfter: cooldown,
+      });
+    }
+
     const isSuccessSendingEmailCode = await sendAndSaveEmailVerificationCode(
       email,
       verificationTypes.forgotPassword
     );
 
     if (isSuccessSendingEmailCode) {
+      await startResendCooldown(verificationTypes.forgotPassword, email);
+      await resetOtpAttempts(verificationTypes.forgotPassword, email);
       return res
         .status(200)
         .send({ message: "Resend email verification successful" });
@@ -255,6 +354,18 @@ export const resendOtpForgotPassword = async (req, res) => {
 export const verifyOtpForgotPassword = async (req, res) => {
   try {
     const { code, email } = req.body;
+
+    // 무차별 대입 방지: 실패 시도 누적이 한도를 넘으면 새 코드 발급 전까지 차단
+    const attempts = await getOtpAttempts(
+      verificationTypes.forgotPassword,
+      email
+    );
+    if (attempts >= OTP_MAX_ATTEMPTS) {
+      return res
+        .status(httpStatusCodes.tooManyRequests)
+        .json({ message: messageErrors.verifyCodeTooManyAttempts });
+    }
+
     const verifyInfo = await Verification.findOne({
       where: {
         email: email.trim(),
@@ -270,15 +381,29 @@ export const verifyOtpForgotPassword = async (req, res) => {
           .status(httpStatusCodes.badRequest)
           .json({ message: messageErrors.verifyCodeExpires });
       }
+      // 코드 재사용 방지: 검증 성공 시 해당 이메일의 비밀번호 찾기 코드 모두 삭제
+      await Verification.destroy({
+        where: {
+          email: email,
+          type: verificationTypes.forgotPassword,
+        },
+      });
+      await resetOtpAttempts(verificationTypes.forgotPassword, email);
       const secretKey = process.env.TOKEN_SECRET_KEY;
       const token = jwt.sign({ email }, secretKey, { expiresIn: "1h" });
       return res
         .status(httpStatusCodes.success)
         .json({ message: "OTP verified", token: token });
     } else {
-      res
-        .status(httpStatusCodes.badRequest)
-        .json({ message: messageErrors.verifyCodeIncorrect });
+      const currentAttempts = await incrementOtpAttempts(
+        verificationTypes.forgotPassword,
+        email
+      );
+      const attemptsRemaining = Math.max(OTP_MAX_ATTEMPTS - currentAttempts, 0);
+      return res.status(httpStatusCodes.badRequest).json({
+        message: messageErrors.verifyCodeIncorrect,
+        attemptsRemaining,
+      });
     }
   } catch (error) {
     res
@@ -290,6 +415,14 @@ export const verifyOtpForgotPassword = async (req, res) => {
 export const changePassword = async (req, res) => {
   try {
     const { token, password } = req.body;
+
+    // 서버측 비밀번호 정책 검증 (회원가입 정책과 동일: 6~50자)
+    if (typeof password !== "string" || password.length < 6 || password.length > 50) {
+      return res
+        .status(httpStatusCodes.badRequest)
+        .json({ message: messageErrors.passwordPolicy });
+    }
+
     const secretKey = process.env.TOKEN_SECRET_KEY;
     const decodedToken = jwt.verify(token, secretKey);
 

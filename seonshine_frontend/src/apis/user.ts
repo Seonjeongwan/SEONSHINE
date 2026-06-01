@@ -154,6 +154,20 @@ export const deleteMenuItem = async (item_id: number): Promise<{ message: string
   const response = await axiosInstance.delete<{ message: string }>(`/menu/item/${item_id}`);
   return response.data;
 };
+
+export const getDeletedMenuList = async ({
+  restaurant_id,
+}: GetMenuListApiPropsType): Promise<GetMenuListResponseType[]> => {
+  const response = await axiosInstance.get<GetMenuListResponseType[]>(
+    `/menu/deleted-list?restaurant_id=${restaurant_id}`,
+  );
+  return response.data;
+};
+
+export const restoreMenuItem = async (item_id: number): Promise<{ message: string }> => {
+  const response = await axiosInstance.patch<{ message: string }>(`/menu/item/${item_id}/restore`);
+  return response.data;
+};
 export const createMenuItem = async (payload: CreateMenuItemPayloadType): Promise<CreateMenuItemResponseType> => {
   const formData = new FormData();
   formData.append('name', payload.name);

@@ -7,11 +7,13 @@ import {
   HighlightOff,
   HighlightOffOutlined,
   RestaurantRounded,
+  Restore as RestoreIcon,
 } from '@mui/icons-material';
 import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
 import SearchIcon from '@mui/icons-material/Search';
 import {
   Box,
+  Button,
   FormControl,
   Icon,
   IconButton,
@@ -33,8 +35,10 @@ import {
   useDeleteMenuItemApi,
   useGetAllRestaurantsApi,
   useGetDashBoardSummary,
+  useGetDeletedMenuListApi,
   useGetMenuListlApi,
   useGetTodayMenuListApi,
+  useRestoreMenuItemApi,
   useUpdateMenuItemApi,
 } from '@/apis/hooks/userApi.hook';
 import useAuthStore from '@/store/auth.store';
@@ -56,6 +60,8 @@ const MenuManagement = () => {
   const { data: allRestaurants = [] } = useGetAllRestaurantsApi({ enabled: true });
   const [selectedItem, setSelectedItem] = useState<GetMenuListResponseType | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
+  const [isConfirmRestoreModalOpen, setIsConfirmRestoreModalOpen] = useState<boolean>(false);
+  const [showDeleted, setShowDeleted] = useState<boolean>(false);
 
   const {
     data: menuList,
@@ -65,17 +71,26 @@ const MenuManagement = () => {
     restaurant_id: restaurantQuery,
   });
 
-  const { mutate: deleteMenuItem, isPending: isLoadingDelete } = useDeleteMenuItemApi(selectedItem?.item_id as number);
+  const { data: deletedMenuList } = useGetDeletedMenuListApi(
+    { restaurant_id: restaurantQuery },
+    { enabled: !!restaurantQuery && showDeleted },
+  );
 
-  const [filteredDishes, setFilteredDishes] = useState(menuList);
+  const { mutate: deleteMenuItem, isPending: isLoadingDelete } = useDeleteMenuItemApi(selectedItem?.item_id as number);
+  const { mutate: restoreMenuItem, isPending: isLoadingRestore } = useRestoreMenuItemApi(
+    selectedItem?.item_id as number,
+  );
+
+  const sourceList = showDeleted ? deletedMenuList : menuList;
+  const [filteredDishes, setFilteredDishes] = useState(sourceList);
 
   useEffect(() => {
     if (query === '') {
-      setFilteredDishes(menuList);
+      setFilteredDishes(sourceList);
     } else {
-      setFilteredDishes(menuList?.filter((dish) => dish.name.toLowerCase().includes(query.toLowerCase())));
+      setFilteredDishes(sourceList?.filter((dish) => dish.name.toLowerCase().includes(query.toLowerCase())));
     }
-  }, [query, menuList]);
+  }, [query, sourceList]);
 
   const handleOpenModal = (item: GetMenuListResponseType) => {
     setSelectedItem(item);
@@ -109,6 +124,29 @@ const MenuManagement = () => {
 
   const handleClickAction = () => {
     setIsConfirmModalOpen(true);
+  };
+
+  const handleClickRestoreAction = () => {
+    setIsConfirmRestoreModalOpen(true);
+  };
+
+  const handleRestoreItem = () => {
+    restoreMenuItem(undefined, {
+      onSuccess: (data) => {
+        toast.success(data.message);
+        queryClient.invalidateQueries({ queryKey: ['getDeletedMenuList'] });
+        queryClient.invalidateQueries({ queryKey: ['getMenuList'] });
+      },
+      onError: () => {
+        toast.error('Restore menu item failed!');
+      },
+    });
+    setIsConfirmRestoreModalOpen(false);
+  };
+
+  const handleToggleShowDeleted = () => {
+    setQuery('');
+    setShowDeleted((prev) => !prev);
   };
 
   return (
@@ -184,7 +222,28 @@ const MenuManagement = () => {
             />
           )}
         </Stack>
-        {restaurantQuery && <h2 className="text-2xl font-bold mt-4 mb-3">Menu List</h2>}
+        {restaurantQuery && (
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            className="mt-4 mb-3"
+          >
+            <h2 className="text-2xl font-bold">{showDeleted ? 'Deleted Menu List' : 'Menu List'}</h2>
+            <Button
+              variant="outlined"
+              startIcon={showDeleted ? <RestaurantRounded /> : <RestoreIcon />}
+              onClick={handleToggleShowDeleted}
+              className={`font-bold rounded-full border-none hover:border-none h-auto py-2 px-6 whitespace-nowrap ${
+                showDeleted
+                  ? 'bg-black-500 text-white hover:bg-black-400'
+                  : 'bg-black-200 text-black-500 hover:bg-black-300 hover:text-white'
+              }`}
+            >
+              {showDeleted ? 'Back to menu' : 'Deleted menus'}
+            </Button>
+          </Stack>
+        )}
       </Box>
       <Stack
         direction="column"
@@ -194,22 +253,40 @@ const MenuManagement = () => {
           {filteredDishes?.map((dish, index) => (
             <Stack
               key={dish.name + index}
-              className="relative rounded-md pb-2 p-0 md:p-6 m-2 box-border cursor-pointer bg-white transition-transform transform hover:scale-105 hover:shadow-lg min-w-fit text-center"
+              className={`relative rounded-md pb-2 p-0 md:p-6 m-2 box-border bg-white transition-transform transform hover:scale-105 hover:shadow-lg min-w-fit text-center ${
+                showDeleted ? '' : 'cursor-pointer'
+              }`}
               direction="column"
               gap={2}
-              onClick={() => handleOpenModal(dish)}
+              onClick={() => {
+                if (!showDeleted) handleOpenModal(dish);
+              }}
             >
-              <IconButton
-                disabled={isLoadingDelete}
-                className="absolute top-0 left-0 m-2 md:m-8 bg-white hover:bg-black-100 hover:text-black-500 transition-colors p-1"
-                onClick={(e) => {
-                  setSelectedItem(dish);
-                  e.stopPropagation();
-                  handleClickAction();
-                }}
-              >
-                <Close className="text-sm" />
-              </IconButton>
+              {showDeleted ? (
+                <IconButton
+                  disabled={isLoadingRestore}
+                  className="absolute top-0 left-0 m-2 md:m-8 bg-white text-green-500 hover:bg-black-100 hover:text-green-300 transition-colors p-1"
+                  onClick={(e) => {
+                    setSelectedItem(dish);
+                    e.stopPropagation();
+                    handleClickRestoreAction();
+                  }}
+                >
+                  <RestoreIcon className="text-base" />
+                </IconButton>
+              ) : (
+                <IconButton
+                  disabled={isLoadingDelete}
+                  className="absolute top-0 left-0 m-2 md:m-8 bg-white hover:bg-black-100 hover:text-black-500 transition-colors p-1"
+                  onClick={(e) => {
+                    setSelectedItem(dish);
+                    e.stopPropagation();
+                    handleClickAction();
+                  }}
+                >
+                  <Close className="text-sm" />
+                </IconButton>
+              )}
               <Box className="w-full h-36 md:h-64 bg-gray-200 flex items-center justify-center overflow-hidden rounded-md">
                 {dish.image_url ? (
                   <img
@@ -229,7 +306,12 @@ const MenuManagement = () => {
               <Typography className="font-bold">{dish.name}</Typography>
             </Stack>
           ))}
-          {restaurantQuery && (
+          {showDeleted && filteredDishes?.length === 0 && (
+            <Typography className="col-span-full text-center text-black-300 py-10">
+              No deleted menu items.
+            </Typography>
+          )}
+          {restaurantQuery && !showDeleted && (
             <Stack
               className="rounded-md p-6 m-2 box-border bg-gray-200 cursor-pointer opacity-50 transition-transform transform hover:scale-105 hover:shadow-lg"
               direction="column"
@@ -262,6 +344,13 @@ const MenuManagement = () => {
         description={approvalItemleteDescription}
         handleClose={() => setIsConfirmModalOpen(false)}
         handleConfirm={handleDeleteItem}
+      />
+      <ConfirmModal
+        open={isConfirmRestoreModalOpen}
+        title="Restore menu item"
+        description="Do you want to restore this menu item? It will be visible again."
+        handleClose={() => setIsConfirmRestoreModalOpen(false)}
+        handleConfirm={handleRestoreItem}
       />
     </Box>
   );

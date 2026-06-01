@@ -7,13 +7,25 @@ import { orderItemCancelStatus, orderStatus } from "../constants/order.js";
 import { sequelizeOrderDb } from "../db/dbConfig.js";
 import { OrderHistory, OrderItem, User } from "../models/index.js";
 import MenuItem from "../models/menuItemModel.js";
-import RestaurantAssigned from "../models/restaurantAssignedModel.js";
 import Settings from "../models/settingModel.js";
+import { getRestaurantForDate } from "../utils/restaurantAssignHistory.js";
 import { settingCategories } from "../constants/setting.js";
+import {
+  currentOrderDate,
+  isWithinOrderPeriod,
+} from "../utils/orderPeriod.js";
 
 export const orderItemCurrentDay = async (req, res) => {
   const transactionOrderDb = await sequelizeOrderDb.transaction();
   try {
+    // 주문 가능 시간창 검증 (기준 타임존 기준, 디바이스 시간과 무관하게 서버가 강제)
+    if (!(await isWithinOrderPeriod())) {
+      await transactionOrderDb.rollback();
+      return res.status(httpStatusCodes.badRequest).json({
+        message: "Ordering is only available during the designated order period",
+      });
+    }
+
     const { item_id } = req.body;
     // 삭제된 메뉴(is_deleted = true)는 주문할 수 없도록 체크
     const menuItem = await MenuItem.findOne({
@@ -31,7 +43,7 @@ export const orderItemCurrentDay = async (req, res) => {
       });
     }
 
-    const currentDate = dayjs().format("YYYY-MM-DD");
+    const currentDate = currentOrderDate();
 
     const currentUser = req.user;
 
@@ -132,13 +144,21 @@ export const orderItemCurrentDay = async (req, res) => {
 
 export const discardCurrentOrderItem = async (req, res) => {
   const transactionOrderDb = await sequelizeOrderDb.transaction();
-  const currentDate = dayjs().format("YYYY-MM-DD");
+  const currentDate = currentOrderDate();
 
   const currentUser = req.user;
 
   const branchId = currentUser?.branch_id || 0;
 
   try {
+    // 취소도 주문 가능 시간창 안에서만 허용 (서버 강제)
+    if (!(await isWithinOrderPeriod())) {
+      await transactionOrderDb.rollback();
+      return res.status(httpStatusCodes.badRequest).json({
+        message: "Cancelling is only available during the designated order period",
+      });
+    }
+
     const currentOrderItem = await OrderItem.findOne({
       where: {
         user_id: currentUser.user_id,
@@ -228,10 +248,16 @@ export const getOrderListSummary = async (req, res) => {
       ],
     };
     if (Number(role_id) === Number(UserRole.restaurant)) {
+      // 식당 계정: 본인 식당 주문만
       condition.restaurant_id = user_id;
-    }
-
-    if (branch_id) {
+      if (branch_id) {
+        condition.branch_id = branch_id;
+      }
+    } else if (Number(role_id) === Number(UserRole.user)) {
+      // 일반 사용자: 본인 지점 주문만 (다른 지점 조회 차단)
+      condition.branch_id = currentUser.branch_id;
+    } else if (branch_id) {
+      // 관리자: 요청한 지점(있으면)으로 필터
       condition.branch_id = branch_id;
     }
 
@@ -257,33 +283,17 @@ export const getOrderListSummary = async (req, res) => {
       restaurantId = rows[0].restaurant_id;
       const restaurant = await User.findByPk(restaurantId, { raw: true });
       restaurantName = restaurant.username;
-    } else {
-      //TODO: After restaurant assign history done, please use history table. And remove restaurant id with normal user call
-      const weekday = dayjs(date).day();
-      const restaurantAssign = await RestaurantAssigned.findOne({
-        attributes: ["restaurant_id"],
-        where: {
-          weekday: weekday,
-        },
+    } else if (Number(role_id) === Number(UserRole.restaurant)) {
+      const restaurant = await User.findByPk(user_id, {
+        attributes: ["username"],
         raw: true,
       });
-
-      const restaurant_id =
-        !restaurantAssign || currentUser.role_id === String(UserRole.restaurant)
-          ? currentUser.role_id === String(UserRole.admin)
-            ? undefined
-            : currentUser.user_id
-          : restaurantAssign?.restaurant_id;
-
-      const restaurant =
-        restaurant_id &&
-        (await User.findByPk(restaurant_id, {
-          attributes: ["username"],
-          raw: true,
-        }));
-
-      restaurantId = restaurant?.user_id || "";
+      restaurantId = user_id;
       restaurantName = restaurant?.username || "";
+    } else {
+      const assigned = await getRestaurantForDate(date);
+      restaurantId = assigned.restaurant_id;
+      restaurantName = assigned.restaurant_name;
     }
 
     res.status(httpStatusCodes.success).send({
@@ -303,9 +313,23 @@ export const getOrderListSummary = async (req, res) => {
 
 //TODO: Check current user cannot get other branch and all, just admin can get all
 export const getOrderListDetail = async (req, res) => {
-  const { date = "", branch_id } = req.query;
+  const { date = "" } = req.query;
+  let { branch_id } = req.query;
+
+  const currentUser = req.user;
+  const { user_id, role_id } = currentUser;
 
   const clientTimezone = req.headers["timezone"] || "UTC";
+
+  // 역할별 접근 범위 결정
+  let restaurantFilter = "";
+  if (Number(role_id) === Number(UserRole.restaurant)) {
+    // 식당 계정: 본인 식당 주문만
+    restaurantFilter = "AND (o.restaurant_id = :restaurant_id)";
+  } else if (Number(role_id) === Number(UserRole.user)) {
+    // 일반 사용자: 본인 지점으로 강제
+    branch_id = currentUser.branch_id;
+  }
 
   const select = `SELECT o.user_id, o.restaurant_id, o.item_id, o.item_name, u.username, u2.username as restaurant_name, o.updated_at as submitted_time, b.branch_name 
     FROM order_db.order_items o 
@@ -315,7 +339,7 @@ export const getOrderListDetail = async (req, res) => {
 
   const where = `WHERE (o.order_date = :date) AND (o.cancel_yn != 0 OR o.cancel_yn is null) ${
     branch_id ? "AND (o.branch_id = :branch_id)" : ""
-  }  `;
+  } ${restaurantFilter} `;
 
   const orderBy = `ORDER BY u.username ASC`;
 
@@ -326,6 +350,7 @@ export const getOrderListDetail = async (req, res) => {
       replacements: {
         date,
         branch_id,
+        restaurant_id: user_id,
       },
       type: QueryTypes.SELECT,
     });
@@ -346,23 +371,9 @@ export const getOrderListDetail = async (req, res) => {
       const restaurant = await User.findByPk(restaurantId, { raw: true });
       restaurantName = restaurant.username;
     } else {
-      //TODO: After restaurant assign history done, please use history table. And remove restaurant id with normal user call
-      const weekday = dayjs(date).day();
-      const restaurantAssign = await RestaurantAssigned.findOne({
-        attributes: ["restaurant_id"],
-        where: {
-          weekday: weekday,
-        },
-        raw: true,
-      });
-      if (restaurantAssign) {
-        const restaurant = await User.findByPk(restaurantAssign.restaurant_id, {
-          attributes: ["username"],
-          raw: true,
-        });
-        restaurantId = restaurantAssign?.restaurant_id || "";
-        restaurantName = restaurant?.username || "";
-      }
+      const assigned = await getRestaurantForDate(date);
+      restaurantId = assigned.restaurant_id;
+      restaurantName = assigned.restaurant_name;
     }
 
     const totalCount = rowsConvertedDate.length;

@@ -12,6 +12,18 @@ import httpUpload from "../config/axiosUpload.js";
 export const getMenuList = async (req, res) => {
   try {
     const { restaurant_id } = req.query;
+    const currentUser = req.user;
+
+    // 식당 계정은 본인 메뉴만 조회 가능 (관리자/일반 사용자는 제한 없음)
+    if (
+      currentUser.role_id == UserRole.restaurant &&
+      currentUser.user_id != restaurant_id
+    ) {
+      return res.status(httpStatusCodes.forbidden).json({
+        message: "You do not have permission to view this restaurant's menu.",
+      });
+    }
+
     const menuItems = await MenuItem.findAll({
       attributes: ["item_id", "name", "description", "price", "image_url"],
       where: {
@@ -27,12 +39,103 @@ export const getMenuList = async (req, res) => {
   }
 };
 
-//TODO: Check restaurant cannot create menu for other restaurant. Admin can add for all but current restaurant just for this.
+export const getDeletedMenuList = async (req, res) => {
+  try {
+    const { restaurant_id } = req.query;
+    const currentUser = req.user;
+
+    // 일반 사용자는 삭제된 메뉴 조회 불가, 식당 계정은 본인 것만 (관리자는 전체)
+    if (
+      currentUser.role_id == UserRole.user ||
+      (currentUser.role_id == UserRole.restaurant &&
+        currentUser.user_id != restaurant_id)
+    ) {
+      return res.status(httpStatusCodes.forbidden).json({
+        message:
+          "You do not have permission to view this restaurant's deleted menu.",
+      });
+    }
+
+    const menuItems = await MenuItem.findAll({
+      attributes: ["item_id", "name", "description", "price", "image_url"],
+      where: {
+        restaurant_id,
+        is_deleted: true, // 삭제된(숨겨진) 메뉴만 조회
+      },
+    });
+    res.status(httpStatusCodes.success).send(menuItems);
+  } catch (error) {
+    res
+      .status(httpStatusCodes.internalServerError)
+      .send(httpStatusErrors.internalServerError);
+  }
+};
+
+export const restoreMenuItem = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const menuItem = await MenuItem.findOne({
+      where: {
+        item_id: id,
+      },
+    });
+
+    if (!menuItem) {
+      return res.status(httpStatusCodes.notFound).json({
+        message: "Menu item not found",
+      });
+    }
+
+    const restaurantId = menuItem.restaurant_id;
+    const currentUser = req.user;
+
+    // 삭제와 동일한 권한: 일반 사용자 불가, 식당은 본인 것만, 관리자는 전체
+    if (
+      currentUser.role_id == UserRole.user ||
+      (currentUser.role_id == UserRole.restaurant &&
+        currentUser.user_id != restaurantId)
+    ) {
+      return res.status(httpStatusCodes.forbidden).json({
+        message: "You do not have permission to restore menu item.",
+      });
+    }
+
+    if (!menuItem.is_deleted) {
+      return res.status(httpStatusCodes.badRequest).json({
+        message: "Menu item is not deleted",
+      });
+    }
+
+    // Restore: is_deleted를 false로 되돌려 다시 화면에 노출
+    await menuItem.update({ is_deleted: false });
+
+    return res.status(httpStatusCodes.success).json({
+      message: "Restore successfully",
+    });
+  } catch (error) {
+    console.log("error :>> ", error);
+    res
+      .status(httpStatusCodes.internalServerError)
+      .send(httpStatusErrors.internalServerError);
+  }
+};
 
 export const createMenuItem = async (req, res) => {
   try {
     const file = req.file;
     const { name, restaurant_id } = req.body;
+    const currentUser = req.user;
+
+    // 일반 사용자는 메뉴 생성 불가, 식당 계정은 본인 식당에만 생성 가능 (관리자는 전체 허용)
+    if (
+      currentUser.role_id == UserRole.user ||
+      (currentUser.role_id == UserRole.restaurant &&
+        currentUser.user_id != restaurant_id)
+    ) {
+      return res.status(httpStatusCodes.forbidden).json({
+        message: "You do not have permission to create menu for this restaurant.",
+      });
+    }
 
     let itemImagePath = null;
 
