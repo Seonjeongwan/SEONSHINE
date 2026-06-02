@@ -28,7 +28,7 @@ const AccountVerificationLayout = ({
         justifyContent="center"
         gap={6}
         alignItems="center"
-        className={`w-full h-screen p-8 md:p-24 bg-white rounded-lg shadow-md max-w-screen relative ${
+        className={`w-full h-screen p-8 md:p-24 bg-white rounded-lg shadow-md max-w-full relative ${
           size === 'normal' ? 'md:h-171 md:w-240' : 'md:h-131 md:w-194'
         }`}
       >

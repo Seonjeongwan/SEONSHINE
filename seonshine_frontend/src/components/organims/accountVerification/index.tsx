@@ -135,7 +135,7 @@ const AccountVerification = ({
         direction="column"
         gap="8px"
         alignItems="center"
-        className="w-screen md:w-auto"
+        className="w-full md:w-auto"
       >
         <Controller
           name="otp"

@@ -118,7 +118,7 @@ const AccountVerificationPage = ({
       <form
         onSubmit={handleSubmit(submitForm)}
         noValidate
-        className="w-full h-screen md:pt-12 md:p-24 bg-white rounded-lg shadow-md max-w-screen relative md:h-171 md:w-240 sm:h-131 sm:w-200 flex flex-col justify-center items-center gap-6"
+        className="w-full h-screen md:pt-12 md:p-24 bg-white rounded-lg shadow-md max-w-full relative md:h-171 md:w-240 sm:h-131 sm:w-200 flex flex-col justify-center items-center gap-6"
       >
         <Link
           className="cursor-pointer !underline self-start absolute top-4 left-4"
@@ -143,7 +143,7 @@ const AccountVerificationPage = ({
           direction="column"
           gap="8px"
           alignItems="center"
-          className="w-screen md:w-auto "
+          className="w-full md:w-auto "
         >
           <Controller
             name="code"

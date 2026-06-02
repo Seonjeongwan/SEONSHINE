@@ -125,7 +125,7 @@ const MainLayout = ({ children, role }: MainLayoutPropsType) => {
           <Menu sx={{ color: 'white' }} />
         </IconButton>
         <Header />
-        <Box className="flex-1 overflow-auto scroll-smooth">{children}</Box>
+        <Box className="flex-1 overflow-auto scroll-smooth [scrollbar-gutter:stable]">{children}</Box>
       </Stack>
     </Stack>
   );

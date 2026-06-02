@@ -248,7 +248,7 @@ const MenuManagement = () => {
                 {filteredActiveDishes?.map((dish, index) => (
                   <Stack
                     key={dish.name + index}
-                    className="relative rounded-md pb-2 p-0 md:p-6 m-2 box-border cursor-pointer bg-white transition-transform transform hover:scale-105 hover:shadow-lg min-w-fit text-center"
+                    className="relative rounded-md pb-2 p-0 md:p-6 m-2 box-border cursor-pointer bg-white transition-transform transform hover:scale-105 hover:shadow-lg w-full min-w-0 text-center"
                     direction="column"
                     gap={2}
                     onClick={() => handleOpenModal(dish)}
@@ -284,7 +284,7 @@ const MenuManagement = () => {
                   </Stack>
                 ))}
                 <Stack
-                  className="rounded-md p-6 m-2 box-border bg-gray-200 cursor-pointer opacity-50 transition-transform transform hover:scale-105 hover:shadow-lg"
+                  className="rounded-md p-6 m-2 box-border bg-gray-200 cursor-pointer opacity-50 transition-transform transform hover:scale-105 hover:shadow-lg w-full min-w-0"
                   direction="column"
                   justifyContent="center"
                   alignItems="center"
@@ -318,7 +318,7 @@ const MenuManagement = () => {
                 {filteredDeletedDishes?.map((dish, index) => (
                   <Stack
                     key={dish.name + index}
-                    className="relative rounded-md pb-2 p-0 md:p-6 m-2 box-border bg-white opacity-90 min-w-fit text-center"
+                    className="relative rounded-md pb-2 p-0 md:p-6 m-2 box-border bg-white opacity-90 w-full min-w-0 text-center"
                     direction="column"
                     gap={2}
                   >
